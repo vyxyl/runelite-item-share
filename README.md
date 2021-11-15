@@ -1,2 +1,2 @@
-# Example
-An example greeter plugin
+# Item Share
+Share items you have with other players
