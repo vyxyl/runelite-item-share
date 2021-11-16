@@ -2,7 +2,7 @@ package com.itemshare.ui;
 
 import com.itemshare.model.ItemShareData;
 import java.awt.BorderLayout;
-import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.components.PluginErrorPanel;
@@ -12,6 +12,7 @@ public class ItemSharePlayerPanel extends JPanel
 	protected ItemSharePlayerPanel()
 	{
 		super(false);
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 	}
 
 	public void reset()

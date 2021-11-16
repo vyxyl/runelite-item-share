@@ -4,6 +4,7 @@ import com.itemshare.model.ItemShareData;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -19,6 +20,7 @@ public class ItemSharePanel extends PluginPanel
 	{
 		super(false);
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
 		JPanel titlePanel = getTitlePanel();
 		add(titlePanel);

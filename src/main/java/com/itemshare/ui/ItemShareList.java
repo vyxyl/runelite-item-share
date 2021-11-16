@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -28,9 +29,7 @@ public class ItemShareList extends JPanel
 	protected ItemShareList()
 	{
 		super(false);
-
-		setLayout(new BorderLayout());
-		setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 	}
 
 	public void reset()

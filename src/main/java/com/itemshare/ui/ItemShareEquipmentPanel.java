@@ -3,6 +3,7 @@ package com.itemshare.ui;
 import com.itemshare.model.ItemSharePlayer;
 import java.awt.BorderLayout;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import net.runelite.client.game.ItemManager;
 
@@ -11,8 +12,7 @@ public class ItemShareEquipmentPanel extends JPanel
 	protected ItemShareEquipmentPanel()
 	{
 		super(false);
-		setLayout(new BorderLayout(0, 8));
-		setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 	}
 
 	public void reset()

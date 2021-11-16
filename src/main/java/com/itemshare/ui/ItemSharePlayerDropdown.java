@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 public class ItemSharePlayerDropdown extends JPanel
@@ -18,8 +19,7 @@ public class ItemSharePlayerDropdown extends JPanel
 	{
 		super(false);
 		this.callback = callback;
-		setLayout(new BorderLayout(0, 8));
-		setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 	}
 
 	public void update(ItemShareData data)
@@ -28,7 +28,7 @@ public class ItemSharePlayerDropdown extends JPanel
 
 		ItemShareDrodown dropdown = new ItemShareDrodown();
 
-		add(dropdown);
+		add(dropdown, BorderLayout.PAGE_START);
 		repaint();
 
 		ArrayList<ItemSharePlayer> players = getPlayers(data);
