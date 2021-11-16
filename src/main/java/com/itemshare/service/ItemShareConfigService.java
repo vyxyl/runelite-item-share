@@ -23,7 +23,7 @@ public class ItemShareConfigService
 	{
 		this.configManager = configManager;
 
-		GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
+		GsonBuilder builder = new GsonBuilder().disableHtmlEscaping();
 		this.gson = builder.create();
 	}
 
@@ -46,9 +46,9 @@ public class ItemShareConfigService
 		}
 	}
 
-	public void saveLocalData(ItemShareData data)
+	public void saveLocalData(String playerName, ItemShareData data)
 	{
-		configManager.setConfiguration(CONFIG_BASE, CONFIG_DATA, gson.toJson(data));
+		configManager.setConfiguration(CONFIG_BASE, CONFIG_DATA + "_" + playerName, gson.toJson(data));
 	}
 
 	private ItemSharePlayer getLocalPlayerData(String playerName)

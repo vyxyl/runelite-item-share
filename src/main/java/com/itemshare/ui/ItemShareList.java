@@ -3,12 +3,17 @@ package com.itemshare.ui;
 import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareRenderItem;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import net.runelite.client.game.ItemManager;
@@ -16,14 +21,16 @@ import net.runelite.client.util.AsyncBufferedImage;
 
 public class ItemShareList extends JPanel
 {
-	private JPanel panel;
-	private List<JPanel> panelItems;
 	private List<ItemShareRenderItem> currentRenderItems = new ArrayList<>();
+	private final JList<ItemShareRenderItem> itemList;
 
 	protected ItemShareList()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+		setAlignmentX(Component.LEFT_ALIGNMENT);
+		itemList = new JList<>();
 	}
 
 	public void reset()
@@ -52,11 +59,16 @@ public class ItemShareList extends JPanel
 	{
 		currentRenderItems = getUpdatedItems(itemManager, items);
 
-		panel = new JPanel();
+		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-		panelItems = currentRenderItems.stream().map(this::getPanelItem).collect(Collectors.toList());
-		panelItems.forEach(panelItem -> panel.add(panelItem));
+		ItemShareListModel model = new ItemShareListModel();
+		model.addItems(currentRenderItems);
+
+		itemList.setModel(model);
+		itemList.setCellRenderer(new ItemShareListRenderer());
+
+		panel.add(itemList);
 
 		JScrollPane scrollPane = new JScrollPane(panel);
 		add(scrollPane);
@@ -99,12 +111,14 @@ public class ItemShareList extends JPanel
 	private JPanel getPanelItem(ItemShareRenderItem item)
 	{
 		JPanel panelItem = new JPanel();
-		panelItem.setLayout(new BoxLayout(panelItem, BoxLayout.LINE_AXIS));
-
 		JLabel itemIcon = new JLabel(item.getIcon());
-		panelItem.add(itemIcon);
-
 		JLabel itemName = new JLabel(item.getItem().getName());
+
+		panelItem.setLayout(new BoxLayout(panelItem, BoxLayout.LINE_AXIS));
+		panelItem.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		panelItem.add(itemIcon);
+		panelItem.add(Box.createRigidArea(new Dimension(10, 0)));
 		panelItem.add(itemName);
 
 		item.getImage().onLoaded(panelItem::repaint);
@@ -112,13 +126,13 @@ public class ItemShareList extends JPanel
 		return panelItem;
 	}
 
-	private boolean isOsrsNull(ItemShareItem item)
-	{
-		return item == null || item.getName().equals("null") || item.getId() == -1;
-	}
-
 	private boolean isOsrsNull(ItemShareRenderItem renderItem)
 	{
 		return isOsrsNull(renderItem.getItem());
+	}
+
+	private boolean isOsrsNull(ItemShareItem item)
+	{
+		return item == null || item.getName().equals("null") || item.getId() == -1;
 	}
 }

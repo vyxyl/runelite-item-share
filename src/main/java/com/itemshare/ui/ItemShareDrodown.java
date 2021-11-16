@@ -6,6 +6,8 @@ import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.function.Consumer;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -18,9 +20,10 @@ public class ItemShareDrodown extends JPanel
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-		setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 30));
-		setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 30));
-		setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 30));
+		setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
+		setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
+		setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
+		setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
 	}
 
 	void update(String name, ArrayList<String> options, Consumer<String> callback)
@@ -45,6 +48,7 @@ public class ItemShareDrodown extends JPanel
 
 		removeAll();
 		add(label);
+		add(Box.createHorizontalGlue());
 		add(dropdown);
 
 		repaint();

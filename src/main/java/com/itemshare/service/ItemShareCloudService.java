@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class ItemShareCloudService
 {
-	public void saveLocalData(ItemSharePlayer localPlayer)
+	public void uploadLocalData(ItemSharePlayer localPlayer)
 	{
 
 	}
