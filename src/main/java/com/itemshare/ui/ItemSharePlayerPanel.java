@@ -9,10 +9,14 @@ import net.runelite.client.ui.components.PluginErrorPanel;
 
 public class ItemSharePlayerPanel extends JPanel
 {
+	private final ItemShareItemTabPanel tabPanel;
+
 	protected ItemSharePlayerPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+
+		tabPanel = new ItemShareItemTabPanel();
 	}
 
 	public void reset()
@@ -35,14 +39,13 @@ public class ItemSharePlayerPanel extends JPanel
 			}
 		});
 
-		ItemShareEquipmentPanel equipment = new ItemShareEquipmentPanel();
-
 		removeAll();
 		add(playerDropdown);
-		add(equipment);
-		playerDropdown.update(data);
-		repaint();
+		add(tabPanel);
 
-		equipment.update(itemManager, data.getLocalPlayer());
+		playerDropdown.update(data);
+		tabPanel.update(itemManager, data.getLocalPlayer());
+
+		repaint();
 	}
 }

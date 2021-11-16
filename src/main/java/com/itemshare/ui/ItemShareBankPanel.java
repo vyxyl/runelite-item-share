@@ -5,11 +5,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import net.runelite.client.game.ItemManager;
 
-public class ItemShareEquipmentPanel extends JPanel
+public class ItemShareBankPanel extends JPanel
 {
 	private final ItemShareList list = new ItemShareList();
 
-	protected ItemShareEquipmentPanel()
+	protected ItemShareBankPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -26,7 +26,7 @@ public class ItemShareEquipmentPanel extends JPanel
 		removeAll();
 		add(list);
 
-		list.update(itemManager, data.getEquipment());
+		list.update(itemManager, data.getBank());
 
 		repaint();
 	}

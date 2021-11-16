@@ -1,23 +1,19 @@
 package com.itemshare.ui;
 
 import com.itemshare.model.ItemShareContainer;
-import com.itemshare.model.ItemShareRenderItem;
 import com.itemshare.model.ItemShareItem;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import com.itemshare.model.ItemShareRenderItem;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.AsyncBufferedImage;
 
 public class ItemShareList extends JPanel
@@ -56,17 +52,13 @@ public class ItemShareList extends JPanel
 
 	private void displayItems(ItemManager itemManager, List<ItemShareItem> items)
 	{
-		panel = new JPanel(new GridLayout(11, 2, 10, 5));
 		currentRenderItems = getUpdatedItems(itemManager, items);
-		panelItems = currentRenderItems.stream().map(this::getPanelItem).collect(Collectors.toList());
 
-		panelItems.forEach(panelItem -> {
-			panel.add(panelItem);
-		});
+		panel = new JPanel();
+		panelItems = currentRenderItems.stream().map(this::getPanelItem).collect(Collectors.toList());
+		panelItems.forEach(panelItem -> panel.add(panelItem));
 
 		JScrollPane scrollPane = new JScrollPane(panel);
-		scrollPane.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 16, 32 * 11));
-
 		add(scrollPane);
 	}
 
