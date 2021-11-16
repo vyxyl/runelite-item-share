@@ -25,6 +25,12 @@ public class ItemShareCloudService
 						add(ItemShareItem.builder().id(1).name("Rune Scimitar").quantity(4).build());
 					}})
 					.build())
+				.equipment(ItemShareContainer.builder()
+					.items(new ArrayList<ItemShareItem>())
+					.build())
+				.inventory(ItemShareContainer.builder()
+					.items(new ArrayList<ItemShareItem>())
+					.build())
 				.build());
 		}};
 	}

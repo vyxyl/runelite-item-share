@@ -40,15 +40,15 @@ public final class DropdownRenderer extends DefaultListCellRenderer
 		setForeground(Color.WHITE);
 		setBorder(new EmptyBorder(0, 0, 0, 0));
 
-		if (!isSelected)
-		{
-			setBackground(ColorScheme.DARK_GRAY_COLOR);
-			setForeground(Color.WHITE);
-		}
-		else
+		if (isSelected)
 		{
 			setBackground(list.getBackground());
 			setForeground(ColorScheme.LIGHT_GRAY_COLOR);
+		}
+		else
+		{
+			setBackground(ColorScheme.DARK_GRAY_COLOR);
+			setForeground(Color.WHITE);
 		}
 
 		setText((String) o);

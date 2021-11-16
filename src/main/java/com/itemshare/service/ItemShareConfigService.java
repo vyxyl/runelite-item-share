@@ -2,10 +2,11 @@ package com.itemshare.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
-import static com.itemshare.ui.ItemShareConfigKeys.CONFIG_BASE;
-import static com.itemshare.ui.ItemShareConfigKeys.CONFIG_DATA;
+import static com.itemshare.constant.ItemShareConfigKeys.CONFIG_BASE;
+import static com.itemshare.constant.ItemShareConfigKeys.CONFIG_DATA;
 import java.util.ArrayList;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -52,6 +53,17 @@ public class ItemShareConfigService
 
 	private ItemSharePlayer getLocalPlayerData(String playerName)
 	{
-		return ItemSharePlayer.builder().userName(playerName).build();
+		return ItemSharePlayer.builder()
+			.userName(playerName)
+			.bank(ItemShareContainer.builder()
+				.items(new ArrayList<>())
+				.build())
+			.equipment(ItemShareContainer.builder()
+				.items(new ArrayList<>())
+				.build())
+			.inventory(ItemShareContainer.builder()
+				.items(new ArrayList<>())
+				.build())
+			.build();
 	}
 }

@@ -20,6 +20,7 @@ import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -59,6 +60,9 @@ public class ItemSharePlugin extends Plugin
 	@Inject
 	private ConfigManager configManager;
 
+	@Inject
+	private ItemManager itemManager;
+
 	private boolean isLoaded = false;
 	private ItemShareData data;
 	private ItemSharePanel panel;
@@ -77,7 +81,14 @@ public class ItemSharePlugin extends Plugin
 		panel = injector.getInstance(ItemSharePanel.class);
 		createNavigationButton(panel);
 
-		reset();
+//		reset();
+		loadLocalData("Frozen Gulf");
+	}
+
+	@Override
+	protected void shutDown() throws Exception
+	{
+		log.info("Item Share stopped!");
 	}
 
 	@Subscribe
@@ -85,16 +96,10 @@ public class ItemSharePlugin extends Plugin
 	{
 		String playerName = getPlayerName();
 
-		if (!isLoaded && playerName != null)
+		if (!isLoaded && playerName != null && isSupportedWorld())
 		{
-			update(playerName);
+			loadLocalData(playerName);
 		}
-	}
-
-	@Override
-	protected void shutDown() throws Exception
-	{
-		log.info("Item Share stopped!");
 	}
 
 	@Subscribe
@@ -106,22 +111,12 @@ public class ItemSharePlugin extends Plugin
 		{
 			reset();
 		}
-
-		if (state == GameState.LOGGED_IN)
-		{
-			String playerName = getPlayerName();
-
-			if (playerName != null)
-			{
-				update(playerName);
-			}
-		}
 	}
 
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		if (isSupportedWorld())
+		if (isLoaded && isSupportedWorld())
 		{
 			saveItems(event);
 		}
@@ -164,18 +159,21 @@ public class ItemSharePlugin extends Plugin
 	{
 		data.getLocalPlayer().setEquipment(itemShareContainer);
 		data.getLocalPlayer().setUpdatedDate(new Date());
+		updatePanel();
 	}
 
 	private void saveInventory(ItemShareContainer itemShareContainer)
 	{
 		data.getLocalPlayer().setInventory(itemShareContainer);
 		data.getLocalPlayer().setUpdatedDate(new Date());
+		updatePanel();
 	}
 
 	private void saveBank(ItemShareContainer itemShareContainer)
 	{
 		data.getLocalPlayer().setBank(itemShareContainer);
 		data.getLocalPlayer().setUpdatedDate(new Date());
+		updatePanel();
 	}
 
 	private void createNavigationButton(ItemSharePanel panel)
@@ -199,20 +197,27 @@ public class ItemSharePlugin extends Plugin
 
 	private void update(String playerName)
 	{
-		data = configService.getLocalData(playerName);
-		SwingUtilities.invokeLater(() -> panel.update(data));
-
 		data.setOtherPlayers(cloudService.getOtherPlayers());
-		SwingUtilities.invokeLater(() -> panel.update(data));
+		updatePanel();
 
 		configService.saveLocalData(data);
 		cloudService.saveLocalData(data.getLocalPlayer());
+	}
 
+	private void loadLocalData(String playerName)
+	{
+		data = configService.getLocalData(playerName);
+		updatePanel();
 		isLoaded = true;
 	}
 
 	private String getPlayerName()
 	{
 		return Objects.requireNonNull(client.getLocalPlayer()).getName();
+	}
+
+	private void updatePanel()
+	{
+		SwingUtilities.invokeLater(() -> panel.update(itemManager, data));
 	}
 }

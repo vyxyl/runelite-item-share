@@ -7,48 +7,45 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
 public class ItemSharePanel extends PluginPanel
 {
-    private final ItemSharePlayerInfoPanel playerInfoPanel;
+	private final ItemSharePlayerPanel playerInfoPanel;
 
-    public ItemSharePanel()
-    {
-        super(false);
+	public ItemSharePanel()
+	{
+		super(false);
+		setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-        setBackground(ColorScheme.DARK_GRAY_COLOR);
-        setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+		JPanel titlePanel = getTitlePanel();
+		add(titlePanel);
 
-        JPanel titlePanel = getTitlePanel();
-        add(titlePanel);
+		playerInfoPanel = new ItemSharePlayerPanel();
+		add(playerInfoPanel);
+	}
 
-        playerInfoPanel = new ItemSharePlayerInfoPanel();
-        add(playerInfoPanel);
-    }
+	public void reset()
+	{
+		playerInfoPanel.reset();
+	}
 
-    public void reset()
-    {
-        playerInfoPanel.reset();
-    }
+	public void update(ItemManager itemManager, ItemShareData data)
+	{
+		playerInfoPanel.update(itemManager, data);
+	}
 
-    public void update(ItemShareData data)
-    {
-        playerInfoPanel.update(data);
-    }
+	private JPanel getTitlePanel()
+	{
+		JLabel title = new JLabel();
+		title.setText("Item Share");
+		title.setForeground(Color.WHITE);
 
-    private JPanel getTitlePanel()
-    {
-        JPanel titlePanel = new JPanel();
-        titlePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        titlePanel.setLayout(new BorderLayout());
+		JPanel titlePanel = new JPanel();
+		titlePanel.add(title, BorderLayout.WEST);
 
-        JLabel title = new JLabel();
-        title.setText("Item Share");
-        title.setForeground(Color.WHITE);
-        titlePanel.add(title, BorderLayout.WEST);
-
-        return titlePanel;
-    }
+		return titlePanel;
+	}
 }
