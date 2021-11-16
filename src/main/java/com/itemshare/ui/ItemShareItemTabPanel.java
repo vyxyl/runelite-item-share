@@ -33,17 +33,6 @@ public class ItemShareItemTabPanel extends JPanel
 		tabGroup.select(equipmentTab);
 	}
 
-	public void reset()
-	{
-		PluginErrorPanel panel = new PluginErrorPanel();
-		panel.setContent("No player data", "Log in to see player data.");
-
-		removeAll();
-		add(panel, BorderLayout.NORTH);
-
-		repaint();
-	}
-
 	public void update(ItemManager itemManager, ItemSharePlayer player)
 	{
 		removeAll();

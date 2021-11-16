@@ -3,7 +3,7 @@ package com.itemshare.ui;
 import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareRenderItem;
-import java.awt.Component;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import net.runelite.client.game.ItemManager;
@@ -34,8 +35,7 @@ public class ItemShareList extends JPanel
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-		setAlignmentX(Component.LEFT_ALIGNMENT);
+		setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
 		createSearchBox();
 		itemList = new JList<>();
 	}
@@ -76,12 +76,6 @@ public class ItemShareList extends JPanel
 		});
 	}
 
-	public void reset()
-	{
-		removeAll();
-		repaint();
-	}
-
 	public void update(ItemManager itemManager, ItemShareContainer data)
 	{
 		removeAll();
@@ -109,18 +103,20 @@ public class ItemShareList extends JPanel
 
 		itemList.setModel(model);
 		itemList.setCellRenderer(new ItemShareListRenderer());
-		itemList.setFixedCellWidth(PluginPanel.PANEL_WIDTH - 10);
+		itemList.setFixedCellWidth(PluginPanel.PANEL_WIDTH);
 
 		panel.add(itemList);
 
 		JScrollPane scrollPane = new JScrollPane(panel);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
 		add(scrollPane);
 	}
 
 	private List<ItemShareRenderItem> getUpdatedItems(ItemManager itemManager, List<ItemShareItem> items)
 	{
 		List<ItemShareItem> validItems = items.stream()
-			.filter(item -> !isOsrsNull(item))
+			.filter(item -> !isNullItem(item))
 			.collect(Collectors.toList());
 
 		List<ItemShareRenderItem> renderItems = validItems.stream()
@@ -132,7 +128,7 @@ public class ItemShareList extends JPanel
 			.collect(Collectors.toList());
 
 		List<ItemShareRenderItem> newRenderItems = renderItems.stream()
-			.filter(item -> !isOsrsNull(item) && !currentRenderItems.contains(item))
+			.filter(item -> !isNullItem(item) && !currentRenderItems.contains(item))
 			.sorted(Comparator.comparing((ItemShareRenderItem a) -> a.getItem().getName()))
 			.collect(Collectors.toList());
 
@@ -152,12 +148,12 @@ public class ItemShareList extends JPanel
 		return existingRenderItems;
 	}
 
-	private boolean isOsrsNull(ItemShareRenderItem renderItem)
+	private boolean isNullItem(ItemShareRenderItem renderItem)
 	{
-		return isOsrsNull(renderItem.getItem());
+		return isNullItem(renderItem.getItem());
 	}
 
-	private boolean isOsrsNull(ItemShareItem item)
+	private boolean isNullItem(ItemShareItem item)
 	{
 		return item == null || item.getName().equals("null") || item.getId() == -1;
 	}

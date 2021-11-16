@@ -2,15 +2,11 @@ package com.itemshare.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.function.Consumer;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.runelite.client.ui.PluginPanel;
 
@@ -23,14 +19,10 @@ public class ItemShareDrodown extends JPanel
 		setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
-		setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
 	}
 
-	void update(String name, ArrayList<String> options, Consumer<String> callback)
+	void update(ArrayList<String> options, Consumer<String> callback)
 	{
-		JLabel label = new JLabel(name);
-		label.setForeground(Color.WHITE);
-
 		String[] optionsArray = options.toArray(new String[0]);
 
 		JComboBox<String> dropdown = new JComboBox<>(optionsArray);
@@ -47,8 +39,6 @@ public class ItemShareDrodown extends JPanel
 		});
 
 		removeAll();
-		add(label);
-		add(Box.createHorizontalGlue());
 		add(dropdown);
 
 		repaint();

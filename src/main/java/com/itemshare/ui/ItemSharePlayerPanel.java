@@ -2,6 +2,7 @@ package com.itemshare.ui;
 
 import com.itemshare.model.ItemShareData;
 import java.awt.BorderLayout;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import net.runelite.client.game.ItemManager;
@@ -17,12 +18,14 @@ public class ItemSharePlayerPanel extends JPanel
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
 		tabPanel = new ItemShareItemTabPanel();
+
+		reset();
 	}
 
 	public void reset()
 	{
 		PluginErrorPanel panel = new PluginErrorPanel();
-		panel.setContent("No player data", "Log in to see player data.");
+		panel.setContent("Log in to see player data", "");
 
 		removeAll();
 		add(panel, BorderLayout.NORTH);
@@ -31,6 +34,18 @@ public class ItemSharePlayerPanel extends JPanel
 
 	public void update(ItemManager itemManager, ItemShareData data)
 	{
+		if (data == null || data.getLocalPlayer() == null)
+		{
+			reset();
+		}
+		else
+		{
+			populatePanel(itemManager, data);
+		}
+	}
+
+	private void populatePanel(ItemManager itemManager, ItemShareData data)
+	{
 		ItemSharePlayerDropdown playerDropdown = new ItemSharePlayerDropdown(name ->
 		{
 			if (!name.equals(data.getLocalPlayer().getUserName()))
@@ -38,6 +53,8 @@ public class ItemSharePlayerPanel extends JPanel
 				System.out.println("Selected Different Player");
 			}
 		});
+
+		playerDropdown.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
 
 		removeAll();
 		add(playerDropdown);

@@ -15,12 +15,6 @@ public class ItemShareInventoryPanel extends JPanel
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 	}
 
-	public void reset()
-	{
-		removeAll();
-		repaint();
-	}
-
 	public void update(ItemManager itemManager, ItemSharePlayer data)
 	{
 		removeAll();
