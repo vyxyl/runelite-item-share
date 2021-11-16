@@ -4,6 +4,7 @@ import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareRenderItem;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -14,12 +15,17 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
+import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.util.AsyncBufferedImage;
 
 public class ItemShareList extends JPanel
 {
+	private final IconTextField searchBox = new IconTextField();
 	private List<ItemShareRenderItem> currentRenderItems = new ArrayList<>();
 	private final JList<ItemShareRenderItem> itemList;
 	private final ItemShareListModel model = new ItemShareListModel();
@@ -28,9 +34,46 @@ public class ItemShareList extends JPanel
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		setBorder(BorderFactory.createEmptyBorder(0, 5, 20, 5));
+		setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 		setAlignmentX(Component.LEFT_ALIGNMENT);
+		createSearchBox();
 		itemList = new JList<>();
+	}
+
+	private void createSearchBox()
+	{
+		searchBox.setIcon(IconTextField.Icon.SEARCH);
+		searchBox.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		searchBox.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
+		searchBox.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
+		searchBox.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
+		searchBox.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
+		searchBox.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e)
+			{
+				searchItem();
+				itemList.repaint();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e)
+			{
+				searchItem();
+				itemList.repaint();
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e)
+			{
+			}
+
+			public void searchItem()
+			{
+				model.searchItem(searchBox.getText());
+			}
+		});
 	}
 
 	public void reset()
@@ -42,6 +85,7 @@ public class ItemShareList extends JPanel
 	public void update(ItemManager itemManager, ItemShareContainer data)
 	{
 		removeAll();
+		add(searchBox);
 		updateItems(itemManager, data.getItems());
 		revalidate();
 		repaint();
