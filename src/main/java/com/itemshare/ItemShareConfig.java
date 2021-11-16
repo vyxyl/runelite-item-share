@@ -1,4 +1,4 @@
-package com.example;
+package com.itemshare;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -10,7 +10,8 @@ public interface ItemShareConfig extends Config
 	@ConfigItem(
 		keyName = "greeting",
 		name = "Welcome Greeting",
-		description = "The message to show to the user when they login"
+		description = "The message to show to the user when they login",
+		position = 1
 	)
 	default String greeting()
 	{
