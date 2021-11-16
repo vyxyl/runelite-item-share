@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.function.Consumer;
+import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,7 +17,7 @@ public class ItemShareDrodown extends JPanel
 	protected ItemShareDrodown()
 	{
 		super(false);
-		setLayout(new GridLayout(1, 2, 10, 5));
+		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 30));
 		setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 30));
 		setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 30));

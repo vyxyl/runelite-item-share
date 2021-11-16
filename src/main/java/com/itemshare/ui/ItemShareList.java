@@ -3,8 +3,6 @@ package com.itemshare.ui;
 import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareRenderItem;
-import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,6 +53,8 @@ public class ItemShareList extends JPanel
 		currentRenderItems = getUpdatedItems(itemManager, items);
 
 		panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+
 		panelItems = currentRenderItems.stream().map(this::getPanelItem).collect(Collectors.toList());
 		panelItems.forEach(panelItem -> panel.add(panelItem));
 
@@ -98,16 +98,14 @@ public class ItemShareList extends JPanel
 
 	private JPanel getPanelItem(ItemShareRenderItem item)
 	{
-		GridBagConstraints constraints = new GridBagConstraints();
-		constraints.gridwidth = 1;
-		constraints.fill = GridBagConstraints.HORIZONTAL;
+		JPanel panelItem = new JPanel();
+		panelItem.setLayout(new BoxLayout(panelItem, BoxLayout.LINE_AXIS));
 
-		JPanel panelItem = new JPanel(new GridLayout(1, 2, 10, 5));
 		JLabel itemIcon = new JLabel(item.getIcon());
-		panelItem.add(itemIcon, constraints);
+		panelItem.add(itemIcon);
 
 		JLabel itemName = new JLabel(item.getItem().getName());
-		panelItem.add(itemName, constraints);
+		panelItem.add(itemName);
 
 		item.getImage().onLoaded(panelItem::repaint);
 
