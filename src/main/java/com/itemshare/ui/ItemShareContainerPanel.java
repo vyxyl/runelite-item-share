@@ -14,7 +14,6 @@ public class ItemShareContainerPanel extends JPanel
 {
 	private final ItemShareList list = new ItemShareList();
 	private final JTextPane noItemsMessage;
-	private final JTextPane actionMessage;
 
 	protected ItemShareContainerPanel(String containerName)
 	{
@@ -22,26 +21,17 @@ public class ItemShareContainerPanel extends JPanel
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
 		noItemsMessage = new JTextPane();
-		noItemsMessage.setText("No " + containerName + " items are saved");
+		noItemsMessage.setText("No " + containerName + " items are saved \n\n The player needs to make a change to their " + containerName + " to update this list");
 		noItemsMessage.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
 
-		actionMessage = new JTextPane();
-		actionMessage.setText("The player needs to make a change to their " + containerName + " to update this list");
-		actionMessage.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
-
 		setMessageSettings(noItemsMessage);
-		setMessageSettings(actionMessage);
-
 		setCenterStyle(noItemsMessage);
-		setCenterStyle(actionMessage);
 
 		list.setVisible(false);
 		noItemsMessage.setVisible(true);
-		actionMessage.setVisible(true);
 
 		add(list);
 		add(noItemsMessage);
-		add(actionMessage);
 	}
 
 	private void setMessageSettings(JTextPane actionMessage)
@@ -65,7 +55,6 @@ public class ItemShareContainerPanel extends JPanel
 		{
 			list.setVisible(false);
 			noItemsMessage.setVisible(true);
-			actionMessage.setVisible(true);
 		}
 		else
 		{
@@ -73,7 +62,6 @@ public class ItemShareContainerPanel extends JPanel
 
 			list.setVisible(true);
 			noItemsMessage.setVisible(false);
-			actionMessage.setVisible(false);
 		}
 
 		repaint();
