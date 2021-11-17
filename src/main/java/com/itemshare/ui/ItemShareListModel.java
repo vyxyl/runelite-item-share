@@ -11,32 +11,38 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 {
 	private final List<ItemShareRenderItem> items = new ArrayList<>();
 	private final List<ListDataListener> listeners = new ArrayList<>();
-	private List<ItemShareRenderItem> searchedItems = new ArrayList<>();
+	private List<ItemShareRenderItem> filteredItems = new ArrayList<>();
 
-	public void clearItems()
+	public void setAllItems(List<ItemShareRenderItem> items)
+	{
+		removeAllItems();
+		this.items.addAll(items);
+		this.filteredItems.addAll(items);
+	}
+
+	public void removeAllItems()
 	{
 		this.items.clear();
-		this.searchedItems.clear();
+		this.filteredItems.clear();
 	}
 
-	public void addItems(List<ItemShareRenderItem> items)
-	{
-		this.items.addAll(items);
-		this.searchedItems.addAll(items);
-	}
-
-	public void searchItem(String text)
+	public void filterItems(String text)
 	{
 		if (text == null || text.isEmpty())
 		{
-			clearSearch();
+			clearFilter();
 		}
 		else
 		{
-			this.searchedItems = this.items.stream()
-				.filter(item -> isMatchingItem(text, item))
-				.collect(Collectors.toList());
+			applyFilter(text);
 		}
+	}
+
+	private void applyFilter(String text)
+	{
+		this.filteredItems = this.items.stream()
+			.filter(item -> isMatchingItem(text, item))
+			.collect(Collectors.toList());
 	}
 
 	private boolean isMatchingItem(String text, ItemShareRenderItem item)
@@ -44,21 +50,21 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 		return item.getItem().getName().toLowerCase().contains(text.toLowerCase());
 	}
 
-	public void clearSearch()
+	private void clearFilter()
 	{
-		this.searchedItems = this.items;
+		this.filteredItems = this.items;
 	}
 
 	@Override
 	public int getSize()
 	{
-		return searchedItems.size();
+		return filteredItems.size();
 	}
 
 	@Override
 	public ItemShareRenderItem getElementAt(int index)
 	{
-		return searchedItems.get(index);
+		return filteredItems.get(index);
 	}
 
 	@Override

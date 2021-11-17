@@ -65,33 +65,29 @@ public class ItemShareListPanel extends JPanel
 			public void insertUpdate(DocumentEvent e)
 			{
 				searchItem();
-				itemList.repaint();
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e)
 			{
 				searchItem();
-				itemList.repaint();
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e)
 			{
+				searchItem();
 			}
 
 			public void searchItem()
 			{
-				model.searchItem(searchBox.getText());
+				String text = searchBox.getText();
+				model.filterItems(text);
+				itemList.repaint();
+				revalidate();
+				repaint();
 			}
 		});
-	}
-
-	public void clear()
-	{
-		model.clearItems();
-		revalidate();
-		repaint();
 	}
 
 	public void update(ItemManager itemManager, ItemShareContainer data)
@@ -106,13 +102,12 @@ public class ItemShareListPanel extends JPanel
 		if (items.isEmpty())
 		{
 			currentItems.clear();
-			model.clearItems();
+			model.removeAllItems();
 		}
 		else
 		{
 			currentItems = getUpdatedItems(itemManager, items);
-			model.clearItems();
-			model.addItems(currentItems);
+			model.setAllItems(currentItems);
 		}
 
 		itemList.setModel(model);

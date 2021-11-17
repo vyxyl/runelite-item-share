@@ -12,12 +12,13 @@ import net.runelite.client.game.ItemManager;
 
 public class ItemShareContainerPanel extends JPanel
 {
-	private final ItemShareListPanel list = new ItemShareListPanel();
+	private final ItemShareListPanel list;
 	private final JTextPane noItemsMessage;
 
 	protected ItemShareContainerPanel(String containerName)
 	{
 		super(false);
+
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
 		noItemsMessage = new JTextPane();
@@ -27,6 +28,7 @@ public class ItemShareContainerPanel extends JPanel
 		setMessageSettings(noItemsMessage);
 		setCenterStyle(noItemsMessage);
 
+		list = new ItemShareListPanel();
 		list.setVisible(false);
 		noItemsMessage.setVisible(true);
 

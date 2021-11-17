@@ -8,25 +8,33 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.components.materialtabs.MaterialTab;
 import net.runelite.client.ui.components.materialtabs.MaterialTabGroup;
 
-public class ItemShareItemTabPanel extends JPanel
+public class ItemShareItemContainerTabPanel extends JPanel
 {
 	private final JPanel panel = new JPanel();
 	private final MaterialTabGroup tabGroup = new MaterialTabGroup(panel);
 
-	private final ItemShareContainerPanel equipment = new ItemShareContainerPanel("equipment");
-	private final ItemShareContainerPanel inventory = new ItemShareContainerPanel("inventory");
-	private final ItemShareContainerPanel bank = new ItemShareContainerPanel("bank");
+	private final ItemShareContainerPanel equipment;
+	private final ItemShareContainerPanel inventory;
+	private final ItemShareContainerPanel bank;
 
-	private final MaterialTab equipmentTab = new MaterialTab("Equipment", tabGroup, equipment);
-	private final MaterialTab inventoryTab = new MaterialTab("Inventory", tabGroup, inventory);
-	private final MaterialTab bankTab = new MaterialTab("Bank", tabGroup, bank);
+	private final MaterialTab equipmentTab;
+	private final MaterialTab inventoryTab;
+	private final MaterialTab bankTab;
 
 	private ItemSharePlayer player;
 
-	protected ItemShareItemTabPanel()
+	protected ItemShareItemContainerTabPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+
+		equipment = new ItemShareContainerPanel("equipment");
+		inventory = new ItemShareContainerPanel("inventory");
+		bank = new ItemShareContainerPanel("bank");
+
+		equipmentTab = new MaterialTab("Equipment", tabGroup, equipment);
+		inventoryTab = new MaterialTab("Inventory", tabGroup, inventory);
+		bankTab = new MaterialTab("Bank", tabGroup, bank);
 
 		tabGroup.addTab(equipmentTab);
 		tabGroup.addTab(inventoryTab);

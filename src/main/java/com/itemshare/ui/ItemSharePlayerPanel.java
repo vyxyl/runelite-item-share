@@ -14,7 +14,7 @@ public class ItemSharePlayerPanel extends JPanel
 	private final ItemSharePlayerDropdownPanel playerDropdown;
 	private String selectedPlayerName;
 	private ItemManager itemManager;
-	private ItemShareItemTabPanel tabPanel;
+	private ItemShareItemContainerTabPanel tabPanel;
 	private final JPanel noPlayersMessage;
 	private final JPanel noPlayerSelectedMessage;
 
@@ -25,7 +25,7 @@ public class ItemSharePlayerPanel extends JPanel
 
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		tabPanel = new ItemShareItemTabPanel();
+		tabPanel = new ItemShareItemContainerTabPanel();
 
 		playerDropdown = new ItemSharePlayerDropdownPanel(name -> onPlayerSelect(data, name));
 		playerDropdown.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
