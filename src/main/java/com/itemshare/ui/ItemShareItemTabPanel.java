@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.ui.components.PluginErrorPanel;
 import net.runelite.client.ui.components.materialtabs.MaterialTab;
 import net.runelite.client.ui.components.materialtabs.MaterialTabGroup;
 
@@ -31,14 +30,22 @@ public class ItemShareItemTabPanel extends JPanel
 		tabGroup.addTab(bankTab);
 
 		tabGroup.select(equipmentTab);
+
+		add(tabGroup, BorderLayout.NORTH);
+		add(panel, BorderLayout.NORTH);
+	}
+
+	public void clear()
+	{
+		equipment.clear();
+		inventory.clear();
+		bank.clear();
+
+		repaint();
 	}
 
 	public void update(ItemManager itemManager, ItemSharePlayer player)
 	{
-		removeAll();
-		add(tabGroup, BorderLayout.NORTH);
-		add(panel, BorderLayout.NORTH);
-
 		equipment.update(itemManager, player);
 		inventory.update(itemManager, player);
 		bank.update(itemManager, player);

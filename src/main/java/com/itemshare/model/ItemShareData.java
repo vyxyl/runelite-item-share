@@ -15,6 +15,5 @@ import java.util.List;
 @AllArgsConstructor
 public class ItemShareData
 {
-    private ItemSharePlayer localPlayer;
-    private List<ItemSharePlayer> otherPlayers;
+    private List<ItemSharePlayer> players;
 }

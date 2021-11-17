@@ -1,68 +1,49 @@
 package com.itemshare.ui;
 
+import static com.itemshare.constant.ItemShareConstants.NO_PLAYER;
 import com.itemshare.model.ItemShareData;
-import java.awt.BorderLayout;
+import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.service.ItemShareDefaultDataService;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.ui.components.PluginErrorPanel;
 
 public class ItemSharePlayerPanel extends JPanel
 {
-	private final ItemShareItemTabPanel tabPanel;
+	ItemSharePlayerDropdown playerDropdown;
+	String selectedPlayerName;
 
-	protected ItemSharePlayerPanel()
+	protected ItemSharePlayerPanel(ItemManager itemManager, ItemShareData data)
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		tabPanel = new ItemShareItemTabPanel();
+		ItemShareItemTabPanel tabPanel = new ItemShareItemTabPanel();
 
-		reset();
-	}
-
-	public void reset()
-	{
-		PluginErrorPanel panel = new PluginErrorPanel();
-		panel.setContent("Log in to see player data", "");
-
-		removeAll();
-		add(panel, BorderLayout.NORTH);
-		repaint();
-	}
-
-	public void update(ItemManager itemManager, ItemShareData data)
-	{
-		if (data == null || data.getLocalPlayer() == null)
-		{
-			reset();
-		}
-		else
-		{
-			populatePanel(itemManager, data);
-		}
-	}
-
-	private void populatePanel(ItemManager itemManager, ItemShareData data)
-	{
-		ItemSharePlayerDropdown playerDropdown = new ItemSharePlayerDropdown(name ->
-		{
-			if (!name.equals(data.getLocalPlayer().getUserName()))
-			{
-				System.out.println("Selected Different Player");
-			}
-		});
-
+		playerDropdown = new ItemSharePlayerDropdown(name -> tabPanel.update(itemManager, getSelectedPlayer(data, name)));
 		playerDropdown.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
 
-		removeAll();
 		add(playerDropdown);
 		add(tabPanel);
+	}
 
-		playerDropdown.update(data);
-		tabPanel.update(itemManager, data.getLocalPlayer());
-
+	public void update(ItemShareData data)
+	{
+		playerDropdown.update(data, selectedPlayerName);
 		repaint();
+	}
+
+	private ItemSharePlayer getSelectedPlayer(ItemShareData data, String name)
+	{
+		selectedPlayerName = name;
+		return NO_PLAYER.equals(name)
+			? ItemShareDefaultDataService.getDefaultPlayerData(NO_PLAYER)
+			: getExistingPlayer(data, name);
+	}
+
+	private ItemSharePlayer getExistingPlayer(ItemShareData data, String name)
+	{
+		return data.getPlayers().stream().filter(p -> p.getUserName().equals(name)).findFirst().get();
 	}
 }

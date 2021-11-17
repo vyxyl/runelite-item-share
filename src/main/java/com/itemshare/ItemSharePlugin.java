@@ -3,9 +3,11 @@ package com.itemshare;
 import com.google.inject.Provides;
 import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareData;
+import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemShareCloudService;
 import com.itemshare.service.ItemShareConfigService;
 import com.itemshare.service.ItemShareDataService;
+import com.itemshare.service.ItemShareDefaultDataService;
 import com.itemshare.ui.ItemSharePanel;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.Player;
@@ -68,6 +71,7 @@ public class ItemSharePlugin extends Plugin
 	private String playerName;
 	private ItemShareData data;
 	private ItemSharePanel panel;
+	private ItemSharePlayer player;
 
 	@Provides
 	ItemShareConfig provideConfig(ConfigManager configManager)
@@ -82,6 +86,8 @@ public class ItemSharePlugin extends Plugin
 
 		panel = injector.getInstance(ItemSharePanel.class);
 		createNavigationButton(panel);
+
+		loadData();
 	}
 
 	@Override
@@ -93,34 +99,45 @@ public class ItemSharePlugin extends Plugin
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged gameStateChanged)
 	{
-		retrieveLocalState();
+		loadPlayerData();
+
+		if (data != null && gameStateChanged.getGameState() != GameState.LOGGED_IN)
+		{
+			saveData();
+		}
 	}
 
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
-		retrieveLocalState();
+		loadPlayerData();
 	}
 
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		if (isSupportedWorld() && data != null)
+		if (isSupportedWorld() && player != null)
 		{
 			loadItems(event);
 		}
 	}
 
-	private void retrieveLocalState()
+	private void loadData()
+	{
+		data = configService.getLocalData();
+		data.setPlayers(cloudService.getPlayers());
+		updatePanel();
+	}
+
+	private void loadPlayerData()
 	{
 		if (playerName == null)
 		{
 			playerName = getPlayerName();
 		}
-		else if (data == null)
+		else if (player == null && data != null)
 		{
-			retrieveLocalPlayer();
-			retrieveOtherPLayers();
+			player = getLocalPlayer(data, playerName);
 			updatePanel();
 		}
 	}
@@ -160,22 +177,22 @@ public class ItemSharePlugin extends Plugin
 
 	private void loadEquipment(ItemShareContainer itemShareContainer)
 	{
-		data.getLocalPlayer().setEquipment(itemShareContainer);
-		data.getLocalPlayer().setUpdatedDate(new Date());
+		player.setEquipment(itemShareContainer);
+		player.setUpdatedDate(new Date());
 		updatePanel();
 	}
 
 	private void loadInventory(ItemShareContainer itemShareContainer)
 	{
-		data.getLocalPlayer().setInventory(itemShareContainer);
-		data.getLocalPlayer().setUpdatedDate(new Date());
+		player.setInventory(itemShareContainer);
+		player.setUpdatedDate(new Date());
 		updatePanel();
 	}
 
 	private void loadBank(ItemShareContainer itemShareContainer)
 	{
-		data.getLocalPlayer().setBank(itemShareContainer);
-		data.getLocalPlayer().setUpdatedDate(new Date());
+		player.setBank(itemShareContainer);
+		player.setUpdatedDate(new Date());
 		updatePanel();
 	}
 
@@ -183,13 +200,28 @@ public class ItemSharePlugin extends Plugin
 	{
 		BufferedImage icon = ImageUtil.loadImageResource(ItemSharePlugin.class, "/icon.png");
 		NavigationButton button = NavigationButton.builder()
-			.tooltip("Show shared items")
+			.tooltip("View shared items")
 			.icon(icon)
 			.priority(7)
 			.panel(panel)
 			.build();
 
 		clientToolbar.addNavigation(button);
+	}
+
+	private ItemSharePlayer getLocalPlayer(ItemShareData data, String playerName)
+	{
+		return data.getPlayers().stream()
+			.filter(p -> p.getUserName().equals(playerName))
+			.findFirst()
+			.orElseGet(() -> getNewPlayer(data, playerName));
+	}
+
+	private ItemSharePlayer getNewPlayer(ItemShareData data, String playerName)
+	{
+		ItemSharePlayer player = ItemShareDefaultDataService.getDefaultPlayerData(playerName);
+		data.getPlayers().add(player);
+		return player;
 	}
 
 	private String getPlayerName()
@@ -203,19 +235,9 @@ public class ItemSharePlugin extends Plugin
 		SwingUtilities.invokeLater(() -> panel.update(itemManager, data));
 	}
 
-	private void retrieveLocalPlayer()
-	{
-		data = configService.getLocalData(playerName);
-	}
-
-	private void retrieveOtherPLayers()
-	{
-		data.setOtherPlayers(cloudService.getOtherPlayers());
-	}
-
 	private void saveData()
 	{
-		configService.saveLocalData(playerName, data);
-		cloudService.uploadLocalData(data.getLocalPlayer());
+		configService.saveLocalData(data);
+		cloudService.savePlayerData(player);
 	}
 }

@@ -3,7 +3,6 @@ package com.itemshare.ui;
 import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareRenderItem;
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,7 +14,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import net.runelite.client.game.ItemManager;
@@ -27,7 +25,7 @@ import net.runelite.client.util.AsyncBufferedImage;
 public class ItemShareList extends JPanel
 {
 	private final IconTextField searchBox = new IconTextField();
-	private List<ItemShareRenderItem> currentRenderItems = new ArrayList<>();
+	private List<ItemShareRenderItem> currentItems = new ArrayList<>();
 	private final JList<ItemShareRenderItem> itemList;
 	private final ItemShareListModel model = new ItemShareListModel();
 
@@ -37,7 +35,20 @@ public class ItemShareList extends JPanel
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
 		createSearchBox();
+
 		itemList = new JList<>();
+		itemList.setCellRenderer(new ItemShareListRenderer());
+		itemList.setFixedCellWidth(PluginPanel.PANEL_WIDTH);
+
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+		panel.add(itemList);
+
+		JScrollPane scrollPane = new JScrollPane(panel);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+		add(searchBox);
+		add(scrollPane);
 	}
 
 	private void createSearchBox()
@@ -76,10 +87,15 @@ public class ItemShareList extends JPanel
 		});
 	}
 
+	public void clear()
+	{
+		model.clearItems();
+		revalidate();
+		repaint();
+	}
+
 	public void update(ItemManager itemManager, ItemShareContainer data)
 	{
-		removeAll();
-		add(searchBox);
 		updateItems(itemManager, data.getItems());
 		revalidate();
 		repaint();
@@ -87,32 +103,19 @@ public class ItemShareList extends JPanel
 
 	private void updateItems(ItemManager itemManager, List<ItemShareItem> items)
 	{
-		if (!items.isEmpty())
+		if (items.isEmpty())
 		{
-			displayItems(itemManager, items);
+			currentItems.clear();
+			model.clearItems();
 		}
-	}
-
-	private void displayItems(ItemManager itemManager, List<ItemShareItem> items)
-	{
-		currentRenderItems = getUpdatedItems(itemManager, items);
-
-		model.clearItems();
-		model.addItems(currentRenderItems);
-
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+		else
+		{
+			currentItems = getUpdatedItems(itemManager, items);
+			model.clearItems();
+			model.addItems(currentItems);
+		}
 
 		itemList.setModel(model);
-		itemList.setCellRenderer(new ItemShareListRenderer());
-		itemList.setFixedCellWidth(PluginPanel.PANEL_WIDTH);
-
-		panel.add(itemList);
-
-		JScrollPane scrollPane = new JScrollPane(panel);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-		add(scrollPane);
 	}
 
 	private List<ItemShareRenderItem> getUpdatedItems(ItemManager itemManager, List<ItemShareItem> items)
@@ -125,12 +128,12 @@ public class ItemShareList extends JPanel
 			.map(item -> ItemShareRenderItem.builder().item(item).build())
 			.collect(Collectors.toList());
 
-		List<ItemShareRenderItem> existingRenderItems = currentRenderItems.stream()
+		List<ItemShareRenderItem> existingRenderItems = currentItems.stream()
 			.filter(renderItems::contains)
 			.collect(Collectors.toList());
 
 		List<ItemShareRenderItem> newRenderItems = renderItems.stream()
-			.filter(item -> !isNullItem(item) && !currentRenderItems.contains(item))
+			.filter(item -> !isNullItem(item) && !currentItems.contains(item))
 			.sorted(Comparator.comparing((ItemShareRenderItem a) -> a.getItem().getName()))
 			.collect(Collectors.toList());
 

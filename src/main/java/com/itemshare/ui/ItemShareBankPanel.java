@@ -21,6 +21,12 @@ public class ItemShareBankPanel extends JPanel
 		repaint();
 	}
 
+	public void clear()
+	{
+		list.clear();
+		repaint();
+	}
+
 	public void update(ItemManager itemManager, ItemSharePlayer data)
 	{
 		removeAll();

@@ -1,12 +1,11 @@
 package com.itemshare.service;
 
+import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
+import static com.itemshare.constant.ItemShareConstants.CONFIG_DATA;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareData;
-import com.itemshare.model.ItemSharePlayer;
-import static com.itemshare.constant.ItemShareConfigKeys.CONFIG_BASE;
-import static com.itemshare.constant.ItemShareConfigKeys.CONFIG_DATA;
 import java.util.ArrayList;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,60 +24,35 @@ public class ItemShareConfigService
 		this.gson = new GsonBuilder().disableHtmlEscaping().create();
 	}
 
-	public ItemShareData getLocalData(String playerName)
+	public ItemShareData getLocalData()
 	{
-		if (playerName == null)
-		{
-			return getDefaultData(null);
-		}
-		else
-		{
-			String json = getDataJson(playerName);
+		String json = getDataJson();
 
-			return json == null
-				? getDefaultData(playerName)
-				: getItemShareData(playerName, json);
-		}
+		return json == null
+			? getDefaultData()
+			: getData(json);
 	}
 
-	private String getDataJson(String playerName)
+	private String getDataJson()
 	{
-		return configManager.getConfiguration(CONFIG_BASE, CONFIG_DATA + "_" + playerName);
+		return configManager.getConfiguration(CONFIG_BASE, CONFIG_DATA);
 	}
 
-	private ItemShareData getItemShareData(String playerName, String json)
+	private ItemShareData getData(String json)
 	{
 		ItemShareData data = gson.fromJson(json, ItemShareData.class);
-		data.getLocalPlayer().setUserName(playerName);
 		return data;
 	}
 
-	private ItemShareData getDefaultData(String playerName)
+	private ItemShareData getDefaultData()
 	{
 		return ItemShareData.builder()
-			.localPlayer(getLocalPlayerData(playerName))
-			.otherPlayers(new ArrayList<>())
+			.players(new ArrayList<>())
 			.build();
 	}
 
-	public void saveLocalData(String playerName, ItemShareData data)
+	public void saveLocalData(ItemShareData data)
 	{
-		configManager.setConfiguration(CONFIG_BASE, CONFIG_DATA + "_" + playerName, gson.toJson(data));
-	}
-
-	private ItemSharePlayer getLocalPlayerData(String playerName)
-	{
-		return ItemSharePlayer.builder()
-			.userName(playerName)
-			.bank(ItemShareContainer.builder()
-				.items(new ArrayList<>())
-				.build())
-			.equipment(ItemShareContainer.builder()
-				.items(new ArrayList<>())
-				.build())
-			.inventory(ItemShareContainer.builder()
-				.items(new ArrayList<>())
-				.build())
-			.build();
+		configManager.setConfiguration(CONFIG_BASE, CONFIG_DATA, gson.toJson(data));
 	}
 }

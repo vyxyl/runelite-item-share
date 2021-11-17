@@ -31,7 +31,7 @@ import javax.swing.JList;
 import net.runelite.client.ui.ColorScheme;
 import javax.swing.border.EmptyBorder;
 
-public final class DropdownRenderer extends DefaultListCellRenderer
+public final class ItemShareDropdownRenderer extends DefaultListCellRenderer
 {
 	@Override
 	public Component getListCellRendererComponent(JList<?> list, Object o, int i, boolean isSelected, boolean b1)

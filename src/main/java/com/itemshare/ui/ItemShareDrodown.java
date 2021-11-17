@@ -12,23 +12,21 @@ import net.runelite.client.ui.PluginPanel;
 
 public class ItemShareDrodown extends JPanel
 {
-	protected ItemShareDrodown()
+	private JComboBox<String> dropdown = new JComboBox<>();
+
+	protected ItemShareDrodown(Consumer<String> callback)
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
 		setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
-	}
 
-	void update(ArrayList<String> options, Consumer<String> callback)
-	{
-		String[] optionsArray = options.toArray(new String[0]);
-
-		JComboBox<String> dropdown = new JComboBox<>(optionsArray);
+		dropdown = new JComboBox<>();
 		dropdown.setFocusable(false);
 		dropdown.setForeground(Color.WHITE);
-		dropdown.setRenderer(new DropdownRenderer());
+		dropdown.setRenderer(new ItemShareDropdownRenderer());
+
 		dropdown.addItemListener(e ->
 		{
 			if (e.getStateChange() == ItemEvent.SELECTED)
@@ -38,8 +36,18 @@ public class ItemShareDrodown extends JPanel
 			}
 		});
 
-		removeAll();
 		add(dropdown);
+	}
+
+	void select(String value)
+	{
+		dropdown.setSelectedItem(value);
+	}
+
+	void update(ArrayList<String> options)
+	{
+		dropdown.removeAllItems();
+		options.forEach(option -> dropdown.addItem(option));
 
 		repaint();
 	}

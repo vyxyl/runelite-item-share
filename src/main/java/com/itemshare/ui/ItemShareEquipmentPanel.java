@@ -13,14 +13,18 @@ public class ItemShareEquipmentPanel extends JPanel
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		add(list);
 	}
 
-	public void update(ItemManager itemManager, ItemSharePlayer data)
+	public void clear()
 	{
-		removeAll();
-		add(list);
+		list.clear();
+		repaint();
+	}
 
-		list.update(itemManager, data.getEquipment());
+	public void update(ItemManager itemManager, ItemSharePlayer player)
+	{
+		list.update(itemManager, player.getEquipment());
 
 		repaint();
 	}

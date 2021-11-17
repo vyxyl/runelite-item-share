@@ -8,12 +8,12 @@ import java.util.ArrayList;
 
 public class ItemShareCloudService
 {
-	public void uploadLocalData(ItemSharePlayer localPlayer)
+	public void savePlayerData(ItemSharePlayer player)
 	{
 
 	}
 
-	public ArrayList<ItemSharePlayer> getOtherPlayers()
+	public ArrayList<ItemSharePlayer> getPlayers()
 	{
 		return new ArrayList<ItemSharePlayer>()
 		{{

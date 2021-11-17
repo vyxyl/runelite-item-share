@@ -8,7 +8,7 @@ import net.runelite.client.ui.PluginPanel;
 
 public class ItemSharePanel extends PluginPanel
 {
-	private final ItemSharePlayerPanel playerInfoPanel = new ItemSharePlayerPanel();
+	private ItemSharePlayerPanel playerPanel;
 
 	public ItemSharePanel()
 	{
@@ -19,9 +19,13 @@ public class ItemSharePanel extends PluginPanel
 
 	public void update(ItemManager itemManager, ItemShareData data)
 	{
-		removeAll();
-		add(playerInfoPanel);
+		if (playerPanel == null)
+		{
+			playerPanel = new ItemSharePlayerPanel(itemManager, data);
+			add(playerPanel);
+		}
 
-		playerInfoPanel.update(itemManager, data);
+		playerPanel.update(data);
+		repaint();
 	}
 }
