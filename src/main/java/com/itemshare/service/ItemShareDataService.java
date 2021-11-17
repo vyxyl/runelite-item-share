@@ -32,13 +32,20 @@ public class ItemShareDataService
 
 	private ArrayList<ItemShareItem> getItems(ItemContainer container)
 	{
-		return (ArrayList<ItemShareItem>) Arrays.stream(container.getItems()).map(item ->
-			ItemShareItem.builder()
-				.id(item.getId())
-				.quantity(item.getQuantity())
-				.name(getItemName(item))
-				.build()
-		).collect(Collectors.toList());
+		return (ArrayList<ItemShareItem>) Arrays.stream(container.getItems())
+			.filter(this::isRealItem)
+			.map(item ->
+				ItemShareItem.builder()
+					.id(item.getId())
+					.quantity(item.getQuantity())
+					.name(getItemName(item))
+					.build()
+			).collect(Collectors.toList());
+	}
+
+	private boolean isRealItem(Item item)
+	{
+		return item.getId() == itemManager.canonicalize(item.getId());
 	}
 
 	private String getItemName(Item item)
