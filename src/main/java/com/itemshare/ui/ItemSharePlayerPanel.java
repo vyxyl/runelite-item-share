@@ -3,43 +3,96 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.NO_PLAYER;
 import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
-import com.itemshare.service.ItemShareDefaultDataService;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.runelite.client.game.ItemManager;
 
 public class ItemSharePlayerPanel extends JPanel
 {
-	ItemSharePlayerDropdown playerDropdown;
-	String selectedPlayerName;
+	private final ItemSharePlayerDropdown playerDropdown;
+	private String selectedPlayerName;
+	private ItemManager itemManager;
+	private ItemShareItemTabPanel tabPanel;
+	private final JPanel noPlayersMessage;
+	private final JPanel noPlayerSelectedMessage;
 
 	protected ItemSharePlayerPanel(ItemManager itemManager, ItemShareData data)
 	{
 		super(false);
+		this.itemManager = itemManager;
+
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		ItemShareItemTabPanel tabPanel = new ItemShareItemTabPanel();
+		tabPanel = new ItemShareItemTabPanel();
 
-		playerDropdown = new ItemSharePlayerDropdown(name -> tabPanel.update(itemManager, getSelectedPlayer(data, name)));
+		playerDropdown = new ItemSharePlayerDropdown(name -> onPlayerSelect(data, name));
 		playerDropdown.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
+
+		noPlayersMessage = new JPanel();
+		noPlayersMessage.add(new JLabel("Login to create a new player"));
+
+		noPlayerSelectedMessage = new JPanel();
+		noPlayerSelectedMessage.add(new JLabel("Select a player to view their items"));
+
+		tabPanel.setVisible(true);
+		noPlayersMessage.setVisible(false);
+		noPlayerSelectedMessage.setVisible(false);
 
 		add(playerDropdown);
 		add(tabPanel);
+		add(noPlayersMessage);
+		add(noPlayerSelectedMessage);
 	}
 
 	public void update(ItemShareData data)
 	{
 		playerDropdown.update(data, selectedPlayerName);
+		tabPanel.update(this.itemManager);
 		repaint();
 	}
 
-	private ItemSharePlayer getSelectedPlayer(ItemShareData data, String name)
+	private void onPlayerSelect(ItemShareData data, String name)
 	{
-		selectedPlayerName = name;
-		return NO_PLAYER.equals(name)
-			? ItemShareDefaultDataService.getDefaultPlayerData(NO_PLAYER)
-			: getExistingPlayer(data, name);
+		if (isNoPlayerSelected(name))
+		{
+			tabPanel.setVisible(false);
+
+			if (hasPlayers(data))
+			{
+				noPlayerSelectedMessage.setVisible(true);
+			}
+			else
+			{
+				noPlayersMessage.setVisible(true);
+			}
+		}
+		else
+
+		{
+			selectedPlayerName = name;
+
+			ItemSharePlayer player = getExistingPlayer(data, name);
+			tabPanel.update(this.itemManager, player);
+
+			tabPanel.setVisible(true);
+			noPlayersMessage.setVisible(false);
+			noPlayerSelectedMessage.setVisible(false);
+		}
+
+		repaint();
+
+	}
+
+	private boolean hasPlayers(ItemShareData data)
+	{
+		return data.getPlayers().size() > 0;
+	}
+
+	private boolean isNoPlayerSelected(String name)
+	{
+		return NO_PLAYER.equals(name) || name == null;
 	}
 
 	private ItemSharePlayer getExistingPlayer(ItemShareData data, String name)

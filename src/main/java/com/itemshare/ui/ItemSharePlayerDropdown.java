@@ -24,7 +24,7 @@ public class ItemSharePlayerDropdown extends JPanel
 		add(dropdown, BorderLayout.PAGE_START);
 	}
 
-	public void update(ItemShareData data, String selectedPlayerName)
+	public void update(ItemShareData data, String selectedName)
 	{
 		List<ItemSharePlayer> players = data.getPlayers();
 
@@ -32,9 +32,14 @@ public class ItemSharePlayerDropdown extends JPanel
 			.map(ItemSharePlayer::getUserName)
 			.collect(Collectors.toList());
 
+		String name = options.stream()
+			.filter(n -> n.equals(selectedName))
+			.findFirst()
+			.orElse(NO_PLAYER);
+
 		options.add(0, NO_PLAYER);
 		dropdown.update(options);
-		dropdown.select(selectedPlayerName == null ? NO_PLAYER : selectedPlayerName);
+		dropdown.select(name);
 
 		repaint();
 	}

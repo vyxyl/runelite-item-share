@@ -12,18 +12,21 @@ public class ItemShareItemTabPanel extends JPanel
 {
 	private final JPanel panel = new JPanel();
 	private final MaterialTabGroup tabGroup = new MaterialTabGroup(panel);
-	private final ItemShareEquipmentPanel equipment = new ItemShareEquipmentPanel();
-	private final ItemShareInventoryPanel inventory = new ItemShareInventoryPanel();
-	private final ItemShareBankPanel bank = new ItemShareBankPanel();
+
+	private final ItemShareContainerPanel equipment = new ItemShareContainerPanel("equipment");
+	private final ItemShareContainerPanel inventory = new ItemShareContainerPanel("inventory");
+	private final ItemShareContainerPanel bank = new ItemShareContainerPanel("bank");
+
+	private final MaterialTab equipmentTab = new MaterialTab("Equipment", tabGroup, equipment);
+	private final MaterialTab inventoryTab = new MaterialTab("Inventory", tabGroup, inventory);
+	private final MaterialTab bankTab = new MaterialTab("Bank", tabGroup, bank);
+
+	private ItemSharePlayer player;
 
 	protected ItemShareItemTabPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
-		MaterialTab equipmentTab = new MaterialTab("Equipment", tabGroup, equipment);
-		MaterialTab inventoryTab = new MaterialTab("Inventory", tabGroup, inventory);
-		MaterialTab bankTab = new MaterialTab("Bank", tabGroup, bank);
 
 		tabGroup.addTab(equipmentTab);
 		tabGroup.addTab(inventoryTab);
@@ -35,20 +38,28 @@ public class ItemShareItemTabPanel extends JPanel
 		add(panel, BorderLayout.NORTH);
 	}
 
-	public void clear()
-	{
-		equipment.clear();
-		inventory.clear();
-		bank.clear();
-
-		repaint();
-	}
-
 	public void update(ItemManager itemManager, ItemSharePlayer player)
 	{
-		equipment.update(itemManager, player);
-		inventory.update(itemManager, player);
-		bank.update(itemManager, player);
+		this.player = player;
+		tabGroup.select(equipmentTab);
+
+		update(itemManager);
+	}
+
+	public void update(ItemManager itemManager)
+	{
+		if (this.player != null)
+		{
+			equipment.update(itemManager, this.player.getEquipment());
+			inventory.update(itemManager, this.player.getInventory());
+			bank.update(itemManager, this.player.getBank());
+		}
+
+		equipmentTab.repaint();
+		inventoryTab.repaint();
+		bankTab.repaint();
+
+		tabGroup.repaint();
 
 		repaint();
 	}
