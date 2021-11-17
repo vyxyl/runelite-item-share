@@ -13,6 +13,12 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 	private final List<ListDataListener> listeners = new ArrayList<>();
 	private List<ItemShareRenderItem> searchedItems = new ArrayList<>();
 
+	public void clearItems()
+	{
+		this.items.clear();
+		this.searchedItems.clear();
+	}
+
 	public void addItems(List<ItemShareRenderItem> items)
 	{
 		this.items.addAll(items);

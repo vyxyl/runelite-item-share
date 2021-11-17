@@ -12,14 +12,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.Player;
 import net.runelite.api.WorldType;
+import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -76,12 +78,8 @@ public class ItemSharePlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		playerName = "Frozen Gulf";
-		data = configService.getLocalData(playerName);
-		retrievePlayerData();
-		updatePanel();
-
 		assert SwingUtilities.isEventDispatchThread();
+
 		panel = injector.getInstance(ItemSharePanel.class);
 		createNavigationButton(panel);
 	}
@@ -89,15 +87,41 @@ public class ItemSharePlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
-		log.info("Item Share stopped!");
+		saveData();
+	}
+
+	@Subscribe
+	public void onGameStateChanged(GameStateChanged gameStateChanged)
+	{
+		retrieveLocalState();
+	}
+
+	@Subscribe
+	public void onGameTick(GameTick event)
+	{
+		retrieveLocalState();
 	}
 
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		if (playerName != null && isSupportedWorld())
+		if (isSupportedWorld() && data != null)
 		{
 			loadItems(event);
+		}
+	}
+
+	private void retrieveLocalState()
+	{
+		if (playerName == null)
+		{
+			playerName = getPlayerName();
+		}
+		else if (data == null)
+		{
+			retrieveLocalPlayer();
+			retrieveOtherPLayers();
+			updatePanel();
 		}
 	}
 
@@ -126,7 +150,7 @@ public class ItemSharePlugin extends Plugin
 		}
 		else if (itemContainer == client.getItemContainer(InventoryID.INVENTORY))
 		{
-			loadInvetory(itemShareContainer);
+			loadInventory(itemShareContainer);
 		}
 		else if (itemContainer == client.getItemContainer(InventoryID.EQUIPMENT))
 		{
@@ -141,7 +165,7 @@ public class ItemSharePlugin extends Plugin
 		updatePanel();
 	}
 
-	private void loadInvetory(ItemShareContainer itemShareContainer)
+	private void loadInventory(ItemShareContainer itemShareContainer)
 	{
 		data.getLocalPlayer().setInventory(itemShareContainer);
 		data.getLocalPlayer().setUpdatedDate(new Date());
@@ -170,17 +194,21 @@ public class ItemSharePlugin extends Plugin
 
 	private String getPlayerName()
 	{
-		return Objects.requireNonNull(client.getLocalPlayer()).getName();
+		Player player = client.getLocalPlayer();
+		return player == null ? null : player.getName();
 	}
 
 	private void updatePanel()
 	{
-		saveData();
-
 		SwingUtilities.invokeLater(() -> panel.update(itemManager, data));
 	}
 
-	private void retrievePlayerData()
+	private void retrieveLocalPlayer()
+	{
+		data = configService.getLocalData(playerName);
+	}
+
+	private void retrieveOtherPLayers()
 	{
 		data.setOtherPlayers(cloudService.getOtherPlayers());
 	}

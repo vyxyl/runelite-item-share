@@ -29,6 +29,14 @@ public class ItemShareConfigService
 
 	public ItemShareData getLocalData(String playerName)
 	{
+		if (playerName == null)
+		{
+			return ItemShareData.builder()
+				.localPlayer(getLocalPlayerData(null))
+				.otherPlayers(new ArrayList<>())
+				.build();
+		}
+
 		String json = configManager.getConfiguration(CONFIG_BASE, CONFIG_DATA + "_" + playerName);
 
 		if (json == null)

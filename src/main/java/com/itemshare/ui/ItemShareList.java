@@ -96,6 +96,8 @@ public class ItemShareList extends JPanel
 	private void displayItems(ItemManager itemManager, List<ItemShareItem> items)
 	{
 		currentRenderItems = getUpdatedItems(itemManager, items);
+
+		model.clearItems();
 		model.addItems(currentRenderItems);
 
 		JPanel panel = new JPanel();
