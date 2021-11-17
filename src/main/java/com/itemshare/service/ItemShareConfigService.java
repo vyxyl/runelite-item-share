@@ -22,36 +22,43 @@ public class ItemShareConfigService
 	private ItemShareConfigService(final ConfigManager configManager)
 	{
 		this.configManager = configManager;
-
-		GsonBuilder builder = new GsonBuilder().disableHtmlEscaping();
-		this.gson = builder.create();
+		this.gson = new GsonBuilder().disableHtmlEscaping().create();
 	}
 
 	public ItemShareData getLocalData(String playerName)
 	{
 		if (playerName == null)
 		{
-			return ItemShareData.builder()
-				.localPlayer(getLocalPlayerData(null))
-				.otherPlayers(new ArrayList<>())
-				.build();
-		}
-
-		String json = configManager.getConfiguration(CONFIG_BASE, CONFIG_DATA + "_" + playerName);
-
-		if (json == null)
-		{
-			return ItemShareData.builder()
-				.localPlayer(getLocalPlayerData(playerName))
-				.otherPlayers(new ArrayList<>())
-				.build();
+			return getDefaultData(null);
 		}
 		else
 		{
-			ItemShareData data = gson.fromJson(json, ItemShareData.class);
-			data.getLocalPlayer().setUserName(playerName);
-			return data;
+			String json = getDataJson(playerName);
+
+			return json == null
+				? getDefaultData(playerName)
+				: getItemShareData(playerName, json);
 		}
+	}
+
+	private String getDataJson(String playerName)
+	{
+		return configManager.getConfiguration(CONFIG_BASE, CONFIG_DATA + "_" + playerName);
+	}
+
+	private ItemShareData getItemShareData(String playerName, String json)
+	{
+		ItemShareData data = gson.fromJson(json, ItemShareData.class);
+		data.getLocalPlayer().setUserName(playerName);
+		return data;
+	}
+
+	private ItemShareData getDefaultData(String playerName)
+	{
+		return ItemShareData.builder()
+			.localPlayer(getLocalPlayerData(playerName))
+			.otherPlayers(new ArrayList<>())
+			.build();
 	}
 
 	public void saveLocalData(String playerName, ItemShareData data)
