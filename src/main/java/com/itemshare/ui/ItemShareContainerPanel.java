@@ -12,7 +12,6 @@ import net.runelite.client.game.ItemManager;
 
 public class ItemShareContainerPanel extends JPanel
 {
-	private final ItemShareListPanel list;
 	private final JTextPane noItemsMessage;
 
 	protected ItemShareContainerPanel(String containerName)
@@ -28,11 +27,6 @@ public class ItemShareContainerPanel extends JPanel
 		setMessageSettings(noItemsMessage);
 		setCenterStyle(noItemsMessage);
 
-		list = new ItemShareListPanel();
-		list.setVisible(false);
-		noItemsMessage.setVisible(true);
-
-		add(list);
 		add(noItemsMessage);
 	}
 
@@ -53,17 +47,17 @@ public class ItemShareContainerPanel extends JPanel
 
 	public void update(ItemManager itemManager, ItemShareContainer container)
 	{
+		removeAll();
+
 		if (container.getItems().isEmpty())
 		{
-			list.setVisible(false);
-			noItemsMessage.setVisible(true);
+			add(noItemsMessage);
 		}
 		else
 		{
+			ItemShareListPanel list = new ItemShareListPanel();
 			list.update(itemManager, container);
-
-			list.setVisible(true);
-			noItemsMessage.setVisible(false);
+			add(list);
 		}
 
 		repaint();

@@ -28,6 +28,7 @@ public class ItemShareListPanel extends JPanel
 	private List<ItemShareRenderItem> currentItems = new ArrayList<>();
 	private final JList<ItemShareRenderItem> itemList;
 	private final ItemShareListModel model = new ItemShareListModel();
+	private final JScrollPane scrollPane;
 
 	protected ItemShareListPanel()
 	{
@@ -44,7 +45,7 @@ public class ItemShareListPanel extends JPanel
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panel.add(itemList);
 
-		JScrollPane scrollPane = new JScrollPane(panel);
+		scrollPane = new JScrollPane(panel);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		add(searchBox);
@@ -59,7 +60,12 @@ public class ItemShareListPanel extends JPanel
 		searchBox.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
-		searchBox.getDocument().addDocumentListener(new DocumentListener()
+		searchBox.getDocument().addDocumentListener(getSearchBoxListener());
+	}
+
+	private DocumentListener getSearchBoxListener()
+	{
+		return new DocumentListener()
 		{
 			@Override
 			public void insertUpdate(DocumentEvent e)
@@ -78,16 +84,7 @@ public class ItemShareListPanel extends JPanel
 			{
 				searchItem();
 			}
-
-			public void searchItem()
-			{
-				String text = searchBox.getText();
-				model.filterItems(text);
-				itemList.repaint();
-				revalidate();
-				repaint();
-			}
-		});
+		};
 	}
 
 	public void update(ItemManager itemManager, ItemShareContainer data)
@@ -113,6 +110,20 @@ public class ItemShareListPanel extends JPanel
 		itemList.setModel(model);
 	}
 
+	private void searchItem()
+	{
+		String text = searchBox.getText();
+
+		model.filterItems(text);
+		itemList.setModel(model);
+
+		itemList.repaint();
+		scrollPane.repaint();
+
+		revalidate();
+		repaint();
+	}
+
 	private List<ItemShareRenderItem> getUpdatedItems(ItemManager itemManager, List<ItemShareItem> items)
 	{
 		List<ItemShareItem> validItems = items.stream()
@@ -121,10 +132,6 @@ public class ItemShareListPanel extends JPanel
 
 		List<ItemShareRenderItem> renderItems = validItems.stream()
 			.map(item -> ItemShareRenderItem.builder().item(item).build())
-			.collect(Collectors.toList());
-
-		List<ItemShareRenderItem> existingRenderItems = currentItems.stream()
-			.filter(renderItems::contains)
 			.collect(Collectors.toList());
 
 		List<ItemShareRenderItem> newRenderItems = renderItems.stream()
@@ -142,6 +149,10 @@ public class ItemShareListPanel extends JPanel
 			renderItem.setImage(icon);
 			renderItem.setIcon(new ImageIcon(icon));
 		});
+
+		List<ItemShareRenderItem> existingRenderItems = currentItems.stream()
+			.filter(renderItems::contains)
+			.collect(Collectors.toList());
 
 		existingRenderItems.addAll(newRenderItems);
 

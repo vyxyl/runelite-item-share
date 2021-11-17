@@ -69,7 +69,6 @@ public class ItemSharePlayerPanel extends JPanel
 			}
 		}
 		else
-
 		{
 			selectedPlayerName = name;
 
@@ -82,7 +81,6 @@ public class ItemSharePlayerPanel extends JPanel
 		}
 
 		repaint();
-
 	}
 
 	private boolean hasPlayers(ItemShareData data)
