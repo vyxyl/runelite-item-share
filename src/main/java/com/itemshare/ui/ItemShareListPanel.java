@@ -22,14 +22,14 @@ import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.util.AsyncBufferedImage;
 
-public class ItemShareList extends JPanel
+public class ItemShareListPanel extends JPanel
 {
 	private final IconTextField searchBox = new IconTextField();
 	private List<ItemShareRenderItem> currentItems = new ArrayList<>();
 	private final JList<ItemShareRenderItem> itemList;
 	private final ItemShareListModel model = new ItemShareListModel();
 
-	protected ItemShareList()
+	protected ItemShareListPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));

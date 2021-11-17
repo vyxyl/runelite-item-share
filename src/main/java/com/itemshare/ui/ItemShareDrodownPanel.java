@@ -10,11 +10,11 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import net.runelite.client.ui.PluginPanel;
 
-public class ItemShareDrodown extends JPanel
+public class ItemShareDrodownPanel extends JPanel
 {
 	private JComboBox<String> dropdown = new JComboBox<>();
 
-	protected ItemShareDrodown(Consumer<String> callback)
+	protected ItemShareDrodownPanel(Consumer<String> callback)
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));

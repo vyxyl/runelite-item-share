@@ -1,6 +1,7 @@
 package com.itemshare;
 
 import com.google.inject.Provides;
+import static com.itemshare.constant.ItemShareConstants.ICON;
 import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
@@ -204,7 +205,7 @@ public class ItemSharePlugin extends Plugin
 
 	private void createNavigationButton(ItemSharePanel panel)
 	{
-		BufferedImage icon = ImageUtil.loadImageResource(ItemSharePlugin.class, "/icon.png");
+		BufferedImage icon = ImageUtil.loadImageResource(ItemSharePlugin.class, ICON);
 		NavigationButton button = NavigationButton.builder()
 			.tooltip("View shared items")
 			.icon(icon)

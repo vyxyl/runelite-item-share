@@ -11,7 +11,7 @@ import net.runelite.client.game.ItemManager;
 
 public class ItemSharePlayerPanel extends JPanel
 {
-	private final ItemSharePlayerDropdown playerDropdown;
+	private final ItemSharePlayerDropdownPanel playerDropdown;
 	private String selectedPlayerName;
 	private ItemManager itemManager;
 	private ItemShareItemTabPanel tabPanel;
@@ -27,7 +27,7 @@ public class ItemSharePlayerPanel extends JPanel
 
 		tabPanel = new ItemShareItemTabPanel();
 
-		playerDropdown = new ItemSharePlayerDropdown(name -> onPlayerSelect(data, name));
+		playerDropdown = new ItemSharePlayerDropdownPanel(name -> onPlayerSelect(data, name));
 		playerDropdown.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
 
 		noPlayersMessage = new JPanel();

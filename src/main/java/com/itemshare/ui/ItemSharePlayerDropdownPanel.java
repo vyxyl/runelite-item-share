@@ -11,16 +11,16 @@ import java.util.stream.Collectors;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-public class ItemSharePlayerDropdown extends JPanel
+public class ItemSharePlayerDropdownPanel extends JPanel
 {
-	private final ItemShareDrodown dropdown;
+	private final ItemShareDrodownPanel dropdown;
 
-	protected ItemSharePlayerDropdown(Consumer<String> callback)
+	protected ItemSharePlayerDropdownPanel(Consumer<String> callback)
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		dropdown = new ItemShareDrodown(callback);
+		dropdown = new ItemShareDrodownPanel(callback);
 		add(dropdown, BorderLayout.PAGE_START);
 	}
 

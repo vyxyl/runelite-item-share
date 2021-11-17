@@ -1,7 +1,7 @@
 package com.itemshare.ui;
 
 import com.itemshare.model.ItemShareData;
-import javax.swing.BoxLayout;
+import java.awt.BorderLayout;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
@@ -14,7 +14,10 @@ public class ItemSharePanel extends PluginPanel
 	{
 		super(false);
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		setLayout(new BorderLayout());
+
+		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel();
+		add(titlePanel, BorderLayout.NORTH);
 	}
 
 	public void update(ItemManager itemManager, ItemShareData data)
@@ -22,7 +25,7 @@ public class ItemSharePanel extends PluginPanel
 		if (playerPanel == null)
 		{
 			playerPanel = new ItemSharePlayerPanel(itemManager, data);
-			add(playerPanel);
+			add(playerPanel, BorderLayout.CENTER);
 		}
 
 		playerPanel.update(data);
