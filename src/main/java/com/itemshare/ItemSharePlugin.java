@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
@@ -124,8 +125,13 @@ public class ItemSharePlugin extends Plugin
 
 	private void loadData()
 	{
+		ArrayList<ItemSharePlayer> players = cloudService.getPlayers();
+		List<String> names = players.stream().map(ItemSharePlayer::getUserName).collect(Collectors.toList());
+
 		data = configService.getLocalData();
-		data.setPlayers(cloudService.getPlayers());
+		data.getPlayers().removeIf(p -> names.contains(p.getUserName()));
+		data.getPlayers().addAll(players);
+
 		updatePanel();
 	}
 

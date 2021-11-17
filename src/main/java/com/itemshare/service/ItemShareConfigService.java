@@ -40,8 +40,7 @@ public class ItemShareConfigService
 
 	private ItemShareData getData(String json)
 	{
-		ItemShareData data = gson.fromJson(json, ItemShareData.class);
-		return data;
+		return gson.fromJson(json, ItemShareData.class);
 	}
 
 	private ItemShareData getDefaultData()
