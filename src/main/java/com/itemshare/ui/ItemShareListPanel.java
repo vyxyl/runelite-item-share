@@ -34,18 +34,14 @@ public class ItemShareListPanel extends JPanel
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+		setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 		createSearchBox();
 
 		itemList = new JList<>();
 		itemList.setCellRenderer(new ItemShareListRenderer());
 		itemList.setFixedCellWidth(PluginPanel.PANEL_WIDTH);
 
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		panel.add(itemList);
-
-		scrollPane = new JScrollPane(panel);
+		scrollPane = new JScrollPane(itemList);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		add(searchBox);
