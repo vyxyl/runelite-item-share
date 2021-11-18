@@ -10,8 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 {
-	private final List<ListDataListener> listeners = new ArrayList<>();
-
 	private final List<ItemShareRenderItem> items = new ArrayList<>();
 	private List<ItemShareRenderItem> filteredItems = new ArrayList<>();
 
@@ -36,6 +34,11 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 	{
 		items.clear();
 		filteredItems.clear();
+	}
+
+	public List<ItemShareRenderItem> getUnfiliteredItems()
+	{
+		return items;
 	}
 
 	public void filterItems(String text)
@@ -64,8 +67,7 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 
 	private void clearFilter()
 	{
-		filteredItems.clear();
-		filteredItems.addAll(this.items);
+		filteredItems = new ArrayList<>(items);
 	}
 
 	@Override
@@ -83,12 +85,10 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 	@Override
 	public void addListDataListener(ListDataListener l)
 	{
-		listeners.add(l);
 	}
 
 	@Override
 	public void removeListDataListener(ListDataListener l)
 	{
-		listeners.remove(l);
 	}
 }

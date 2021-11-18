@@ -25,10 +25,11 @@ import net.runelite.client.util.AsyncBufferedImage;
 public class ItemShareListPanel extends JPanel
 {
 	private final IconTextField searchBox = new IconTextField();
-	private List<ItemShareRenderItem> items = new ArrayList<>();
-	private final JList<ItemShareRenderItem> list;
 	private final ItemShareListModel model = new ItemShareListModel();
+
+	private final JList<ItemShareRenderItem> list;
 	private final JScrollPane scrollPane;
+	private ItemManager itemManager;
 
 	protected ItemShareListPanel()
 	{
@@ -40,12 +41,19 @@ public class ItemShareListPanel extends JPanel
 		list = new JList<>();
 		list.setCellRenderer(new ItemShareListRenderer());
 		list.setFixedCellWidth(PluginPanel.PANEL_WIDTH);
+		list.setModel(model);
 
 		scrollPane = new JScrollPane(list);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		add(searchBox);
 		add(scrollPane);
+	}
+
+	public void update(ItemManager itemManager, ItemShareContainer data)
+	{
+		updateItems(itemManager, data.getItems());
+		repaintAll();
 	}
 
 	private void createSearchBox()
@@ -66,51 +74,31 @@ public class ItemShareListPanel extends JPanel
 			@Override
 			public void insertUpdate(DocumentEvent e)
 			{
-				searchItem();
+				filterItems();
 			}
 
 			@Override
 			public void removeUpdate(DocumentEvent e)
 			{
-				searchItem();
+				filterItems();
 			}
 
 			@Override
 			public void changedUpdate(DocumentEvent e)
 			{
-				searchItem();
+				filterItems();
 			}
 		};
 	}
 
-	public void update(ItemManager itemManager, ItemShareContainer data)
+	private void filterItems()
 	{
-		updateItems(itemManager, data.getItems());
-		revalidate();
-		repaint();
+		applyCurrentFilter();
+		repaintAll();
 	}
 
-	private void updateItems(ItemManager itemManager, List<ItemShareItem> items)
+	private void repaintAll()
 	{
-		if (items.isEmpty())
-		{
-			this.items.clear();
-			model.removeAll();
-		}
-		else
-		{
-			this.items = getUpdatedItems(itemManager, items);
-			model.replaceAll(this.items);
-		}
-
-		list.setModel(model);
-	}
-
-	private void searchItem()
-	{
-		String text = searchBox.getText();
-
-		model.filterItems(text);
 		list.setModel(model);
 
 		list.repaint();
@@ -120,21 +108,57 @@ public class ItemShareListPanel extends JPanel
 		repaint();
 	}
 
-	private List<ItemShareRenderItem> getUpdatedItems(ItemManager itemManager, List<ItemShareItem> baseItems)
+	private void updateItems(ItemManager itemManager, List<ItemShareItem> items)
+	{
+		this.itemManager = itemManager;
+
+		if (items.isEmpty())
+		{
+			removeAllItems();
+		}
+		else
+		{
+			setAllItems(items);
+		}
+	}
+
+	private void removeAllItems()
+	{
+		model.removeAll();
+	}
+
+	private void setAllItems(List<ItemShareItem> baseItems)
 	{
 		List<ItemShareRenderItem> allItems = getRenderItems(baseItems);
+		setAllRenderItems(allItems);
+	}
+
+	private void setAllRenderItems(List<ItemShareRenderItem> allItems)
+	{
+		List<ItemShareRenderItem> items = model.getUnfiliteredItems();
 		List<ItemShareRenderItem> existingItems = items.stream().filter(allItems::contains).collect(Collectors.toList());
 		List<ItemShareRenderItem> newItems = allItems.stream().filter(item -> !items.contains(item)).collect(Collectors.toList());
-
-		renderIcons(itemManager, newItems);
 
 		existingItems.addAll(newItems);
 		existingItems.sort(Comparator.comparing(item -> item.getItem().getName()));
 
-		return existingItems;
+		model.replaceAll(existingItems);
+		renderIcons(newItems);
+
+		applyCurrentFilter();
 	}
 
-	private void renderIcons(ItemManager itemManager, List<ItemShareRenderItem> items)
+	private void applyCurrentFilter()
+	{
+		model.filterItems(getSearchText());
+	}
+
+	private String getSearchText()
+	{
+		return searchBox == null ? "" : searchBox.getText();
+	}
+
+	private void renderIcons(List<ItemShareRenderItem> items)
 	{
 		items.forEach(item -> {
 			AsyncBufferedImage icon = getIcon(itemManager, item);

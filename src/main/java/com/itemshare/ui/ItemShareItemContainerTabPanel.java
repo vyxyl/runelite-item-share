@@ -11,6 +11,8 @@ public class ItemShareItemContainerTabPanel extends JPanel
 {
 	ItemSharePlayer player;
 
+	JTabbedPane tabs = new JTabbedPane();
+
 	ItemShareContainerPanel equipment;
 	ItemShareContainerPanel inventory;
 	ItemShareContainerPanel bank;
@@ -20,18 +22,27 @@ public class ItemShareItemContainerTabPanel extends JPanel
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-
 		equipment = new ItemShareContainerPanel("equipment");
 		inventory = new ItemShareContainerPanel("inventory");
 		bank = new ItemShareContainerPanel("bank");
 
-		JTabbedPane tabs = new JTabbedPane();
 		tabs.addTab("Equipment", equipment);
 		tabs.addTab("Inventory", inventory);
 		tabs.addTab("Bank", bank);
 		tabs.setAlignmentX(CENTER_ALIGNMENT);
 
 		add(tabs, BorderLayout.NORTH);
+	}
+
+	public void repaintAll()
+	{
+		equipment.repaint();
+		inventory.repaint();
+		bank.repaint();
+
+		tabs.repaint();
+
+		repaint();
 	}
 
 	public void update(ItemManager itemManager, ItemSharePlayer player)

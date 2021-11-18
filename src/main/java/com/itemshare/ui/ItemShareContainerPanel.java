@@ -12,7 +12,7 @@ import net.runelite.client.game.ItemManager;
 
 public class ItemShareContainerPanel extends JPanel
 {
-	private final JTextPane noItemsMessage;
+	private final JTextPane emptyStateMessage;
 	private final ItemShareListPanel list = new ItemShareListPanel();
 
 	protected ItemShareContainerPanel(String containerName)
@@ -21,14 +21,14 @@ public class ItemShareContainerPanel extends JPanel
 
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		noItemsMessage = new JTextPane();
-		noItemsMessage.setText("The player needs to change their " + containerName + " to update this list");
-		noItemsMessage.setBorder(BorderFactory.createEmptyBorder(10, 5, 0, 10));
+		emptyStateMessage = new JTextPane();
+		emptyStateMessage.setText("The player needs to change their " + containerName + " to update this list");
+		emptyStateMessage.setBorder(BorderFactory.createEmptyBorder(10, 5, 0, 10));
 
-		setMessageSettings(noItemsMessage);
-		setCenterStyle(noItemsMessage);
+		setMessageSettings(emptyStateMessage);
+		setCenterStyle(emptyStateMessage);
 
-		add(noItemsMessage);
+		add(emptyStateMessage);
 	}
 
 	private void setMessageSettings(JTextPane actionMessage)
@@ -52,7 +52,7 @@ public class ItemShareContainerPanel extends JPanel
 
 		if (container.getItems().isEmpty())
 		{
-			add(noItemsMessage);
+			add(emptyStateMessage);
 		}
 		else
 		{

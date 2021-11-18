@@ -31,7 +31,7 @@ public class ItemSharePlayerPanel extends JPanel
 		playerDropdown.setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
 
 		noPlayersMessage = new JPanel();
-		noPlayersMessage.add(new JLabel("Login to create a new player"));
+		noPlayersMessage.add(new JLabel("Login to create a new save"));
 
 		noPlayerSelectedMessage = new JPanel();
 		noPlayerSelectedMessage.add(new JLabel("Select a player to view their items"));
@@ -73,11 +73,14 @@ public class ItemSharePlayerPanel extends JPanel
 			selectedPlayerName = name;
 
 			ItemSharePlayer player = getExistingPlayer(data, name);
-			tabPanel.update(this.itemManager, player);
 
+			tabPanel.update(this.itemManager, player);
 			tabPanel.setVisible(true);
+
 			noPlayersMessage.setVisible(false);
 			noPlayerSelectedMessage.setVisible(false);
+
+			tabPanel.repaintAll();
 		}
 
 		repaint();
