@@ -31,6 +31,12 @@ public class ItemShareContainerPanel extends JPanel
 		add(emptyStateMessage);
 	}
 
+	public void clearFilter()
+	{
+		list.clearFilter();
+		repaint();
+	}
+
 	private void setMessageSettings(JTextPane actionMessage)
 	{
 		actionMessage.setOpaque(false);

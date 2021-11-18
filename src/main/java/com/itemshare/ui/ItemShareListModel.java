@@ -53,6 +53,11 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 		}
 	}
 
+	public void clearFilter()
+	{
+		filteredItems = new ArrayList<>(items);
+	}
+
 	private void applyFilter(String text)
 	{
 		filteredItems = items.stream()
@@ -63,11 +68,6 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 	private boolean isMatchingItem(String text, ItemShareRenderItem item)
 	{
 		return item.getItem().getName().toLowerCase().contains(text.toLowerCase());
-	}
-
-	private void clearFilter()
-	{
-		filteredItems = new ArrayList<>(items);
 	}
 
 	@Override

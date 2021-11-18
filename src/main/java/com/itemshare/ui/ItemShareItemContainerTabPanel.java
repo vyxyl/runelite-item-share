@@ -34,15 +34,13 @@ public class ItemShareItemContainerTabPanel extends JPanel
 		add(tabs, BorderLayout.NORTH);
 	}
 
-	public void repaintAll()
+	public void clearFilters()
 	{
-		equipment.repaint();
-		inventory.repaint();
-		bank.repaint();
+		equipment.clearFilter();
+		inventory.clearFilter();
+		bank.clearFilter();
 
-		tabs.repaint();
-
-		repaint();
+		repaintAll();
 	}
 
 	public void update(ItemManager itemManager, ItemSharePlayer player)
@@ -61,6 +59,18 @@ public class ItemShareItemContainerTabPanel extends JPanel
 			bank.update(itemManager, this.player.getBank());
 		}
 
+		tabs.repaint();
 		repaint();
 	}
+
+	public void repaintAll()
+	{
+		equipment.repaint();
+		inventory.repaint();
+		bank.repaint();
+		tabs.repaint();
+
+		repaint();
+	}
+
 }

@@ -56,6 +56,13 @@ public class ItemShareListPanel extends JPanel
 		repaintAll();
 	}
 
+	public void clearFilter()
+	{
+		searchBox.setText("");
+		model.clearFilter();;
+		repaintAll();
+	}
+
 	private void createSearchBox()
 	{
 		searchBox.setIcon(IconTextField.Icon.SEARCH);

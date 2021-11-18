@@ -3,6 +3,7 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.NO_PLAYER;
 import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
+import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -68,12 +69,13 @@ public class ItemSharePlayerPanel extends JPanel
 				noPlayersMessage.setVisible(true);
 			}
 		}
-		else
+		else if (!Objects.equals(selectedPlayerName, name))
 		{
 			selectedPlayerName = name;
 
 			ItemSharePlayer player = getExistingPlayer(data, name);
 
+			tabPanel.clearFilters();
 			tabPanel.update(this.itemManager, player);
 			tabPanel.setVisible(true);
 
