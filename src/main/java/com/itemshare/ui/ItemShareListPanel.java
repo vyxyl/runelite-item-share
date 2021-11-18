@@ -5,6 +5,7 @@ import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareRenderItem;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
@@ -24,7 +25,7 @@ import net.runelite.client.util.AsyncBufferedImage;
 public class ItemShareListPanel extends JPanel
 {
 	private final IconTextField searchBox = new IconTextField();
-	private List<ItemShareRenderItem> currentItems = new ArrayList<>();
+	private List<ItemShareRenderItem> items = new ArrayList<>();
 	private final JList<ItemShareRenderItem> list;
 	private final ItemShareListModel model = new ItemShareListModel();
 	private final JScrollPane scrollPane;
@@ -93,13 +94,13 @@ public class ItemShareListPanel extends JPanel
 	{
 		if (items.isEmpty())
 		{
-			currentItems.clear();
+			this.items.clear();
 			model.removeAll();
 		}
 		else
 		{
-			currentItems = getUpdatedItems(itemManager, items);
-			model.replaceAll(currentItems);
+			this.items = getUpdatedItems(itemManager, items);
+			model.replaceAll(this.items);
 		}
 
 		list.setModel(model);
@@ -119,21 +120,36 @@ public class ItemShareListPanel extends JPanel
 		repaint();
 	}
 
-	private List<ItemShareRenderItem> getUpdatedItems(ItemManager itemManager, List<ItemShareItem> items)
+	private List<ItemShareRenderItem> getUpdatedItems(ItemManager itemManager, List<ItemShareItem> baseItems)
 	{
-		List<ItemShareRenderItem> newItems = items.stream()
-			.filter(item -> !isNullItem(item))
-			.map(item -> ItemShareRenderItem.builder().item(item).build())
-			.collect(Collectors.toList());
+		List<ItemShareRenderItem> allItems = getRenderItems(baseItems);
+		List<ItemShareRenderItem> existingItems = items.stream().filter(allItems::contains).collect(Collectors.toList());
+		List<ItemShareRenderItem> newItems = allItems.stream().filter(item -> !items.contains(item)).collect(Collectors.toList());
 
-		newItems.forEach(item -> {
+		renderIcons(itemManager, newItems);
+
+		existingItems.addAll(newItems);
+		existingItems.sort(Comparator.comparing(item -> item.getItem().getName()));
+
+		return existingItems;
+	}
+
+	private void renderIcons(ItemManager itemManager, List<ItemShareRenderItem> items)
+	{
+		items.forEach(item -> {
 			AsyncBufferedImage icon = getIcon(itemManager, item);
 			item.setImage(icon);
 			item.setIcon(new ImageIcon(icon));
 			icon.onLoaded(() -> repaintItem(item));
 		});
+	}
 
-		return newItems;
+	private List<ItemShareRenderItem> getRenderItems(List<ItemShareItem> items)
+	{
+		return items.stream()
+			.filter(item -> !isNullItem(item))
+			.map(item -> ItemShareRenderItem.builder().item(item).build())
+			.collect(Collectors.toList());
 	}
 
 	private AsyncBufferedImage getIcon(ItemManager itemManager, ItemShareRenderItem renderItem)
