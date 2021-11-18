@@ -13,6 +13,7 @@ import net.runelite.client.game.ItemManager;
 public class ItemShareContainerPanel extends JPanel
 {
 	private final JTextPane noItemsMessage;
+	private final ItemShareListPanel list = new ItemShareListPanel();
 
 	protected ItemShareContainerPanel(String containerName)
 	{
@@ -55,7 +56,6 @@ public class ItemShareContainerPanel extends JPanel
 		}
 		else
 		{
-			ItemShareListPanel list = new ItemShareListPanel();
 			list.update(itemManager, container);
 			add(list);
 		}

@@ -5,10 +5,7 @@ import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareRenderItem;
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -28,7 +25,7 @@ public class ItemShareListPanel extends JPanel
 {
 	private final IconTextField searchBox = new IconTextField();
 	private List<ItemShareRenderItem> currentItems = new ArrayList<>();
-	private final JList<ItemShareRenderItem> itemList;
+	private final JList<ItemShareRenderItem> list;
 	private final ItemShareListModel model = new ItemShareListModel();
 	private final JScrollPane scrollPane;
 
@@ -39,11 +36,11 @@ public class ItemShareListPanel extends JPanel
 		setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 		createSearchBox();
 
-		itemList = new JList<>();
-		itemList.setCellRenderer(new ItemShareListRenderer());
-		itemList.setFixedCellWidth(PluginPanel.PANEL_WIDTH);
+		list = new JList<>();
+		list.setCellRenderer(new ItemShareListRenderer());
+		list.setFixedCellWidth(PluginPanel.PANEL_WIDTH);
 
-		scrollPane = new JScrollPane(itemList);
+		scrollPane = new JScrollPane(list);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
 		add(searchBox);
@@ -97,15 +94,15 @@ public class ItemShareListPanel extends JPanel
 		if (items.isEmpty())
 		{
 			currentItems.clear();
-			model.removeAllItems();
+			model.removeAll();
 		}
 		else
 		{
 			currentItems = getUpdatedItems(itemManager, items);
-			model.setAllItems(currentItems);
+			model.replaceAll(currentItems);
 		}
 
-		itemList.setModel(model);
+		list.setModel(model);
 	}
 
 	private void searchItem()
@@ -113,9 +110,9 @@ public class ItemShareListPanel extends JPanel
 		String text = searchBox.getText();
 
 		model.filterItems(text);
-		itemList.setModel(model);
+		list.setModel(model);
 
-		itemList.repaint();
+		list.repaint();
 		scrollPane.repaint();
 
 		revalidate();
@@ -129,10 +126,11 @@ public class ItemShareListPanel extends JPanel
 			.map(item -> ItemShareRenderItem.builder().item(item).build())
 			.collect(Collectors.toList());
 
-		newItems.forEach(renderItem -> {
-			AsyncBufferedImage icon = getIcon(itemManager, renderItem);
-			renderItem.setImage(icon);
-			renderItem.setIcon(new ImageIcon(icon));
+		newItems.forEach(item -> {
+			AsyncBufferedImage icon = getIcon(itemManager, item);
+			item.setImage(icon);
+			item.setIcon(new ImageIcon(icon));
+			icon.onLoaded(() -> repaintItem(item));
 		});
 
 		return newItems;
@@ -140,23 +138,18 @@ public class ItemShareListPanel extends JPanel
 
 	private AsyncBufferedImage getIcon(ItemManager itemManager, ItemShareRenderItem renderItem)
 	{
-		AsyncBufferedImage icon = itemManager.getImage(
-			renderItem.getItem().getId(),
-			renderItem.getItem().getQuantity(),
-			renderItem.getItem().getQuantity() > 1
-		);
-
-		icon.onLoaded(() -> repaintItem(renderItem));
-		return icon;
+		ItemShareItem item = renderItem.getItem();
+		int quantity = item.getQuantity();
+		return itemManager.getImage(item.getId(), quantity, quantity > 1);
 	}
 
-	private void repaintItem(ItemShareRenderItem renderItem)
+	private void repaintItem(ItemShareRenderItem item)
 	{
-		int index = model.getIndex(renderItem);
+		int index = model.getIndex(item);
 
 		if (index >= 0)
 		{
-			itemList.repaint(itemList.getCellBounds(index, index));
+			list.repaint(list.getCellBounds(index, index));
 		}
 	}
 

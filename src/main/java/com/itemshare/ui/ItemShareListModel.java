@@ -6,34 +6,41 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
+import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 {
-	private final List<ItemShareRenderItem> items = new ArrayList<>();
 	private final List<ListDataListener> listeners = new ArrayList<>();
+
+	private final List<ItemShareRenderItem> items = new ArrayList<>();
 	private List<ItemShareRenderItem> filteredItems = new ArrayList<>();
 
 	public int getIndex(ItemShareRenderItem item)
 	{
-		return this.filteredItems.indexOf(item);
+		return filteredItems.indexOf(item);
 	}
 
-	public void setAllItems(List<ItemShareRenderItem> items)
+	public void replaceAll(List<ItemShareRenderItem> itemsToReplace)
 	{
-		removeAllItems();
-		this.items.addAll(items);
-		this.filteredItems.addAll(items);
+		removeAll();
+		addAll(itemsToReplace);
 	}
 
-	public void removeAllItems()
+	public void addAll(List<ItemShareRenderItem> itemsToAdd)
 	{
-		this.items.clear();
-		this.filteredItems.clear();
+		items.addAll(itemsToAdd);
+		filteredItems.addAll(itemsToAdd);
+	}
+
+	public void removeAll()
+	{
+		items.clear();
+		filteredItems.clear();
 	}
 
 	public void filterItems(String text)
 	{
-		if (text == null || text.isEmpty())
+		if (StringUtils.isEmpty(text))
 		{
 			clearFilter();
 		}
@@ -45,7 +52,7 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 
 	private void applyFilter(String text)
 	{
-		this.filteredItems = this.items.stream()
+		filteredItems = items.stream()
 			.filter(item -> isMatchingItem(text, item))
 			.collect(Collectors.toList());
 	}
@@ -57,7 +64,8 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 
 	private void clearFilter()
 	{
-		this.filteredItems = this.items;
+		filteredItems.clear();
+		filteredItems.addAll(this.items);
 	}
 
 	@Override
