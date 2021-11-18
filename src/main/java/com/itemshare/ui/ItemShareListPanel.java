@@ -6,7 +6,9 @@ import com.itemshare.model.ItemShareRenderItem;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -122,42 +124,40 @@ public class ItemShareListPanel extends JPanel
 
 	private List<ItemShareRenderItem> getUpdatedItems(ItemManager itemManager, List<ItemShareItem> items)
 	{
-		List<ItemShareItem> validItems = items.stream()
+		List<ItemShareRenderItem> newItems = items.stream()
 			.filter(item -> !isNullItem(item))
-			.collect(Collectors.toList());
-
-		List<ItemShareRenderItem> renderItems = validItems.stream()
 			.map(item -> ItemShareRenderItem.builder().item(item).build())
 			.collect(Collectors.toList());
 
-		List<ItemShareRenderItem> newRenderItems = renderItems.stream()
-			.filter(item -> !isNullItem(item) && !currentItems.contains(item))
-			.sorted(Comparator.comparing((ItemShareRenderItem a) -> a.getItem().getName()))
-			.collect(Collectors.toList());
-
-		newRenderItems.forEach(renderItem -> {
-			AsyncBufferedImage icon = itemManager.getImage(
-				renderItem.getItem().getId(),
-				renderItem.getItem().getQuantity(),
-				renderItem.getItem().getQuantity() > 1
-			);
-
+		newItems.forEach(renderItem -> {
+			AsyncBufferedImage icon = getIcon(itemManager, renderItem);
 			renderItem.setImage(icon);
 			renderItem.setIcon(new ImageIcon(icon));
 		});
 
-		List<ItemShareRenderItem> existingRenderItems = currentItems.stream()
-			.filter(renderItems::contains)
-			.collect(Collectors.toList());
-
-		existingRenderItems.addAll(newRenderItems);
-
-		return existingRenderItems;
+		return newItems;
 	}
 
-	private boolean isNullItem(ItemShareRenderItem renderItem)
+	private AsyncBufferedImage getIcon(ItemManager itemManager, ItemShareRenderItem renderItem)
 	{
-		return isNullItem(renderItem.getItem());
+		AsyncBufferedImage icon = itemManager.getImage(
+			renderItem.getItem().getId(),
+			renderItem.getItem().getQuantity(),
+			renderItem.getItem().getQuantity() > 1
+		);
+
+		icon.onLoaded(() -> repaintItem(renderItem));
+		return icon;
+	}
+
+	private void repaintItem(ItemShareRenderItem renderItem)
+	{
+		int index = model.getIndex(renderItem);
+
+		if (index >= 0)
+		{
+			itemList.repaint(itemList.getCellBounds(index, index));
+		}
 	}
 
 	private boolean isNullItem(ItemShareItem item)

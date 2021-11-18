@@ -31,9 +31,7 @@ public class ItemShareRenderItem
 		if (o instanceof ItemShareRenderItem)
 		{
 			ItemShareRenderItem toCompare = (ItemShareRenderItem) o;
-			boolean matchingId = this.item.getId() == toCompare.item.getId();
-			boolean matchingQuantity = this.item.getQuantity() == toCompare.item.getQuantity();
-			return matchingId && matchingQuantity;
+			return this.item.getId() == toCompare.item.getId();
 		}
 		return false;
 	}

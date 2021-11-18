@@ -13,6 +13,11 @@ public class ItemShareListModel implements ListModel<ItemShareRenderItem>
 	private final List<ListDataListener> listeners = new ArrayList<>();
 	private List<ItemShareRenderItem> filteredItems = new ArrayList<>();
 
+	public int getIndex(ItemShareRenderItem item)
+	{
+		return this.filteredItems.indexOf(item);
+	}
+
 	public void setAllItems(List<ItemShareRenderItem> items)
 	{
 		removeAllItems();

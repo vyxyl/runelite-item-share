@@ -21,7 +21,7 @@ public class ItemShareContainerPanel extends JPanel
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
 		noItemsMessage = new JTextPane();
-		noItemsMessage.setText("No " + containerName + " items are saved \n\n The player needs to make a change to their " + containerName + " to update this list");
+		noItemsMessage.setText("The player needs to change their " + containerName + " to update this list");
 		noItemsMessage.setBorder(BorderFactory.createEmptyBorder(10, 5, 0, 10));
 
 		setMessageSettings(noItemsMessage);
