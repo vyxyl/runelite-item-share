@@ -1,6 +1,6 @@
 package com.itemshare.ui;
 
-import static com.itemshare.constant.ItemShareConstants.NO_PLAYER;
+import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
 import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemShareDefaultDataService;
@@ -14,6 +14,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import net.runelite.client.ui.PluginPanel;
+import org.apache.commons.lang3.StringUtils;
 
 public class ItemSharePlayerDropdownPanel extends JPanel
 {
@@ -54,7 +55,7 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		String selected = getSelected();
 
 		return data.getPlayers().stream()
-			.filter(p -> p.getUserName().equals(selected))
+			.filter(p -> StringUtils.equals(p.getName(), selected))
 			.findFirst()
 			.orElse(ItemShareDefaultDataService.getDefaultPlayerData(selected));
 	}
@@ -66,13 +67,13 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		dropdown.removeAllItems();
 
 		List<String> options = getOptions(data);
-		options.add(0, NO_PLAYER);
+		options.add(0, OPTION_NO_PLAYER);
 		options.forEach(dropdown::addItem);
 
 		dropdown.setSelectedItem(options.stream()
-			.filter(n -> n.equals(selected))
+			.filter(option -> StringUtils.equals(option, selected))
 			.findFirst()
-			.orElse(NO_PLAYER));
+			.orElse(OPTION_NO_PLAYER));
 
 		repaint();
 	}
@@ -85,7 +86,7 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 	private List<String> getOptions(ItemShareData data)
 	{
 		return data.getPlayers().stream()
-			.map(ItemSharePlayer::getUserName)
+			.map(ItemSharePlayer::getName)
 			.collect(Collectors.toList());
 	}
 }

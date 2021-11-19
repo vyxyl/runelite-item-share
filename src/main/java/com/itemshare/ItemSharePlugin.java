@@ -1,16 +1,14 @@
 package com.itemshare;
 
 import com.google.inject.Provides;
-import static com.itemshare.constant.ItemShareConstants.ICON;
-import com.itemshare.model.ItemShareContainer;
+import static com.itemshare.constant.ItemShareConstants.ICON_NAV_BUTTON;
+import com.itemshare.db.ItemShareMongoDB;
 import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
-import com.itemshare.service.ItemShareCloudService;
 import com.itemshare.service.ItemShareConfigService;
 import com.itemshare.service.ItemShareDataService;
 import com.itemshare.ui.ItemSharePanel;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -59,7 +57,7 @@ public class ItemSharePlugin extends Plugin
 	private ItemShareConfigService configService;
 
 	@Inject
-	private ItemShareCloudService cloudService;
+	private ItemShareMongoDB db;
 
 	@Inject
 	private ClientToolbar toolbar;
@@ -74,6 +72,7 @@ public class ItemSharePlugin extends Plugin
 	private ItemShareData data;
 	private ItemSharePlayer player;
 	private ItemSharePanel panel;
+	private boolean isConnected;
 
 	@Provides
 	ItemShareConfig provideConfig(ConfigManager configManager)
@@ -84,9 +83,18 @@ public class ItemSharePlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		loadData();
 		loadUI();
+		loadLocalData();
 		updateUI();
+
+		db.connect(() -> {
+			isConnected = true;
+			loadPlayers();
+			updateUI();
+		}, () -> {
+			isConnected = false;
+			updateUI();
+		});
 	}
 
 	@Override
@@ -137,13 +145,16 @@ public class ItemSharePlugin extends Plugin
 		)::contains);
 	}
 
-	private void loadData()
+	private void loadLocalData()
 	{
-		ArrayList<ItemSharePlayer> players = cloudService.getPlayers();
-		List<String> names = players.stream().map(ItemSharePlayer::getUserName).collect(Collectors.toList());
-
 		data = configService.getLocalData();
-		data.getPlayers().removeIf(p -> names.contains(p.getUserName()));
+	}
+
+	private void loadPlayers()
+	{
+		List<ItemSharePlayer> players = db.getPlayers();
+		List<String> names = players.stream().map(ItemSharePlayer::getName).collect(Collectors.toList());
+		data.getPlayers().removeIf(p -> names.contains(p.getName()));
 		data.getPlayers().addAll(players);
 	}
 
@@ -199,21 +210,6 @@ public class ItemSharePlugin extends Plugin
 		{
 			player = getPlayer();
 		}
-//		else if (player.getEquipment() == null)
-//		{
-//			ItemContainer container = client.getItemContainer(InventoryID.EQUIPMENT);
-//			loadEquipment(container);
-//		}
-//		else if (player.getInventory() == null)
-//		{
-//			ItemContainer container = client.getItemContainer(InventoryID.INVENTORY);
-//			loadInventory(container);
-//		}
-//		else if (player.getBank() == null)
-//		{
-//			ItemContainer container = client.getItemContainer(InventoryID.BANK);
-//			loadBank(container);
-//		}
 	}
 
 	private String getPlayerName()
@@ -225,7 +221,7 @@ public class ItemSharePlugin extends Plugin
 	private ItemSharePlayer getPlayer()
 	{
 		return data.getPlayers().stream()
-			.filter(player -> player.getUserName().equals(playerName))
+			.filter(player -> player.getName().equals(playerName))
 			.findFirst()
 			.orElseGet(() -> addPlayer(data, playerName));
 	}
@@ -233,7 +229,7 @@ public class ItemSharePlugin extends Plugin
 	private ItemSharePlayer addPlayer(ItemShareData data, String name)
 	{
 		ItemSharePlayer player = ItemSharePlayer.builder()
-			.userName(playerName)
+			.name(playerName)
 			.build();
 
 		data.getPlayers().add(player);
@@ -244,16 +240,16 @@ public class ItemSharePlugin extends Plugin
 	{
 		return isSupportedWorld()
 			&& player != null
-			&& !StringUtils.isEmpty(player.getUserName())
+			&& !StringUtils.isEmpty(player.getName())
 			&& data != null;
 	}
 
 	private void loadUI()
 	{
 		assert SwingUtilities.isEventDispatchThread();
-		panel = injector.getInstance(ItemSharePanel.class);
+		panel = new ItemSharePanel(configManager, db);
 
-		BufferedImage icon = ImageUtil.loadImageResource(ItemSharePlugin.class, ICON);
+		BufferedImage icon = ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_NAV_BUTTON);
 		NavigationButton button = NavigationButton.builder()
 			.tooltip("View shared items")
 			.icon(icon)
@@ -266,12 +262,16 @@ public class ItemSharePlugin extends Plugin
 
 	private void updateUI()
 	{
-		SwingUtilities.invokeLater(() -> panel.update(itemManager, data));
+		SwingUtilities.invokeLater(() -> panel.update(itemManager, data, isConnected));
 	}
 
 	private void saveData()
 	{
 		configService.saveLocalData(data);
-		cloudService.savePlayerData(player);
+
+		if (isConnected)
+		{
+			db.savePlayer(player);
+		}
 	}
 }

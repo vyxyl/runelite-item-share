@@ -13,6 +13,7 @@ repositories {
 def runeLiteVersion = '1.8.2'
 
 dependencies {
+    compile 'org.mongodb:mongodb-driver-sync:4.2.0'
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
 
 	compileOnly 'org.projectlombok:lombok:1.18.20'

@@ -14,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ItemSharePlayer
 {
-	private String userName;
+	private String name;
 	private ItemShareContainer bank;
 	private ItemShareContainer inventory;
 	private ItemShareContainer equipment;

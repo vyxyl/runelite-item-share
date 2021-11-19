@@ -9,7 +9,7 @@ public class ItemShareDefaultDataService
 	public static ItemSharePlayer getDefaultPlayerData(String playerName)
 	{
 		return ItemSharePlayer.builder()
-			.userName(playerName)
+			.name(playerName)
 			.bank(getDefaultItemContainer())
 			.equipment(getDefaultItemContainer())
 			.inventory(getDefaultItemContainer())
