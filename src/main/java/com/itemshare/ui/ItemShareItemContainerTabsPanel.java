@@ -7,17 +7,15 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import net.runelite.client.game.ItemManager;
 
-public class ItemShareItemContainerTabPanel extends JPanel
+public class ItemShareItemContainerTabsPanel extends JPanel
 {
-	ItemSharePlayer player;
-
 	JTabbedPane tabs = new JTabbedPane();
 
 	ItemShareContainerPanel equipment;
 	ItemShareContainerPanel inventory;
 	ItemShareContainerPanel bank;
 
-	protected ItemShareItemContainerTabPanel()
+	protected ItemShareItemContainerTabsPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -39,38 +37,14 @@ public class ItemShareItemContainerTabPanel extends JPanel
 		equipment.clearFilter();
 		inventory.clearFilter();
 		bank.clearFilter();
-
-		repaintAll();
+		repaint();
 	}
 
 	public void update(ItemManager itemManager, ItemSharePlayer player)
 	{
-		this.player = player;
-		update(itemManager);
+		equipment.update(itemManager, player.getEquipment());
+		inventory.update(itemManager, player.getInventory());
+		bank.update(itemManager, player.getBank());
 		repaint();
 	}
-
-	public void update(ItemManager itemManager)
-	{
-		if (this.player != null)
-		{
-			equipment.update(itemManager, this.player.getEquipment());
-			inventory.update(itemManager, this.player.getInventory());
-			bank.update(itemManager, this.player.getBank());
-		}
-
-		tabs.repaint();
-		repaint();
-	}
-
-	public void repaintAll()
-	{
-		equipment.repaint();
-		inventory.repaint();
-		bank.repaint();
-		tabs.repaint();
-
-		repaint();
-	}
-
 }

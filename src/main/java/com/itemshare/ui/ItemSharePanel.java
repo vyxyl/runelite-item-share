@@ -8,7 +8,7 @@ import net.runelite.client.ui.PluginPanel;
 
 public class ItemSharePanel extends PluginPanel
 {
-	private ItemSharePlayerPanel playerPanel;
+	private final ItemShareNavigationPanel playerPanel = new ItemShareNavigationPanel();
 
 	public ItemSharePanel()
 	{
@@ -17,18 +17,14 @@ public class ItemSharePanel extends PluginPanel
 		setLayout(new BorderLayout());
 
 		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel();
+
 		add(titlePanel, BorderLayout.NORTH);
+		add(playerPanel, BorderLayout.CENTER);
 	}
 
 	public void update(ItemManager itemManager, ItemShareData data)
 	{
-		if (playerPanel == null)
-		{
-			playerPanel = new ItemSharePlayerPanel(itemManager, data);
-			add(playerPanel, BorderLayout.CENTER);
-		}
-
-		playerPanel.update(data);
+		playerPanel.update(itemManager, data);
 		repaint();
 	}
 }

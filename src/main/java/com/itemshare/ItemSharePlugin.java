@@ -8,7 +8,6 @@ import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemShareCloudService;
 import com.itemshare.service.ItemShareConfigService;
 import com.itemshare.service.ItemShareDataService;
-import com.itemshare.service.ItemShareDefaultDataService;
 import com.itemshare.ui.ItemSharePanel;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -38,6 +37,7 @@ import net.runelite.client.plugins.banktags.BankTagsPlugin;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @PluginDescriptor(
@@ -62,7 +62,7 @@ public class ItemSharePlugin extends Plugin
 	private ItemShareCloudService cloudService;
 
 	@Inject
-	private ClientToolbar clientToolbar;
+	private ClientToolbar toolbar;
 
 	@Inject
 	private ConfigManager configManager;
@@ -72,8 +72,8 @@ public class ItemSharePlugin extends Plugin
 
 	private String playerName;
 	private ItemShareData data;
-	private ItemSharePanel panel;
 	private ItemSharePlayer player;
+	private ItemSharePanel panel;
 
 	@Provides
 	ItemShareConfig provideConfig(ConfigManager configManager)
@@ -84,12 +84,9 @@ public class ItemSharePlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		assert SwingUtilities.isEventDispatchThread();
-
-		panel = injector.getInstance(ItemSharePanel.class);
-		createNavigationButton(panel);
-
 		loadData();
+		loadUI();
+		updateUI();
 	}
 
 	@Override
@@ -99,29 +96,45 @@ public class ItemSharePlugin extends Plugin
 	}
 
 	@Subscribe
-	public void onGameStateChanged(GameStateChanged gameStateChanged)
+	public void onGameTick(GameTick event)
 	{
-		loadPlayerData();
-
-		if (data != null && gameStateChanged.getGameState() != GameState.LOGGED_IN)
-		{
-			saveData();
-		}
+		loadPlayer();
 	}
 
 	@Subscribe
-	public void onGameTick(GameTick event)
+	public void onGameStateChanged(GameStateChanged e)
 	{
-		loadPlayerData();
+		if (isValidState())
+		{
+			if (e.getGameState().equals(GameState.LOGGED_IN))
+			{
+				loadPlayer();
+				updateUI();
+			}
+			else
+			{
+				saveData();
+			}
+		}
 	}
 
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		if (isSupportedWorld() && player != null)
+		if (isValidState())
 		{
 			loadItems(event);
 		}
+	}
+
+	private boolean isSupportedWorld()
+	{
+		return client.getWorldType().stream().noneMatch(EnumSet.of(
+			WorldType.NOSAVE_MODE,
+			WorldType.TOURNAMENT_WORLD,
+			WorldType.DEADMAN,
+			WorldType.SEASONAL
+		)::contains);
 	}
 
 	private void loadData()
@@ -132,103 +145,75 @@ public class ItemSharePlugin extends Plugin
 		data = configService.getLocalData();
 		data.getPlayers().removeIf(p -> names.contains(p.getUserName()));
 		data.getPlayers().addAll(players);
-
-		updatePanel();
 	}
 
-	private void loadPlayerData()
+	private void loadItems(ItemContainerChanged event)
+	{
+		ItemContainer container = event.getItemContainer();
+
+		if (container == client.getItemContainer(InventoryID.BANK))
+		{
+			loadBank(container);
+		}
+		else if (container == client.getItemContainer(InventoryID.INVENTORY))
+		{
+			loadInventory(container);
+		}
+		else if (container == client.getItemContainer(InventoryID.EQUIPMENT))
+		{
+			loadEquipment(container);
+		}
+	}
+
+	private void loadEquipment(ItemContainer container)
+	{
+		player.setEquipment(dataService.getItemContainer(container));
+		player.setUpdatedDate(new Date());
+
+		updateUI();
+	}
+
+	private void loadInventory(ItemContainer container)
+	{
+		player.setInventory(dataService.getItemContainer(container));
+		player.setUpdatedDate(new Date());
+
+		updateUI();
+	}
+
+	private void loadBank(ItemContainer container)
+	{
+		player.setBank(dataService.getItemContainer(container));
+		player.setUpdatedDate(new Date());
+
+		updateUI();
+	}
+
+	private void loadPlayer()
 	{
 		if (playerName == null)
 		{
 			playerName = getPlayerName();
 		}
-		else if (player == null && data != null)
+		else if (player == null)
 		{
-			player = getLocalPlayer(data, playerName);
-			updatePanel();
+			player = getPlayer();
 		}
-	}
-
-	private boolean isSupportedWorld()
-	{
-		List<WorldType> worldTypes = new ArrayList<>(client.getWorldType());
-
-		List<WorldType> unsupportedWorldTypes = new ArrayList<>(EnumSet.of(
-			WorldType.NOSAVE_MODE,
-			WorldType.TOURNAMENT_WORLD,
-			WorldType.DEADMAN,
-			WorldType.SEASONAL
-		));
-
-		return worldTypes.stream().noneMatch(unsupportedWorldTypes::contains);
-	}
-
-	private void loadItems(ItemContainerChanged event)
-	{
-		ItemContainer itemContainer = event.getItemContainer();
-		ItemShareContainer itemShareContainer = dataService.getItemContainer(itemContainer);
-
-		if (itemContainer == client.getItemContainer(InventoryID.BANK))
-		{
-			loadBank(itemShareContainer);
-		}
-		else if (itemContainer == client.getItemContainer(InventoryID.INVENTORY))
-		{
-			loadInventory(itemShareContainer);
-		}
-		else if (itemContainer == client.getItemContainer(InventoryID.EQUIPMENT))
-		{
-			loadEquipment(itemShareContainer);
-		}
-	}
-
-	private void loadEquipment(ItemShareContainer itemShareContainer)
-	{
-		player.setEquipment(itemShareContainer);
-		player.setUpdatedDate(new Date());
-		updatePanel();
-	}
-
-	private void loadInventory(ItemShareContainer itemShareContainer)
-	{
-		player.setInventory(itemShareContainer);
-		player.setUpdatedDate(new Date());
-		updatePanel();
-	}
-
-	private void loadBank(ItemShareContainer itemShareContainer)
-	{
-		player.setBank(itemShareContainer);
-		player.setUpdatedDate(new Date());
-		updatePanel();
-	}
-
-	private void createNavigationButton(ItemSharePanel panel)
-	{
-		BufferedImage icon = ImageUtil.loadImageResource(ItemSharePlugin.class, ICON);
-		NavigationButton button = NavigationButton.builder()
-			.tooltip("View shared items")
-			.icon(icon)
-			.priority(7)
-			.panel(panel)
-			.build();
-
-		clientToolbar.addNavigation(button);
-	}
-
-	private ItemSharePlayer getLocalPlayer(ItemShareData data, String playerName)
-	{
-		return data.getPlayers().stream()
-			.filter(p -> p.getUserName().equals(playerName))
-			.findFirst()
-			.orElseGet(() -> getNewPlayer(data, playerName));
-	}
-
-	private ItemSharePlayer getNewPlayer(ItemShareData data, String playerName)
-	{
-		ItemSharePlayer player = ItemShareDefaultDataService.getDefaultPlayerData(playerName);
-		data.getPlayers().add(player);
-		return player;
+//		else if (player.getEquipment() == null)
+//		{
+//			ItemContainer container = client.getItemContainer(InventoryID.EQUIPMENT);
+//			loadEquipment(container);
+//		}
+//		else if (player.getInventory() == null)
+//		{
+//			ItemContainer container = client.getItemContainer(InventoryID.INVENTORY);
+//			loadInventory(container);
+//		}
+//		else if (player.getBank() == null)
+//		{
+//			ItemContainer container = client.getItemContainer(InventoryID.BANK);
+//			loadBank(container);
+//		}
 	}
 
 	private String getPlayerName()
@@ -237,7 +222,49 @@ public class ItemSharePlugin extends Plugin
 		return player == null ? null : player.getName();
 	}
 
-	private void updatePanel()
+	private ItemSharePlayer getPlayer()
+	{
+		return data.getPlayers().stream()
+			.filter(player -> player.getUserName().equals(playerName))
+			.findFirst()
+			.orElseGet(() -> addPlayer(data, playerName));
+	}
+
+	private ItemSharePlayer addPlayer(ItemShareData data, String name)
+	{
+		ItemSharePlayer player = ItemSharePlayer.builder()
+			.userName(playerName)
+			.build();
+
+		data.getPlayers().add(player);
+		return player;
+	}
+
+	private boolean isValidState()
+	{
+		return isSupportedWorld()
+			&& player != null
+			&& !StringUtils.isEmpty(player.getUserName())
+			&& data != null;
+	}
+
+	private void loadUI()
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		panel = injector.getInstance(ItemSharePanel.class);
+
+		BufferedImage icon = ImageUtil.loadImageResource(ItemSharePlugin.class, ICON);
+		NavigationButton button = NavigationButton.builder()
+			.tooltip("View shared items")
+			.icon(icon)
+			.priority(7)
+			.panel(panel)
+			.build();
+
+		toolbar.addNavigation(button);
+	}
+
+	private void updateUI()
 	{
 		SwingUtilities.invokeLater(() -> panel.update(itemManager, data));
 	}
