@@ -56,14 +56,9 @@ public class ItemShareMongoDBPanel extends JPanel
 
 		button.addMouseListener(new java.awt.event.MouseAdapter()
 		{
-			public void mouseEntered(java.awt.event.MouseEvent evt)
+			public void mousePressed(java.awt.event.MouseEvent evt)
 			{
-				db.reconnect();
-			}
-
-			public void mouseExited(java.awt.event.MouseEvent evt)
-			{
-				db.reconnect();
+				db.getPlayers();
 			}
 		});
 
@@ -99,6 +94,7 @@ public class ItemShareMongoDBPanel extends JPanel
 		JLabel label = getLabel("Password");
 		JPasswordField value = new JPasswordField();
 		value.setText(configManager.getConfiguration(CONFIG_BASE, CONFIG_MONGODB_PASSWORD));
+		value.getDocument().addDocumentListener(getListener(value));
 		setAsLine(value);
 
 		setting.add(label);
@@ -173,6 +169,30 @@ public class ItemShareMongoDBPanel extends JPanel
 			public void changedUpdate(DocumentEvent e)
 			{
 				updateSetting(key, field.getText());
+			}
+		};
+	}
+
+	private DocumentListener getListener(JPasswordField field)
+	{
+		return new DocumentListener()
+		{
+			@Override
+			public void insertUpdate(DocumentEvent e)
+			{
+				updateSetting(CONFIG_MONGODB_PASSWORD, new String(field.getPassword()));
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e)
+			{
+				updateSetting(CONFIG_MONGODB_PASSWORD, new String(field.getPassword()));
+			}
+
+			@Override
+			public void changedUpdate(DocumentEvent e)
+			{
+				updateSetting(CONFIG_MONGODB_PASSWORD, new String(field.getPassword()));
 			}
 		};
 	}

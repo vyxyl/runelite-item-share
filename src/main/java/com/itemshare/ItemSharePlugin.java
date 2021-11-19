@@ -87,9 +87,11 @@ public class ItemSharePlugin extends Plugin
 		loadLocalData();
 		updateUI();
 
-		db.setCallback(this::loadPlayers);
+		db.setPlayersCallback(players -> {
+			setPlayers(players);
+			isConnected = true;
+		});
 		db.connect();
-
 		loadPlayers();
 	}
 
@@ -149,10 +151,15 @@ public class ItemSharePlugin extends Plugin
 	private void loadPlayers()
 	{
 		List<ItemSharePlayer> players = db.getPlayers();
+
+		setPlayers(players);
+	}
+
+	private void setPlayers(List<ItemSharePlayer> players)
+	{
 		List<String> names = players.stream().map(ItemSharePlayer::getName).collect(Collectors.toList());
 		data.getPlayers().removeIf(p -> names.contains(p.getName()));
 		data.getPlayers().addAll(players);
-		isConnected = true;
 		updateUI();
 	}
 

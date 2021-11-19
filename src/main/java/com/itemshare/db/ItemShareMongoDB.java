@@ -21,6 +21,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.event.ServerMonitorListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import net.runelite.client.config.ConfigManager;
@@ -32,13 +33,13 @@ public class ItemShareMongoDB implements ServerMonitorListener
 	@Inject
 	private ConfigManager configManager;
 
-	private Runnable callback;
+	private Consumer<List<ItemSharePlayer>> playersCallback;
 	private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 	private MongoCollection<Document> collection;
 
-	public void setCallback(Runnable callback)
+	public void setPlayersCallback(Consumer<List<ItemSharePlayer>> callback)
 	{
-		this.callback = callback;
+		this.playersCallback = callback;
 	}
 
 	public boolean hasEnvironmentVariables()
@@ -57,13 +58,12 @@ public class ItemShareMongoDB implements ServerMonitorListener
 			MongoClient client = createClient();
 			MongoDatabase database = client.getDatabase(getDatabaseName());
 			collection = database.getCollection(getCollectionName());
-			callback.run();
 		}
 	}
 
 	public void reconnect()
 	{
-		if (collection == null)
+		if (this.hasEnvironmentVariables() && collection == null)
 		{
 			connect();
 		}
@@ -71,10 +71,10 @@ public class ItemShareMongoDB implements ServerMonitorListener
 
 	public void savePlayer(ItemSharePlayer player)
 	{
-		reconnect();
-
-		if (player != null)
+		if (this.hasEnvironmentVariables() && player != null)
 		{
+			reconnect();
+
 			String json = gson.toJson(player);
 			Document data = Document.parse(json);
 
@@ -87,15 +87,26 @@ public class ItemShareMongoDB implements ServerMonitorListener
 
 	public List<ItemSharePlayer> getPlayers()
 	{
-		reconnect();
+		if (this.hasEnvironmentVariables())
+		{
+			reconnect();
 
-		FindIterable<Document> iterable = collection.find();
-		List<Document> documents = new ArrayList<>();
-		iterable.forEach(documents::add);
+			FindIterable<Document> iterable = collection.find();
+			List<Document> documents = new ArrayList<>();
+			iterable.forEach(documents::add);
 
-		return documents.stream()
-			.map(document -> gson.fromJson(document.toJson(), ItemSharePlayer.class))
-			.collect(Collectors.toList());
+			List<ItemSharePlayer> players = documents.stream()
+				.map(document -> gson.fromJson(document.toJson(), ItemSharePlayer.class))
+				.collect(Collectors.toList());
+
+			this.playersCallback.accept(players);
+
+			return players;
+		}
+		else
+		{
+			return new ArrayList<>();
+		}
 	}
 
 	private MongoClient createClient()
