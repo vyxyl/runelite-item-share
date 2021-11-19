@@ -6,6 +6,7 @@ import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS_BUTTON;
 import com.itemshare.db.ItemShareMongoDB;
 import com.itemshare.model.ItemShareData;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -20,8 +21,9 @@ import net.runelite.client.util.SwingUtil;
 
 public class ItemSharePanel extends PluginPanel
 {
+	private final JButton settingsButton = createSettingsButton();
 	private final ItemShareMongoDBPanel settingsPanel;
-	private final ItemShareNavigationPanel playerPanel = new ItemShareNavigationPanel();
+	private final ItemShareNavigationPanel navPanel = new ItemShareNavigationPanel();
 	private final ImageIcon settingsIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_SETTINGS_BUTTON));
 	private final ImageIcon closeIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_CLOSE_BUTTON));
 
@@ -32,24 +34,23 @@ public class ItemSharePanel extends PluginPanel
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
 
-		settingsPanel = new ItemShareMongoDBPanel(configManager, db);
-
 		JPanel controls = getControls();
-
 		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel();
 		titlePanel.add(controls);
 
-		add(titlePanel, BorderLayout.NORTH);
-		add(settingsPanel, BorderLayout.CENTER);
-		add(playerPanel, BorderLayout.CENTER);
+		settingsPanel = new ItemShareMongoDBPanel(configManager, db);
+		settingsPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 100));
+		navPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 100));
 
-		showSettings();
+		add(titlePanel, BorderLayout.PAGE_START);
+		add(settingsPanel, BorderLayout.WEST);
+		add(navPanel, BorderLayout.CENTER);
 	}
 
 	public void update(ItemManager itemManager, ItemShareData data, boolean isConnected)
 	{
 		settingsPanel.update(isConnected);
-		playerPanel.update(itemManager, data);
+		navPanel.update(itemManager, data);
 
 		if (isConnected)
 		{
@@ -63,24 +64,26 @@ public class ItemSharePanel extends PluginPanel
 
 	private void showData()
 	{
-		playerPanel.show();
-		settingsPanel.hide();
+		settingsButton.setIcon(settingsIcon);
+		add(navPanel);
+		remove(settingsPanel);
 
 		repaintAll();
 	}
 
 	private void showSettings()
 	{
-		playerPanel.hide();
-		settingsPanel.show();
+		settingsButton.setIcon(closeIcon);
+		remove(navPanel);
+		add(settingsPanel);
 
 		repaintAll();
 	}
 
 	private void repaintAll()
 	{
-		playerPanel.revalidate();
-		playerPanel.repaint();
+		navPanel.revalidate();
+		navPanel.repaint();
 
 		settingsPanel.revalidate();
 		settingsPanel.repaint();
@@ -91,7 +94,6 @@ public class ItemSharePanel extends PluginPanel
 
 	private JPanel getControls()
 	{
-		JButton settingsButton = createSettingsButton();
 		JPanel controls = new JPanel(new GridLayout(1, 3, 10, 0));
 		controls.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		controls.add(settingsButton);
@@ -132,12 +134,10 @@ public class ItemSharePanel extends PluginPanel
 	{
 		if (button.getIcon() == settingsIcon)
 		{
-			button.setIcon(closeIcon);
 			showSettings();
 		}
 		else
 		{
-			button.setIcon(settingsIcon);
 			showData();
 		}
 	}

@@ -72,7 +72,7 @@ public class ItemSharePlugin extends Plugin
 	private ItemShareData data;
 	private ItemSharePlayer player;
 	private ItemSharePanel panel;
-	private boolean isConnected;
+	private boolean isConnected = false;
 
 	@Provides
 	ItemShareConfig provideConfig(ConfigManager configManager)
@@ -87,14 +87,10 @@ public class ItemSharePlugin extends Plugin
 		loadLocalData();
 		updateUI();
 
-		db.connect(() -> {
-			isConnected = true;
-			loadPlayers();
-			updateUI();
-		}, () -> {
-			isConnected = false;
-			updateUI();
-		});
+		db.setCallback(this::loadPlayers);
+		db.connect();
+
+		loadPlayers();
 	}
 
 	@Override
@@ -156,6 +152,8 @@ public class ItemSharePlugin extends Plugin
 		List<String> names = players.stream().map(ItemSharePlayer::getName).collect(Collectors.toList());
 		data.getPlayers().removeIf(p -> names.contains(p.getName()));
 		data.getPlayers().addAll(players);
+		isConnected = true;
+		updateUI();
 	}
 
 	private void loadItems(ItemContainerChanged event)

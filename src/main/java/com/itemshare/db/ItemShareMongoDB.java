@@ -32,11 +32,14 @@ public class ItemShareMongoDB implements ServerMonitorListener
 	@Inject
 	private ConfigManager configManager;
 
+	private Runnable callback;
 	private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-
-	private Runnable onReady;
-	private Runnable onClosed;
 	private MongoCollection<Document> collection;
+
+	public void setCallback(Runnable callback)
+	{
+		this.callback = callback;
+	}
 
 	public boolean hasEnvironmentVariables()
 	{
@@ -47,41 +50,45 @@ public class ItemShareMongoDB implements ServerMonitorListener
 			&& !StringUtils.isEmpty(getPassword());
 	}
 
-	public void connect(Runnable onReady, Runnable onClosed)
+	public void connect()
 	{
-		this.onReady = onReady;
-		this.onClosed = onClosed;
-
 		if (this.hasEnvironmentVariables())
 		{
-			MongoClient client = createClient(onReady, onClosed);
+			MongoClient client = createClient();
 			MongoDatabase database = client.getDatabase(getDatabaseName());
 			collection = database.getCollection(getCollectionName());
-		}
-		else
-		{
-			onClosed.run();
+			callback.run();
 		}
 	}
 
 	public void reconnect()
 	{
-		connect(onReady, onClosed);
+		if (collection == null)
+		{
+			connect();
+		}
 	}
 
 	public void savePlayer(ItemSharePlayer player)
 	{
-		String json = gson.toJson(player);
-		Document data = Document.parse(json);
+		reconnect();
 
-		collection.updateOne(
-			Filters.eq("name", player.getName()),
-			new Document("$set", data),
-			new UpdateOptions().upsert(true));
+		if (player != null)
+		{
+			String json = gson.toJson(player);
+			Document data = Document.parse(json);
+
+			collection.updateOne(
+				Filters.eq("name", player.getName()),
+				new Document("$set", data),
+				new UpdateOptions().upsert(true));
+		}
 	}
 
 	public List<ItemSharePlayer> getPlayers()
 	{
+		reconnect();
+
 		FindIterable<Document> iterable = collection.find();
 		List<Document> documents = new ArrayList<>();
 		iterable.forEach(documents::add);
@@ -91,12 +98,11 @@ public class ItemShareMongoDB implements ServerMonitorListener
 			.collect(Collectors.toList());
 	}
 
-	private MongoClient createClient(Runnable onReady, Runnable onClosed)
+	private MongoClient createClient()
 	{
 		ConnectionString connection = new ConnectionString(getConnectionString());
 		MongoClientSettings settings = MongoClientSettings.builder()
 			.applyConnectionString(connection)
-			.applyToConnectionPoolSettings(builder -> builder.addConnectionPoolListener(new ItemShareMongoDBListener(onReady, onClosed)))
 			.build();
 		return MongoClients.create(settings);
 	}

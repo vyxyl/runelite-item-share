@@ -71,6 +71,7 @@ public class ItemShareMongoDBPanel extends JPanel
 
 		JPanel footer = new JPanel();
 		footer.add(button);
+		footer.add(status);
 
 		add(footer);
 	}

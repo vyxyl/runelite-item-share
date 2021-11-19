@@ -10,7 +10,7 @@ public class ItemShareConstants
 	public static final String CONFIG_MONGODB_USERNAME = "mongoDbUsername";
 	public static final String CONFIG_MONGODB_PASSWORD = "mongoDbPassword";
 
-	public static final String ICON_NAV_BUTTON = "/close.png";
+	public static final String ICON_NAV_BUTTON = "/icon.png";
 	public static final String ICON_CLOSE_BUTTON = "/close.png";
 	public static final String ICON_SETTINGS_BUTTON = "/settings.png";
 
