@@ -9,6 +9,8 @@ import com.itemshare.service.ItemShareConfigService;
 import com.itemshare.service.ItemShareDataService;
 import com.itemshare.ui.ItemSharePanel;
 import java.awt.image.BufferedImage;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -68,10 +70,12 @@ public class ItemSharePlugin extends Plugin
 	@Inject
 	private ItemManager itemManager;
 
+	private final long SYNC_MS = 15 * 1000;
 	private String playerName;
 	private ItemShareData data;
 	private ItemSharePlayer player;
 	private ItemSharePanel panel;
+	private Instant lastSync = Instant.now();
 	private boolean isConnected = false;
 
 	@Provides
@@ -105,6 +109,21 @@ public class ItemSharePlugin extends Plugin
 	public void onGameTick(GameTick event)
 	{
 		loadPlayer();
+		syncData();
+	}
+
+	private void syncData()
+	{
+		if (isConnected)
+		{
+			Duration diff = Duration.between(lastSync, Instant.now());
+			if (diff.toMillis() > SYNC_MS)
+			{
+				lastSync = Instant.now();
+				savePlayer();
+				loadPlayers();
+			}
+		}
 	}
 
 	@Subscribe
@@ -273,7 +292,11 @@ public class ItemSharePlugin extends Plugin
 	private void saveData()
 	{
 		configService.saveLocalData(data);
+		savePlayer();
+	}
 
+	private void savePlayer()
+	{
 		if (isConnected)
 		{
 			db.savePlayer(player);
