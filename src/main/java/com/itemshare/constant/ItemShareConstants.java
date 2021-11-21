@@ -15,4 +15,6 @@ public class ItemShareConstants
 	public static final String ICON_SETTINGS_BUTTON = "/settings.png";
 
 	public static final String OPTION_NO_PLAYER = "Select a player";
+
+	public static final long MONGODB_SYNC_FREQUENCY_MS = 15 * 1000;
 }

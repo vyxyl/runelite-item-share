@@ -2,6 +2,7 @@ package com.itemshare;
 
 import com.google.inject.Provides;
 import static com.itemshare.constant.ItemShareConstants.ICON_NAV_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.MONGODB_SYNC_FREQUENCY_MS;
 import com.itemshare.db.ItemShareMongoDB;
 import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
@@ -70,13 +71,11 @@ public class ItemSharePlugin extends Plugin
 	@Inject
 	private ItemManager itemManager;
 
-	private final long SYNC_MS = 15 * 1000;
 	private String playerName;
 	private ItemShareData data;
 	private ItemSharePlayer player;
 	private ItemSharePanel panel;
-	private Instant lastSync = Instant.now();
-	private boolean isConnected = false;
+	private Instant lastSync;
 
 	@Provides
 	ItemShareConfig provideConfig(ConfigManager configManager)
@@ -91,12 +90,7 @@ public class ItemSharePlugin extends Plugin
 		loadLocalData();
 		updateUI();
 
-		db.setPlayersCallback(players -> {
-			setPlayers(players);
-			isConnected = true;
-		});
-		db.connect();
-		loadPlayers();
+		db.connect(this::onConnectionSuccess, this::onConnectionFailure);
 	}
 
 	@Override
@@ -109,38 +103,21 @@ public class ItemSharePlugin extends Plugin
 	public void onGameTick(GameTick event)
 	{
 		loadPlayer();
-		syncData();
-	}
-
-	private void syncData()
-	{
-		if (isConnected)
-		{
-			Duration diff = Duration.between(lastSync, Instant.now());
-			if (diff.toMillis() > SYNC_MS)
-			{
-				lastSync = Instant.now();
-				savePlayer();
-				loadPlayers();
-			}
-		}
 	}
 
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged e)
 	{
-		if (isValidState())
+		loadPlayer();
+
+		boolean isNotLoggedIn = e.getGameState().equals(GameState.LOGGED_IN);
+
+		if (isValidState() && !isNotLoggedIn)
 		{
-			if (e.getGameState().equals(GameState.LOGGED_IN))
-			{
-				loadPlayer();
-				updateUI();
-			}
-			else
-			{
-				saveData();
-			}
+			saveData();
 		}
+
+		updateUI();
 	}
 
 	@Subscribe
@@ -150,6 +127,32 @@ public class ItemSharePlugin extends Plugin
 		{
 			loadItems(event);
 		}
+	}
+
+	private void onConnectionSuccess()
+	{
+		syncData();
+		updateUI();
+	}
+
+	private void onConnectionFailure()
+	{
+		updateUI();
+	}
+
+	private void syncData()
+	{
+		if (lastSync == null || db.isConnected() && isSyncExpired())
+		{
+			lastSync = Instant.now();
+			savePlayer();
+			loadPlayers();
+		}
+	}
+
+	private boolean isSyncExpired()
+	{
+		return Duration.between(lastSync, Instant.now()).toMillis() > MONGODB_SYNC_FREQUENCY_MS - 100;
 	}
 
 	private boolean isSupportedWorld()
@@ -179,7 +182,6 @@ public class ItemSharePlugin extends Plugin
 		List<String> names = players.stream().map(ItemSharePlayer::getName).collect(Collectors.toList());
 		data.getPlayers().removeIf(p -> names.contains(p.getName()));
 		data.getPlayers().addAll(players);
-		updateUI();
 	}
 
 	private void loadItems(ItemContainerChanged event)
@@ -226,7 +228,7 @@ public class ItemSharePlugin extends Plugin
 
 	private void loadPlayer()
 	{
-		if (playerName == null)
+		if (StringUtils.isEmpty(playerName))
 		{
 			playerName = getPlayerName();
 		}
@@ -254,6 +256,7 @@ public class ItemSharePlugin extends Plugin
 	{
 		ItemSharePlayer player = ItemSharePlayer.builder()
 			.name(playerName)
+			.updatedDate(new Date())
 			.build();
 
 		data.getPlayers().add(player);
@@ -286,7 +289,7 @@ public class ItemSharePlugin extends Plugin
 
 	private void updateUI()
 	{
-		SwingUtilities.invokeLater(() -> panel.update(itemManager, data, isConnected));
+		SwingUtilities.invokeLater(() -> panel.update(itemManager, data, db.getStatus()));
 	}
 
 	private void saveData()
@@ -297,7 +300,7 @@ public class ItemSharePlugin extends Plugin
 
 	private void savePlayer()
 	{
-		if (isConnected)
+		if (db.isConnected())
 		{
 			db.savePlayer(player);
 		}

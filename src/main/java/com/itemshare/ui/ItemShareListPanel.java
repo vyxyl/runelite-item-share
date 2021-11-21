@@ -119,7 +119,7 @@ public class ItemShareListPanel extends JPanel
 	{
 		this.itemManager = itemManager;
 
-		if (items.isEmpty())
+		if (items == null || items.isEmpty())
 		{
 			removeAllItems();
 		}

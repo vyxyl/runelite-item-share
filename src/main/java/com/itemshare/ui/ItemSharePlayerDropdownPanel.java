@@ -34,6 +34,7 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		dropdown.setFocusable(false);
 		dropdown.setForeground(Color.WHITE);
 		dropdown.setRenderer(new ItemShareDropdownRenderer());
+		dropdown.setSelectedItem(OPTION_NO_PLAYER);
 
 		add(dropdown);
 	}
@@ -70,12 +71,26 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		options.add(0, OPTION_NO_PLAYER);
 		options.forEach(dropdown::addItem);
 
-		dropdown.setSelectedItem(options.stream()
-			.filter(option -> StringUtils.equals(option, selected))
-			.findFirst()
-			.orElse(OPTION_NO_PLAYER));
+		String selectedItem = findSelectedOption(options, selected);
+
+		dropdown.setSelectedItem(selectedItem);
 
 		repaint();
+	}
+
+	private String findSelectedOption(List<String> options, String selected)
+	{
+		if (selected == null)
+		{
+			return OPTION_NO_PLAYER;
+		}
+		else
+		{
+			return options.stream()
+				.filter(option -> StringUtils.equals(option, selected))
+				.findFirst()
+				.orElse(OPTION_NO_PLAYER);
+		}
 	}
 
 	private String getSelected()

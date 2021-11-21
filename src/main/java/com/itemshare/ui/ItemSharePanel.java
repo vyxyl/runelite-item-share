@@ -4,9 +4,9 @@ import com.itemshare.ItemSharePlugin;
 import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS_BUTTON;
 import com.itemshare.db.ItemShareMongoDB;
+import com.itemshare.db.ItemShareMongoDBStatus;
 import com.itemshare.model.ItemShareData;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,8 +21,9 @@ import net.runelite.client.util.SwingUtil;
 
 public class ItemSharePanel extends PluginPanel
 {
+	private final ItemShareTitlePanel titlePanel = new ItemShareTitlePanel();
 	private final JButton settingsButton = createSettingsButton();
-	private final ItemShareMongoDBPanel settingsPanel;
+	private final ItemShareMongoDBPanel mongoDbPanel;
 	private final ItemShareNavigationPanel navPanel = new ItemShareNavigationPanel();
 	private final ImageIcon settingsIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_SETTINGS_BUTTON));
 	private final ImageIcon closeIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_CLOSE_BUTTON));
@@ -34,48 +35,38 @@ public class ItemSharePanel extends PluginPanel
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setLayout(new BorderLayout());
 
-		JPanel controls = getControls();
-		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel();
-		titlePanel.add(controls);
-
-		settingsPanel = new ItemShareMongoDBPanel(configManager, db);
-		settingsPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 100));
-		navPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 100));
+		titlePanel.add(getControls());
+		mongoDbPanel = new ItemShareMongoDBPanel(configManager, db, this::showSharedItems);
 
 		add(titlePanel, BorderLayout.PAGE_START);
-		add(settingsPanel, BorderLayout.WEST);
+		add(mongoDbPanel, BorderLayout.CENTER);
 		add(navPanel, BorderLayout.CENTER);
+
+		showMongoDB();
 	}
 
-	public void update(ItemManager itemManager, ItemShareData data, boolean isConnected)
+	public void update(ItemManager itemManager, ItemShareData data, ItemShareMongoDBStatus status)
 	{
-		settingsPanel.update(isConnected);
+		mongoDbPanel.update(status);
 		navPanel.update(itemManager, data);
-
-		if (isConnected)
-		{
-			showData();
-		}
-		else
-		{
-			showSettings();
-		}
 	}
 
-	private void showData()
+	private void showSharedItems()
 	{
 		settingsButton.setIcon(settingsIcon);
+		titlePanel.setTitleName("Item Share");
 		add(navPanel);
-		remove(settingsPanel);
+		remove(mongoDbPanel);
 
 		repaintAll();
 	}
 
-	private void showSettings()
+	private void showMongoDB()
 	{
 		settingsButton.setIcon(closeIcon);
+		titlePanel.setTitleName("MongoDB Settings");
 		remove(navPanel);
-		add(settingsPanel);
+		add(mongoDbPanel);
 
 		repaintAll();
 	}
@@ -85,8 +76,10 @@ public class ItemSharePanel extends PluginPanel
 		navPanel.revalidate();
 		navPanel.repaint();
 
-		settingsPanel.revalidate();
-		settingsPanel.repaint();
+		mongoDbPanel.revalidate();
+		mongoDbPanel.repaint();
+
+		titlePanel.repaint();
 
 		revalidate();
 		repaint();
@@ -134,11 +127,11 @@ public class ItemSharePanel extends PluginPanel
 	{
 		if (button.getIcon() == settingsIcon)
 		{
-			showSettings();
+			showMongoDB();
 		}
 		else
 		{
-			showData();
+			showSharedItems();
 		}
 	}
 }

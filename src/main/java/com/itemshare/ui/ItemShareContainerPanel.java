@@ -56,7 +56,7 @@ public class ItemShareContainerPanel extends JPanel
 	{
 		removeAll();
 
-		if (container.getItems().isEmpty())
+		if (container == null || container.getItems().isEmpty())
 		{
 			add(emptyStateMessage);
 		}
