@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import net.runelite.client.game.ItemManager;
 
-public class ItemShareItemPlayerItemsPanel extends JPanel
+public class ItemSharePlayerItemsPanel extends JPanel
 {
 	JTabbedPane tabs = new JTabbedPane();
 
@@ -15,7 +15,7 @@ public class ItemShareItemPlayerItemsPanel extends JPanel
 	ItemShareContainerPanel inventory;
 	ItemShareContainerPanel bank;
 
-	protected ItemShareItemPlayerItemsPanel()
+	protected ItemSharePlayerItemsPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
