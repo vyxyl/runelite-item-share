@@ -73,15 +73,11 @@ public class ItemSharePanel extends PluginPanel
 
 	private void repaintAll()
 	{
-		navPanel.revalidate();
-		navPanel.repaint();
-
 		mongoDbPanel.revalidate();
 		mongoDbPanel.repaint();
 
 		titlePanel.repaint();
 
-		revalidate();
 		repaint();
 	}
 

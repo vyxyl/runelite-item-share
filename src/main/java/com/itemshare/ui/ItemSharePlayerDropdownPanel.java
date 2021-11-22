@@ -7,6 +7,8 @@ import com.itemshare.service.ItemShareDefaultDataService;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
@@ -20,6 +22,7 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 {
 	private ItemListener listener;
 	private final JComboBox<String> dropdown;
+	private List<String> previousOptions = new ArrayList<String>();
 
 	protected ItemSharePlayerDropdownPanel()
 	{
@@ -63,19 +66,23 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 
 	public void update(ItemShareData data)
 	{
-		String selected = getSelected();
-
-		dropdown.removeAllItems();
-
 		List<String> options = getOptions(data);
 		options.add(0, OPTION_NO_PLAYER);
-		options.forEach(dropdown::addItem);
 
-		String selectedItem = findSelectedOption(options, selected);
+		if (!listEqualsIgnoreOrder(options, previousOptions))
+		{
+			String selected = getSelected();
 
-		dropdown.setSelectedItem(selectedItem);
+			dropdown.removeAllItems();
+			options.forEach(dropdown::addItem);
 
-		repaint();
+			String selectedItem = findSelectedOption(options, selected);
+			dropdown.setSelectedItem(selectedItem);
+
+			previousOptions = new ArrayList<>(options);
+
+			repaint();
+		}
 	}
 
 	private String findSelectedOption(List<String> options, String selected)
@@ -103,5 +110,10 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		return data.getPlayers().stream()
 			.map(ItemSharePlayer::getName)
 			.collect(Collectors.toList());
+	}
+
+	public static <T> boolean listEqualsIgnoreOrder(List<T> list1, List<T> list2)
+	{
+		return new HashSet<>(list1).equals(new HashSet<>(list2));
 	}
 }

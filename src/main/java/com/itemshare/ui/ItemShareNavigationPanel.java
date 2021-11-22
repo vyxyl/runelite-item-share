@@ -8,6 +8,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.runelite.client.game.ItemManager;
+import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareNavigationPanel extends JPanel
 {
@@ -42,8 +43,6 @@ public class ItemShareNavigationPanel extends JPanel
 				lastUpdated.setText(getUpdatedDateString());
 			}
 		});
-
-		repaint();
 	}
 
 	private String getUpdatedDateString()
@@ -61,19 +60,30 @@ public class ItemShareNavigationPanel extends JPanel
 	private void updateData(ItemManager itemManager, ItemShareData data)
 	{
 		updateTabs(itemManager, data);
-		repaint();
 	}
 
 	private void updateTabs(ItemManager itemManager, ItemShareData data)
 	{
 		ItemSharePlayer selectedPlayer = playerDropdown.getSelectedPlayer(data);
 
-		if (selectedPlayer != player)
+		if (!isSamePlayer(selectedPlayer))
 		{
-			player = selectedPlayer;
 			playerItems.clearFilters();
 		}
 
+		player = selectedPlayer;
 		playerItems.update(itemManager, selectedPlayer);
+	}
+
+	private boolean isSamePlayer(ItemSharePlayer selectedPlayer)
+	{
+		if (player == null || selectedPlayer == null)
+		{
+			return true;
+		}
+		else
+		{
+			return StringUtils.equals(selectedPlayer.getName(), player.getName());
+		}
 	}
 }
