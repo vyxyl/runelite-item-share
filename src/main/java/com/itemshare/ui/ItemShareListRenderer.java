@@ -17,7 +17,7 @@ public class ItemShareListRenderer extends JLabel implements ListCellRenderer<It
 		ItemShareItem item = value.getItem();
 		AsyncBufferedImage image = value.getImage();
 
-		String name = item == null ? "Unknown" : item.getName();
+		String name = item == null ? "N/A" : item.getName();
 		ImageIcon icon = image == null ? new ImageIcon() : new ImageIcon(value.getImage());
 
 		setText(name);
