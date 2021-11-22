@@ -33,7 +33,6 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 	private MongoDatabase database;
 	private MongoCollection<Document> collection;
 
-	private boolean isConnected = false;
 	private Runnable onSuccess;
 	private Runnable onFailure;
 
@@ -61,8 +60,7 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 			}
 			catch (Exception ex)
 			{
-				status = ItemShareMongoDBStatus.DISCONNECTED;
-				onFailure.run();
+				updateStatus(onFailure, ItemShareMongoDBStatus.DISCONNECTED);
 			}
 		}
 	}
@@ -74,7 +72,7 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 
 	public boolean isConnected()
 	{
-		return isConnected;
+		return status == ItemShareMongoDBStatus.CONNECTED;
 	}
 
 	public MongoCollection<Document> getCollection()
@@ -91,25 +89,25 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 	@Override
 	public void serverHeartbeatSucceeded(ServerHeartbeatSucceededEvent succeededEvent)
 	{
-		this.isConnected = true;
-
 		if (onSuccess != null)
 		{
-			status = ItemShareMongoDBStatus.CONNECTED;
-			onSuccess.run();
+			updateStatus(onSuccess, ItemShareMongoDBStatus.CONNECTED);
 		}
 	}
 
 	@Override
 	public void serverHeartbeatFailed(ServerHeartbeatFailedEvent failedEvent)
 	{
-		this.isConnected = false;
-
 		if (onFailure != null)
 		{
-			status = ItemShareMongoDBStatus.DISCONNECTED;
-			onFailure.run();
+			updateStatus(onFailure, ItemShareMongoDBStatus.DISCONNECTED);
 		}
+	}
+
+	private void updateStatus(Runnable runnable, ItemShareMongoDBStatus disconnected)
+	{
+		status = disconnected;
+		runnable.run();
 	}
 
 	private MongoClient createClient()
