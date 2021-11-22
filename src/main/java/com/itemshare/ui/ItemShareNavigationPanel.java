@@ -4,7 +4,6 @@ import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
 import java.awt.event.ItemEvent;
 import java.text.SimpleDateFormat;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -14,35 +13,33 @@ public class ItemShareNavigationPanel extends JPanel
 {
 	ItemSharePlayer player;
 	private final JLabel lastUpdated = new JLabel();
-	private final ItemSharePlayerDropdownPanel dropdown = new ItemSharePlayerDropdownPanel();
-	private final ItemShareItemContainerTabsPanel tabs = new ItemShareItemContainerTabsPanel();
+	private final ItemSharePlayerDropdownPanel playerDropdown = new ItemSharePlayerDropdownPanel();
+	private final ItemShareItemPlayerItemsPanel playerItems = new ItemShareItemPlayerItemsPanel();
 
 	protected ItemShareNavigationPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		JPanel lastUpdatedPanel = new JPanel();
-		lastUpdatedPanel.setLayout(new BoxLayout(lastUpdatedPanel, BoxLayout.LINE_AXIS));
-		lastUpdatedPanel.add(lastUpdated);
-		lastUpdatedPanel.add(Box.createHorizontalBox());
+		JPanel lastUpdatedWrapper = new JPanel();
+		lastUpdatedWrapper.setLayout(new BoxLayout(lastUpdatedWrapper, BoxLayout.LINE_AXIS));
+		lastUpdatedWrapper.add(lastUpdated);
 
-		add(lastUpdatedPanel);
-		add(dropdown);
-		add(tabs);
+		add(lastUpdatedWrapper);
+		add(playerDropdown);
+		add(playerItems);
 	}
 
 	public void update(ItemManager itemManager, ItemShareData data)
 	{
 		updateData(itemManager, data);
 
-		lastUpdated.setText(getUpdatedDateString());
-
-		dropdown.update(data);
-		dropdown.setItemListener(e -> {
+		playerDropdown.update(data);
+		playerDropdown.setItemListener(e -> {
 			if (e.getStateChange() == ItemEvent.SELECTED)
 			{
 				updateData(itemManager, data);
+				lastUpdated.setText(getUpdatedDateString());
 			}
 		});
 
@@ -57,8 +54,7 @@ public class ItemShareNavigationPanel extends JPanel
 		}
 		else
 		{
-			String date = new SimpleDateFormat("EEE, d MMM yyyy hh:mm:ss z").format(player.getUpdatedDate());
-			return "Last Updated: " + date;
+			return new SimpleDateFormat("EEEEE, MMM. dd yyyy, h:mm a z").format(player.getUpdatedDate());
 		}
 	}
 
@@ -70,14 +66,14 @@ public class ItemShareNavigationPanel extends JPanel
 
 	private void updateTabs(ItemManager itemManager, ItemShareData data)
 	{
-		ItemSharePlayer selectedPlayer = dropdown.getSelectedPlayer(data);
+		ItemSharePlayer selectedPlayer = playerDropdown.getSelectedPlayer(data);
 
 		if (selectedPlayer != player)
 		{
 			player = selectedPlayer;
-			tabs.clearFilters();
+			playerItems.clearFilters();
 		}
 
-		tabs.update(itemManager, selectedPlayer);
+		playerItems.update(itemManager, selectedPlayer);
 	}
 }

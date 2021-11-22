@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemShareItem
@@ -16,4 +16,13 @@ public class ItemShareItem
 	private int id;
 	private String name;
 	private int quantity;
+
+	public ItemShareItem merge(ItemShareItem item)
+	{
+		return ItemShareItem.builder()
+			.id(id)
+			.name(name)
+			.quantity(quantity + item.getQuantity())
+			.build();
+	}
 }

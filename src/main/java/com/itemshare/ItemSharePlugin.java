@@ -15,7 +15,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
@@ -173,15 +173,7 @@ public class ItemSharePlugin extends Plugin
 	private void loadPlayers()
 	{
 		List<ItemSharePlayer> players = db.getPlayers();
-
-		setPlayers(players);
-	}
-
-	private void setPlayers(List<ItemSharePlayer> players)
-	{
-		List<String> names = players.stream().map(ItemSharePlayer::getName).collect(Collectors.toList());
-		data.getPlayers().removeIf(p -> names.contains(p.getName()));
-		data.getPlayers().addAll(players);
+		data.setPlayers(players);
 	}
 
 	private void loadItems(ItemContainerChanged event)
@@ -202,9 +194,9 @@ public class ItemSharePlugin extends Plugin
 		}
 	}
 
-	private void loadEquipment(ItemContainer container)
+	private void loadBank(ItemContainer container)
 	{
-		player.setEquipment(dataService.getItemContainer(container));
+		player.setBank(dataService.getBankContainer(container));
 		player.setUpdatedDate(new Date());
 
 		updateUI();
@@ -212,15 +204,15 @@ public class ItemSharePlugin extends Plugin
 
 	private void loadInventory(ItemContainer container)
 	{
-		player.setInventory(dataService.getItemContainer(container));
+		player.setInventory(dataService.getInventoryContainer(container));
 		player.setUpdatedDate(new Date());
 
 		updateUI();
 	}
 
-	private void loadBank(ItemContainer container)
+	private void loadEquipment(ItemContainer container)
 	{
-		player.setBank(dataService.getItemContainer(container));
+		player.setEquipment(dataService.getEquipmentContainer(container));
 		player.setUpdatedDate(new Date());
 
 		updateUI();
@@ -235,6 +227,7 @@ public class ItemSharePlugin extends Plugin
 		else if (player == null)
 		{
 			player = getPlayer();
+			updateUI();
 		}
 	}
 
@@ -246,13 +239,17 @@ public class ItemSharePlugin extends Plugin
 
 	private ItemSharePlayer getPlayer()
 	{
-		return data.getPlayers().stream()
-			.filter(player -> player.getName().equals(playerName))
-			.findFirst()
-			.orElseGet(() -> addPlayer(data, playerName));
+		return findPlayer().orElseGet(this::addNewPlayer);
 	}
 
-	private ItemSharePlayer addPlayer(ItemShareData data, String name)
+	private Optional<ItemSharePlayer> findPlayer()
+	{
+		return data.getPlayers().stream()
+			.filter(player -> StringUtils.equals(player.getName(), playerName))
+			.findFirst();
+	}
+
+	private ItemSharePlayer addNewPlayer()
 	{
 		ItemSharePlayer player = ItemSharePlayer.builder()
 			.name(playerName)
@@ -300,7 +297,7 @@ public class ItemSharePlugin extends Plugin
 
 	private void savePlayer()
 	{
-		if (db.isConnected())
+		if (db.isConnected() && player != null && player.getName() != null)
 		{
 			db.savePlayer(player);
 		}
