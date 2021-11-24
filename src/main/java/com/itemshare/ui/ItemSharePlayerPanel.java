@@ -13,7 +13,7 @@ public class ItemSharePlayerPanel extends JPanel
 
 	ItemShareEquipmentPanel equipment;
 	ItemShareInventoryPanel inventory;
-	ItemShareBankPanel bank;
+	ItemShareItemListPanel bank;
 
 	protected ItemSharePlayerPanel()
 	{
@@ -22,7 +22,7 @@ public class ItemSharePlayerPanel extends JPanel
 
 		equipment = new ItemShareEquipmentPanel();
 		inventory = new ItemShareInventoryPanel();
-		bank = new ItemShareBankPanel();
+		bank = new ItemShareItemListPanel();
 
 		tabs.addTab("Equipment", equipment);
 		tabs.addTab("Inventory", inventory);
@@ -30,12 +30,6 @@ public class ItemSharePlayerPanel extends JPanel
 		tabs.setAlignmentX(CENTER_ALIGNMENT);
 
 		add(tabs, BorderLayout.NORTH);
-	}
-
-	public void clearFilters()
-	{
-		bank.clearFilter();
-		repaint();
 	}
 
 	public void update(ItemManager itemManager, ItemSharePlayer player)

@@ -8,7 +8,7 @@ import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
 import org.apache.commons.lang3.StringUtils;
 
-public class ItemShareListModel implements ListModel<ItemShareRenderItem>
+public class ItemShareItemListModel implements ListModel<ItemShareRenderItem>
 {
 	private final List<ItemShareRenderItem> items = new ArrayList<>();
 	private List<ItemShareRenderItem> filteredItems = new ArrayList<>();

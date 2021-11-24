@@ -36,9 +36,7 @@ public class ItemShareInventoryPanel extends JPanel
 		c.weighty = 1;
 		c.insets = new Insets(0, 0, 5, 5);
 
-		IntStream.range(0, 7).forEach(y ->
-			IntStream.range(0, 4).forEach(x ->
-				addItem(c, x, y)));
+		IntStream.range(0, 7).forEach(y -> IntStream.range(0, 4).forEach(x -> addItem(c, x, y)));
 	}
 
 	private void addItem(GridBagConstraints c, int x, int y)
@@ -50,13 +48,13 @@ public class ItemShareInventoryPanel extends JPanel
 		label.setVerticalAlignment(JLabel.CENTER);
 		label.setHorizontalAlignment(JLabel.CENTER);
 
-		JPanel item = new JPanel();
-		item.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		item.setPreferredSize(new Dimension(36, 36));
-		item.add(label);
+		JPanel itemPanel = new JPanel();
+		itemPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		itemPanel.setPreferredSize(new Dimension(36, 36));
+		itemPanel.add(label);
 
-		itemPanels.add(item);
-		panel.add(item, c);
+		itemPanels.add(itemPanel);
+		panel.add(itemPanel, c);
 	}
 
 	public void update(ItemManager itemManager, ItemSharePlayer player)
@@ -101,6 +99,7 @@ public class ItemShareInventoryPanel extends JPanel
 	private void removeIcon(JPanel itemPanel)
 	{
 		JLabel label = (JLabel) itemPanel.getComponent(0);
+		label.setToolTipText(null);
 		label.removeAll();
 		label.repaint();
 		itemPanel.repaint();

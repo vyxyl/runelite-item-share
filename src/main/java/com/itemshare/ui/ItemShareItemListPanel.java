@@ -24,7 +24,7 @@ import net.runelite.client.util.AsyncBufferedImage;
 public class ItemShareItemListPanel extends JPanel
 {
 	private final IconTextField searchBox = new IconTextField();
-	private final ItemShareListModel model = new ItemShareListModel();
+	private final ItemShareItemListModel model = new ItemShareItemListModel();
 
 	private final JList<ItemShareRenderItem> list;
 	private final JScrollPane scrollPane;
@@ -38,7 +38,7 @@ public class ItemShareItemListPanel extends JPanel
 		createSearchBox();
 
 		list = new JList<>();
-		list.setCellRenderer(new ItemShareListRenderer());
+		list.setCellRenderer(new ItemShareItemListRenderer());
 		list.setFixedCellWidth(PluginPanel.PANEL_WIDTH);
 		list.setModel(model);
 
@@ -52,12 +52,6 @@ public class ItemShareItemListPanel extends JPanel
 	public void update(ItemManager itemManager, ItemShareContainer data)
 	{
 		updateItems(itemManager, data.getItems());
-		applyFilter();
-	}
-
-	public void clearFilter()
-	{
-		searchBox.setText("");
 		applyFilter();
 	}
 

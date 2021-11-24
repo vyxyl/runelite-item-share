@@ -110,8 +110,7 @@ public class ItemShareEquipmentPanel extends JPanel
 
 	private void updateItems(ItemManager itemManager, List<ItemShareItem> items)
 	{
-		Arrays.stream(EquipmentInventorySlot.values())
-			.forEach(slot -> updateItem(itemManager, items, slot));
+		Arrays.stream(EquipmentInventorySlot.values()).forEach(slot -> updateItem(itemManager, items, slot));
 	}
 
 	private void updateItem(ItemManager itemManager, List<ItemShareItem> items, EquipmentInventorySlot slot)
@@ -141,14 +140,15 @@ public class ItemShareEquipmentPanel extends JPanel
 	private void addIcon(ItemManager itemManager, JPanel itemPanel, ItemShareItem item)
 	{
 		JLabel label = (JLabel) itemPanel.getComponent(0);
-		label.setToolTipText(item.getName());
 		AsyncBufferedImage icon = getIcon(itemManager, item);
+		label.setToolTipText(item.getName());
 		icon.addTo(label);
 	}
 
 	private void removeIcon(JPanel itemPanel)
 	{
 		JLabel label = (JLabel) itemPanel.getComponent(0);
+		label.setToolTipText(null);
 		label.removeAll();
 		label.repaint();
 		itemPanel.repaint();

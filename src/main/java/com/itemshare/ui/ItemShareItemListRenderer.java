@@ -9,7 +9,7 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import net.runelite.client.util.AsyncBufferedImage;
 
-public class ItemShareListRenderer extends JLabel implements ListCellRenderer<ItemShareRenderItem>
+public class ItemShareItemListRenderer extends JLabel implements ListCellRenderer<ItemShareRenderItem>
 {
 	@Override
 	public Component getListCellRendererComponent(JList<? extends ItemShareRenderItem> list, ItemShareRenderItem value, int index, boolean isSelected, boolean cellHasFocus)

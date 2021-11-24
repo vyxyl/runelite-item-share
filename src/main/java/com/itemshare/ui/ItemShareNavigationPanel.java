@@ -8,46 +8,48 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.runelite.client.game.ItemManager;
-import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareNavigationPanel extends JPanel
 {
 	ItemSharePlayer player;
-	private final JLabel lastUpdated = new JLabel();
+	private final JLabel updateMessageLabel = new JLabel();
 	private final ItemSharePlayerDropdownPanel playerDropdown = new ItemSharePlayerDropdownPanel();
-	private final ItemSharePlayerPanel playerItems = new ItemSharePlayerPanel();
+	private final ItemSharePlayerPanel playerPanel = new ItemSharePlayerPanel();
 
 	protected ItemShareNavigationPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		JPanel lastUpdatedWrapper = new JPanel();
-		lastUpdatedWrapper.setLayout(new BoxLayout(lastUpdatedWrapper, BoxLayout.LINE_AXIS));
-		lastUpdatedWrapper.add(lastUpdated);
+		JPanel updateMessage = new JPanel();
+		updateMessage.setLayout(new BoxLayout(updateMessage, BoxLayout.LINE_AXIS));
+		updateMessage.add(updateMessageLabel);
 
-		add(lastUpdatedWrapper);
+		add(updateMessage);
 		add(playerDropdown);
-		add(playerItems);
+		add(playerPanel);
 	}
 
 	public void update(ItemManager itemManager, ItemShareData data)
 	{
-		updateData(itemManager, data);
+		updateData(itemManager);
 
 		playerDropdown.update(data);
-		playerDropdown.setItemListener(e -> {
-			if (e.getStateChange() == ItemEvent.SELECTED)
-			{
-				updateData(itemManager, data);
-				lastUpdated.setText(getUpdatedDateString());
-			}
-		});
+		playerDropdown.setItemListener(e -> onPlayerSelected(itemManager, e));
 	}
 
-	private String getUpdatedDateString()
+	private void onPlayerSelected(ItemManager itemManager, ItemEvent e)
 	{
-		if (player == null || player.getUpdatedDate() == null)
+		if (e.getStateChange() == ItemEvent.SELECTED)
+		{
+			updateData(itemManager);
+			updateMessageLabel.setText(getUpdateMessage());
+		}
+	}
+
+	private String getUpdateMessage()
+	{
+		if (player.getUpdatedDate() == null)
 		{
 			return "Last Updated: N/A";
 		}
@@ -57,33 +59,9 @@ public class ItemShareNavigationPanel extends JPanel
 		}
 	}
 
-	private void updateData(ItemManager itemManager, ItemShareData data)
+	private void updateData(ItemManager itemManager)
 	{
-		updateTabs(itemManager, data);
-	}
-
-	private void updateTabs(ItemManager itemManager, ItemShareData data)
-	{
-		ItemSharePlayer selectedPlayer = playerDropdown.getSelectedPlayer(data);
-
-		if (!isSamePlayer(selectedPlayer))
-		{
-			playerItems.clearFilters();
-		}
-
-		player = selectedPlayer;
-		playerItems.update(itemManager, selectedPlayer);
-	}
-
-	private boolean isSamePlayer(ItemSharePlayer selectedPlayer)
-	{
-		if (player == null || selectedPlayer == null)
-		{
-			return true;
-		}
-		else
-		{
-			return StringUtils.equals(selectedPlayer.getName(), player.getName());
-		}
+		player = playerDropdown.getSelectedPlayer();
+		playerPanel.update(itemManager, player);
 	}
 }
