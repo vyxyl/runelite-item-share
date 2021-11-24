@@ -37,5 +37,8 @@ public class ItemSharePlayerPanel extends JPanel
 		equipment.update(itemManager, player);
 		inventory.update(itemManager, player);
 		bank.update(itemManager, player.getBank());
+
+		revalidate();
+		repaint();
 	}
 }

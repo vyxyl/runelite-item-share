@@ -16,8 +16,7 @@ import net.runelite.client.util.AsyncBufferedImage;
 public class ItemShareRenderItem
 {
 	private ItemShareItem item;
-	private ImageIcon icon;
-	private AsyncBufferedImage image;
+	private AsyncBufferedImage icon;
 
 	@Override
 	public int hashCode()

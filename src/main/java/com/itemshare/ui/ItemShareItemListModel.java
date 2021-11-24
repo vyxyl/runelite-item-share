@@ -10,35 +10,31 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareItemListModel implements ListModel<ItemShareRenderItem>
 {
-	private final List<ItemShareRenderItem> items = new ArrayList<>();
-	private List<ItemShareRenderItem> filteredItems = new ArrayList<>();
+	private final List<ItemShareRenderItem> unfilteredItems = new ArrayList<>();
+	private final List<ItemShareRenderItem> filteredItems = new ArrayList<>();
 
 	public int getIndex(ItemShareRenderItem item)
 	{
 		return filteredItems.indexOf(item);
 	}
 
-	public void replaceAll(List<ItemShareRenderItem> itemsToReplace)
+	public void setItems(List<ItemShareRenderItem> items)
 	{
-		removeAll();
-		addAll(itemsToReplace);
+		removeAllItems();
+
+		unfilteredItems.addAll(items);
+		filteredItems.addAll(unfilteredItems);
 	}
 
-	public void addAll(List<ItemShareRenderItem> itemsToAdd)
+	public void removeAllItems()
 	{
-		items.addAll(itemsToAdd);
-		filteredItems.addAll(itemsToAdd);
-	}
-
-	public void removeAll()
-	{
-		items.clear();
+		unfilteredItems.clear();
 		filteredItems.clear();
 	}
 
-	public List<ItemShareRenderItem> getUnfiliteredItems()
+	public List<ItemShareRenderItem> getUnfilteredItems()
 	{
-		return items;
+		return unfilteredItems;
 	}
 
 	public void filterItems(String text)
@@ -55,14 +51,16 @@ public class ItemShareItemListModel implements ListModel<ItemShareRenderItem>
 
 	public void clearFilter()
 	{
-		filteredItems = new ArrayList<>(items);
+		filteredItems.clear();
+		filteredItems.addAll(unfilteredItems);
 	}
 
 	private void applyFilter(String text)
 	{
-		filteredItems = items.stream()
+		filteredItems.clear();
+		filteredItems.addAll(unfilteredItems.stream()
 			.filter(item -> isMatchingItem(text, item))
-			.collect(Collectors.toList());
+			.collect(Collectors.toList()));
 	}
 
 	private boolean isMatchingItem(String text, ItemShareRenderItem item)

@@ -151,12 +151,13 @@ public class ItemSharePlugin extends Plugin
 			lastSync = Instant.now();
 			savePlayer();
 			loadPlayers();
+			updateUI();
 		}
 	}
 
 	private boolean isSyncExpired()
 	{
-		return Duration.between(lastSync, Instant.now()).toMillis() > MONGODB_SYNC_FREQUENCY_MS - 100;
+		return Duration.between(lastSync, Instant.now()).toMillis() > MONGODB_SYNC_FREQUENCY_MS;
 	}
 
 	private boolean isSupportedWorld()

@@ -15,13 +15,12 @@ public class ItemShareItemListRenderer extends JLabel implements ListCellRendere
 	public Component getListCellRendererComponent(JList<? extends ItemShareRenderItem> list, ItemShareRenderItem value, int index, boolean isSelected, boolean cellHasFocus)
 	{
 		ItemShareItem item = value.getItem();
-		AsyncBufferedImage image = value.getImage();
+		AsyncBufferedImage image = value.getIcon();
 
 		String name = item == null ? "N/A" : item.getName();
-		ImageIcon icon = image == null ? new ImageIcon() : new ImageIcon(image);
 
 		setText(name);
-		setIcon(icon);
+		setIcon(new ImageIcon(image));
 
 		return this;
 	}
