@@ -178,13 +178,6 @@ public class ItemSharePlugin extends Plugin
 	private void loadPlayers()
 	{
 		List<ItemSharePlayer> dbPlayers = db.getPlayers();
-
-		if (player != null)
-		{
-			dbPlayers.removeIf(dbPlayer -> dbPlayer != null && StringUtils.equals(dbPlayer.getName(), player.getName()));
-			dbPlayers.add(player);
-		}
-
 		data.setPlayers(dbPlayers);
 	}
 
