@@ -66,7 +66,14 @@ public class ItemShareInventoryPanel extends JPanel
 
 	private void updateItems(ItemManager itemManager, List<ItemShareItem> items)
 	{
-		IntStream.range(0, items.size()).forEach(index -> updateItem(itemManager, items, index));
+		if (items == null || items.size() <= 0)
+		{
+			IntStream.range(0, 28).forEach(this::removeIconAtIndex);
+		}
+		else
+		{
+			IntStream.range(0, items.size()).forEach(index -> updateItem(itemManager, items, index));
+		}
 	}
 
 	private void updateItem(ItemManager itemManager, List<ItemShareItem> items, int index)
@@ -94,6 +101,12 @@ public class ItemShareInventoryPanel extends JPanel
 		AsyncBufferedImage icon = getIcon(itemManager, item);
 		label.setToolTipText(item.getName());
 		icon.addTo(label);
+	}
+
+	private void removeIconAtIndex(int index)
+	{
+		JPanel itemPanel = itemPanels.get(index);
+		removeIcon(itemPanel);
 	}
 
 	private void removeIcon(JPanel itemPanel)

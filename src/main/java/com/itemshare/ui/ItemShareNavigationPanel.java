@@ -47,12 +47,12 @@ public class ItemShareNavigationPanel extends JPanel
 		updateData(itemManager);
 
 		playerDropdown.update(data);
-		playerDropdown.setItemListener(e -> onPlayerSelected(itemManager, e));
+		playerDropdown.setItemListener(event -> onPlayerSelected(itemManager, event));
 	}
 
-	private void onPlayerSelected(ItemManager itemManager, ItemEvent e)
+	private void onPlayerSelected(ItemManager itemManager, ItemEvent event)
 	{
-		if (e.getStateChange() == ItemEvent.SELECTED)
+		if (event.getStateChange() == ItemEvent.SELECTED)
 		{
 			updateData(itemManager);
 			updateMessage();
@@ -70,17 +70,17 @@ public class ItemShareNavigationPanel extends JPanel
 				updateMessage();
 			}
 
-		}, 1000, 5000);
+		}, 1000, 1000);
 
 		return timer;
 	}
 
 	private void updateMessage()
 	{
-		updateMessageLabel.setText(getUpdateMessage());
+		updateMessageLabel.setText(getMessageText());
 	}
 
-	private String getUpdateMessage()
+	private String getMessageText()
 	{
 		if (player == null || player.getUpdatedDate() == null)
 		{
@@ -99,25 +99,34 @@ public class ItemShareNavigationPanel extends JPanel
 
 			if (days > 0)
 			{
-				String plural = days > 1 ? "s" : "";
-				return "Last Saved: " + days + " day" + plural + " ago";
+				return getLastSavedMessage(days, "day");
 			}
 			else if (hours > 0)
 			{
-				String plural = hours > 1 ? "s" : "";
-				return "Last Saved: " + hours + " hour" + plural + " ago";
+				return getLastSavedMessage(hours, "hour");
 			}
 			else if (minutes > 0)
 			{
-				String plural = minutes > 1 ? "s" : "";
-				return "Last Saved: " + minutes + " minute" + plural + " ago";
+				return getLastSavedMessage(minutes, "minute");
 			}
 			else
 			{
-				String plural = seconds > 1 ? "s" : "";
-				return "Last Saved: " + seconds + " second" + plural + " ago";
+				if (seconds == 0)
+				{
+					return "Last Saved: just now";
+				}
+				else
+				{
+					return getLastSavedMessage(seconds, "second");
+				}
 			}
 		}
+	}
+
+	private String getLastSavedMessage(long amount, String unit)
+	{
+		String plural = amount > 1 ? "s" : "";
+		return "Last Saved: " + amount + " " + unit + plural + " ago";
 	}
 
 	private void updateData(ItemManager itemManager)

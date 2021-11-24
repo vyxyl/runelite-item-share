@@ -61,13 +61,8 @@ public class ItemShareDataService
 
 	private ArrayList<ItemShareItem> getInventoryItems(ItemContainer container)
 	{
-		int itemSize = container.size();
-
-		return (ArrayList<ItemShareItem>) IntStream.range(0, itemSize).asLongStream()
-			.mapToObj(slot -> {
-				Item item = container.getItem((int) slot);
-				return item == null ? null : getItem(item);
-			})
+		return (ArrayList<ItemShareItem>) Arrays.stream(container.getItems())
+			.map(this::getItem)
 			.collect(Collectors.toList());
 	}
 
