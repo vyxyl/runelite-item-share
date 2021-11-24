@@ -26,11 +26,22 @@ public final class ItemSharePlayerDropdownRenderer extends DefaultListCellRender
 			setForeground(Color.WHITE);
 		}
 
-		ItemSharePlayer player = (ItemSharePlayer) o;
-		String name = player == null ? "N/A" : player.getName();
-
+		String name = getPlayerName(o);
 		setText(name);
 
 		return this;
+	}
+
+	private String getPlayerName(Object o)
+	{
+		if (o instanceof ItemSharePlayer)
+		{
+			ItemSharePlayer player = (ItemSharePlayer) o;
+			return player.getName();
+		}
+		else
+		{
+			return "N/A";
+		}
 	}
 }

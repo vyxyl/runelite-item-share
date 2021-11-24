@@ -149,7 +149,7 @@ public class ItemShareEquipmentPanel extends JPanel
 	{
 		JLabel label = (JLabel) itemPanel.getComponent(0);
 		label.setToolTipText(null);
-		label.removeAll();
+		label.setIcon(null);
 		label.repaint();
 		itemPanel.repaint();
 	}
