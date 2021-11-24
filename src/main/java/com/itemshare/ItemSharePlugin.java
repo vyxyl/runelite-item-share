@@ -5,15 +5,19 @@ import static com.itemshare.constant.ItemShareConstants.ICON_NAV_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.MONGODB_SYNC_FREQUENCY_MS;
 import com.itemshare.db.ItemShareMongoDB;
 import com.itemshare.model.ItemShareData;
+import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.model.ItemShareSlots;
 import com.itemshare.service.ItemShareConfigService;
 import com.itemshare.service.ItemShareDataService;
 import com.itemshare.ui.ItemSharePanel;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -172,8 +176,15 @@ public class ItemSharePlugin extends Plugin
 
 	private void loadPlayers()
 	{
-		List<ItemSharePlayer> players = db.getPlayers();
-		data.setPlayers(players);
+		List<ItemSharePlayer> dbPlayers = db.getPlayers();
+
+		if (player != null)
+		{
+			dbPlayers.removeIf(dbPlayer -> dbPlayer != null && StringUtils.equals(dbPlayer.getName(), player.getName()));
+			dbPlayers.add(player);
+		}
+
+		data.setPlayers(dbPlayers);
 	}
 
 	private void loadItems(ItemContainerChanged event)
@@ -254,6 +265,9 @@ public class ItemSharePlugin extends Plugin
 		ItemSharePlayer player = ItemSharePlayer.builder()
 			.name(playerName)
 			.updatedDate(new Date())
+			.bank(ItemShareItems.builder().items(new ArrayList<>()).build())
+			.equipment(ItemShareSlots.builder().slots(new HashMap<>()).build())
+			.inventory(ItemShareItems.builder().items(new ArrayList<>()).build())
 			.build();
 
 		data.getPlayers().add(player);

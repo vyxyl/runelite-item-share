@@ -1,6 +1,6 @@
 package com.itemshare.ui;
 
-import com.itemshare.model.ItemShareContainer;
+import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareRenderItem;
 import java.awt.Dimension;
@@ -49,7 +49,7 @@ public class ItemShareItemListPanel extends JPanel
 		add(scrollPane);
 	}
 
-	public void update(ItemManager itemManager, ItemShareContainer data)
+	public void update(ItemManager itemManager, ItemShareItems data)
 	{
 		updateItems(itemManager, data.getItems());
 		applyFilter();

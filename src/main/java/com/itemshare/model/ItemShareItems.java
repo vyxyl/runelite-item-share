@@ -1,6 +1,8 @@
 package com.itemshare.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,14 +11,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder(toBuilder=true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemSharePlayer
+public class ItemShareItems
 {
-	private String name;
-	private ItemShareItems bank;
-	private ItemShareItems inventory;
-	private ItemShareSlots equipment;
+	private ArrayList<ItemShareItem> items;
 	private Date updatedDate;
 }

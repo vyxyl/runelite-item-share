@@ -8,9 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.runelite.api.EquipmentInventorySlot;
@@ -103,33 +101,28 @@ public class ItemShareEquipmentPanel extends JPanel
 
 	public void update(ItemManager itemManager, ItemSharePlayer player)
 	{
-		List<ItemShareItem> items = player.getEquipment().getItems();
-		updateItems(itemManager, items);
+		Map<EquipmentInventorySlot, ItemShareItem> slots = player.getEquipment().getSlots();
+		updateItems(itemManager, slots);
 		repaint();
 	}
 
-	private void updateItems(ItemManager itemManager, List<ItemShareItem> items)
+	private void updateItems(ItemManager itemManager, Map<EquipmentInventorySlot, ItemShareItem> slots)
 	{
-		Arrays.stream(EquipmentInventorySlot.values()).forEach(slot -> updateItem(itemManager, items, slot));
+		Arrays.stream(EquipmentInventorySlot.values()).forEach(slot -> updateItem(itemManager, slots, slot));
 	}
 
-	private void updateItem(ItemManager itemManager, List<ItemShareItem> items, EquipmentInventorySlot slot)
+	private void updateItem(ItemManager itemManager, Map<EquipmentInventorySlot, ItemShareItem> slots, EquipmentInventorySlot slot)
 	{
 		JPanel slotPanel = slotPanels.get(slot);
-		Optional<ItemShareItem> optionalItem = items.stream().filter(i -> i != null && slot.equals(i.getSlot())).findFirst();
+		ItemShareItem item = slots.get(slot);
 
-		if (optionalItem.isPresent())
+		if (item == null)
 		{
-			ItemShareItem item = optionalItem.get();
-
-			if (item.getId() >= 0)
-			{
-				addIcon(itemManager, slotPanel, item);
-			}
-			else
-			{
-				removeIcon(slotPanel);
-			}
+			removeIcon(slotPanel);
+		}
+		else if (item.getId() >= 0)
+		{
+			addIcon(itemManager, slotPanel, item);
 		}
 		else
 		{

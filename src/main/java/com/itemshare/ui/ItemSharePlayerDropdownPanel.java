@@ -22,7 +22,6 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 40));
 		setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 40));
 		setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 40));
-		setBorder(BorderFactory.createEmptyBorder(5, 0, 10, 0));
 
 		model = new ItemSharePlayerDropdownModel();
 

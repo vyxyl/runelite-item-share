@@ -1,14 +1,14 @@
 package com.itemshare.service;
 
-import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareItem;
+import com.itemshare.model.ItemShareItems;
+import com.itemshare.model.ItemShareSlots;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.inject.Inject;
@@ -27,26 +27,26 @@ public class ItemShareDataService
 	@Inject
 	private Client client;
 
-	public ItemShareContainer getBankContainer(ItemContainer container)
+	public ItemShareItems getBankContainer(ItemContainer container)
 	{
-		return ItemShareContainer.builder()
+		return ItemShareItems.builder()
 			.items(getBankItems(container))
 			.updatedDate(new Date())
 			.build();
 	}
 
-	public ItemShareContainer getInventoryContainer(ItemContainer container)
+	public ItemShareItems getInventoryContainer(ItemContainer container)
 	{
-		return ItemShareContainer.builder()
+		return ItemShareItems.builder()
 			.items(getInventoryItems(container))
 			.updatedDate(new Date())
 			.build();
 	}
 
-	public ItemShareContainer getEquipmentContainer(ItemContainer container)
+	public ItemShareSlots getEquipmentContainer(ItemContainer container)
 	{
-		return ItemShareContainer.builder()
-			.items(getEquipmentItems(container))
+		return ItemShareSlots.builder()
+			.slots(getEquipmentSlots(container))
 			.updatedDate(new Date())
 			.build();
 	}
@@ -71,12 +71,14 @@ public class ItemShareDataService
 			.collect(Collectors.toList());
 	}
 
-	private ArrayList<ItemShareItem> getEquipmentItems(ItemContainer container)
+	private Map<EquipmentInventorySlot, ItemShareItem> getEquipmentSlots(ItemContainer container)
 	{
-		return (ArrayList<ItemShareItem>) Arrays.stream(EquipmentInventorySlot.values())
-			.map(slot -> getSlotItem(container, slot))
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+		Map<EquipmentInventorySlot, ItemShareItem> slots = new HashMap<>();
+
+		Arrays.stream(EquipmentInventorySlot.values())
+			.forEach(slot -> slots.put(slot, getSlotItem(container, slot)));
+
+		return slots;
 	}
 
 	private ItemShareItem getSlotItem(ItemContainer container, EquipmentInventorySlot slot)

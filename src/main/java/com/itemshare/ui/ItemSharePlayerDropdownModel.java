@@ -1,9 +1,11 @@
 package com.itemshare.ui;
 
 import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
-import com.itemshare.model.ItemShareContainer;
+import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.model.ItemShareSlots;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataListener;
@@ -20,9 +22,9 @@ public class ItemSharePlayerDropdownModel implements ComboBoxModel<ItemSharePlay
 	{
 		unselected = ItemSharePlayer.builder()
 			.name(OPTION_NO_PLAYER)
-			.bank(getEmptyContainer())
-			.equipment(getEmptyContainer())
-			.inventory(getEmptyContainer())
+			.bank(getEmptyList())
+			.equipment(getEmptySlots())
+			.inventory(getEmptyList())
 			.build();
 
 		selected = unselected.toBuilder().build();
@@ -94,8 +96,13 @@ public class ItemSharePlayerDropdownModel implements ComboBoxModel<ItemSharePlay
 		}
 	}
 
-	private ItemShareContainer getEmptyContainer()
+	private ItemShareItems getEmptyList()
 	{
-		return ItemShareContainer.builder().items(new ArrayList<>()).build();
+		return ItemShareItems.builder().items(new ArrayList<>()).build();
+	}
+
+	private ItemShareSlots getEmptySlots()
+	{
+		return ItemShareSlots.builder().slots(new HashMap<>()).build();
 	}
 }
