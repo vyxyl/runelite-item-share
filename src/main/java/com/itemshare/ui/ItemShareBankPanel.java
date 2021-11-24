@@ -10,19 +10,19 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import net.runelite.client.game.ItemManager;
 
-public class ItemShareContainerPanel extends JPanel
+public class ItemShareBankPanel extends JPanel
 {
 	private final JTextPane emptyStateMessage;
-	private final ItemShareListPanel list = new ItemShareListPanel();
+	private final ItemShareItemListPanel list = new ItemShareItemListPanel();
 
-	protected ItemShareContainerPanel(String containerName)
+	protected ItemShareBankPanel()
 	{
 		super(false);
 
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
 		emptyStateMessage = new JTextPane();
-		emptyStateMessage.setText("The player needs to change their " + containerName + " to update this list");
+		emptyStateMessage.setText("The player needs to change their bank to update this list");
 		emptyStateMessage.setBorder(BorderFactory.createEmptyBorder(10, 5, 0, 10));
 
 		setMessageSettings(emptyStateMessage);
@@ -65,7 +65,5 @@ public class ItemShareContainerPanel extends JPanel
 			list.update(itemManager, container);
 			add(list);
 		}
-
-		repaint();
 	}
 }

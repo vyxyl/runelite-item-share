@@ -4,7 +4,8 @@ import com.itemshare.model.ItemShareContainer;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareRenderItem;
 import java.awt.Dimension;
-import java.util.ArrayList;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,15 +15,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.IconTextField;
 import net.runelite.client.util.AsyncBufferedImage;
 
-public class ItemShareListPanel extends JPanel
+public class ItemShareItemListPanel extends JPanel
 {
 	private final IconTextField searchBox = new IconTextField();
 	private final ItemShareListModel model = new ItemShareListModel();
@@ -31,7 +30,7 @@ public class ItemShareListPanel extends JPanel
 	private final JScrollPane scrollPane;
 	private ItemManager itemManager;
 
-	protected ItemShareListPanel()
+	protected ItemShareItemListPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -53,14 +52,13 @@ public class ItemShareListPanel extends JPanel
 	public void update(ItemManager itemManager, ItemShareContainer data)
 	{
 		updateItems(itemManager, data.getItems());
-		repaintAll();
+		applyFilter();
 	}
 
 	public void clearFilter()
 	{
 		searchBox.setText("");
-		model.clearFilter();;
-		repaintAll();
+		applyFilter();
 	}
 
 	private void createSearchBox()
@@ -71,48 +69,31 @@ public class ItemShareListPanel extends JPanel
 		searchBox.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
-		searchBox.getDocument().addDocumentListener(getSearchBoxListener());
+		searchBox.addKeyListener(getSearchBoxListener());
 	}
 
-	private DocumentListener getSearchBoxListener()
+	private KeyListener getSearchBoxListener()
 	{
-		return new DocumentListener()
+		return new KeyListener()
 		{
 			@Override
-			public void insertUpdate(DocumentEvent e)
+			public void keyTyped(KeyEvent e)
 			{
-				filterItems();
+				applyFilter();
 			}
 
 			@Override
-			public void removeUpdate(DocumentEvent e)
+			public void keyPressed(KeyEvent e)
 			{
-				filterItems();
+				applyFilter();
 			}
 
 			@Override
-			public void changedUpdate(DocumentEvent e)
+			public void keyReleased(KeyEvent e)
 			{
-				filterItems();
+				applyFilter();
 			}
 		};
-	}
-
-	private void filterItems()
-	{
-		applyCurrentFilter();
-		repaintAll();
-	}
-
-	private void repaintAll()
-	{
-		list.setModel(model);
-
-		list.repaint();
-		scrollPane.repaint();
-
-		revalidate();
-		repaint();
 	}
 
 	private void updateItems(ItemManager itemManager, List<ItemShareItem> items)
@@ -151,13 +132,13 @@ public class ItemShareListPanel extends JPanel
 
 		model.replaceAll(existingItems);
 		renderIcons(newItems);
-
-		applyCurrentFilter();
 	}
 
-	private void applyCurrentFilter()
+	private void applyFilter()
 	{
-		model.filterItems(getSearchText());
+		String searchText = getSearchText();
+		model.filterItems(searchText);
+		list.repaint();
 	}
 
 	private String getSearchText()

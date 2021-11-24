@@ -7,22 +7,22 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import net.runelite.client.game.ItemManager;
 
-public class ItemSharePlayerItemsPanel extends JPanel
+public class ItemSharePlayerPanel extends JPanel
 {
 	JTabbedPane tabs = new JTabbedPane();
 
-	ItemShareContainerPanel equipment;
-	ItemShareContainerPanel inventory;
-	ItemShareContainerPanel bank;
+	ItemShareEquipmentPanel equipment;
+	ItemShareInventoryPanel inventory;
+	ItemShareBankPanel bank;
 
-	protected ItemSharePlayerItemsPanel()
+	protected ItemSharePlayerPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
-		equipment = new ItemShareContainerPanel("equipment");
-		inventory = new ItemShareContainerPanel("inventory");
-		bank = new ItemShareContainerPanel("bank");
+		equipment = new ItemShareEquipmentPanel();
+		inventory = new ItemShareInventoryPanel();
+		bank = new ItemShareBankPanel();
 
 		tabs.addTab("Equipment", equipment);
 		tabs.addTab("Inventory", inventory);
@@ -34,17 +34,14 @@ public class ItemSharePlayerItemsPanel extends JPanel
 
 	public void clearFilters()
 	{
-		equipment.clearFilter();
-		inventory.clearFilter();
 		bank.clearFilter();
 		repaint();
 	}
 
 	public void update(ItemManager itemManager, ItemSharePlayer player)
 	{
-		equipment.update(itemManager, player.getEquipment());
-		inventory.update(itemManager, player.getInventory());
+		equipment.update(itemManager, player);
+		inventory.update(itemManager, player);
 		bank.update(itemManager, player.getBank());
-		repaint();
 	}
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.runelite.api.EquipmentInventorySlot;
 
 @Getter
 @Setter
@@ -16,6 +17,7 @@ public class ItemShareItem
 	private int id;
 	private String name;
 	private int quantity;
+	private EquipmentInventorySlot slot;
 
 	public ItemShareItem merge(ItemShareItem item)
 	{

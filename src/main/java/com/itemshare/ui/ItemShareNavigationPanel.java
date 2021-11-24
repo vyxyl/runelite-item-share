@@ -15,7 +15,7 @@ public class ItemShareNavigationPanel extends JPanel
 	ItemSharePlayer player;
 	private final JLabel lastUpdated = new JLabel();
 	private final ItemSharePlayerDropdownPanel playerDropdown = new ItemSharePlayerDropdownPanel();
-	private final ItemSharePlayerItemsPanel playerItems = new ItemSharePlayerItemsPanel();
+	private final ItemSharePlayerPanel playerItems = new ItemSharePlayerPanel();
 
 	protected ItemShareNavigationPanel()
 	{

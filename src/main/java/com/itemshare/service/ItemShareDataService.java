@@ -8,9 +8,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import javax.inject.Inject;
 import net.runelite.api.Client;
+import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemContainer;
@@ -58,16 +61,46 @@ public class ItemShareDataService
 
 	private ArrayList<ItemShareItem> getInventoryItems(ItemContainer container)
 	{
-		return mergeById(Arrays.stream(container.getItems())
-			.map(this::getItem)
-			.collect(Collectors.toList()));
+		int itemSize = container.size();
+
+		return (ArrayList<ItemShareItem>) IntStream.range(0, itemSize).asLongStream()
+			.mapToObj(slot -> {
+				Item item = container.getItem((int) slot);
+				return item == null ? null : getItem(item);
+			})
+			.collect(Collectors.toList());
 	}
 
 	private ArrayList<ItemShareItem> getEquipmentItems(ItemContainer container)
 	{
-		return (ArrayList<ItemShareItem>) Arrays.stream(container.getItems())
-			.map(this::getItem)
+		return (ArrayList<ItemShareItem>) Arrays.stream(EquipmentInventorySlot.values())
+			.map(slot -> getSlotItem(container, slot))
+			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
+	}
+
+	private ItemShareItem getSlotItem(ItemContainer container, EquipmentInventorySlot slot)
+	{
+		Item item = container.getItem(slot.getSlotIdx());
+
+		if (item == null)
+		{
+			return null;
+		}
+		else
+		{
+			return getEquipmentItem(item, slot);
+		}
+	}
+
+	private ItemShareItem getEquipmentItem(Item item, EquipmentInventorySlot slot)
+	{
+		return ItemShareItem.builder()
+			.id(item.getId())
+			.quantity(item.getQuantity())
+			.name(getItemName(item))
+			.slot(slot)
+			.build();
 	}
 
 	private ItemShareItem getItem(Item item)
