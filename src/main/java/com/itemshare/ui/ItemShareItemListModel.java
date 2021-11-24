@@ -37,6 +37,11 @@ public class ItemShareItemListModel implements ListModel<ItemShareRenderItem>
 		return unfilteredItems;
 	}
 
+	public List<ItemShareRenderItem> getFilteredItems()
+	{
+		return filteredItems;
+	}
+
 	public void filterItems(String text)
 	{
 		if (StringUtils.isEmpty(text))

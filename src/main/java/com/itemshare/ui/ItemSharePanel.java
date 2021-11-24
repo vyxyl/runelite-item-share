@@ -86,6 +86,7 @@ public class ItemSharePanel extends PluginPanel
 		JPanel controls = new JPanel(new GridLayout(1, 3, 10, 0));
 		controls.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		controls.add(settingsButton);
+
 		return controls;
 	}
 

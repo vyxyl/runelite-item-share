@@ -32,7 +32,8 @@ public class ItemShareItemListPanel extends JPanel
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 
-		list = new JList<>(model);
+		list = new JList<>();
+		list.setModel(model);
 		list.setCellRenderer(renderer);
 		list.setFixedCellWidth(PluginPanel.PANEL_WIDTH);
 
@@ -45,13 +46,15 @@ public class ItemShareItemListPanel extends JPanel
 		searchBox.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
-		searchBox.addListener(this::applyFilter);
+		searchBox.addListener(this::repaintAll);
+
+		repaintAll();
 	}
 
 	public void update(ItemManager itemManager, ItemShareItems data)
 	{
 		updateItems(itemManager, data.getItems());
-		applyFilter();
+		repaintAll();
 	}
 
 	private void updateItems(ItemManager itemManager, List<ItemShareItem> items)
@@ -87,16 +90,19 @@ public class ItemShareItemListPanel extends JPanel
 		newItems.forEach(this::addIcon);
 	}
 
-	private void applyFilter()
+	private void repaintAll()
 	{
 		String searchText = searchBox.getText();
 		model.filterItems(searchText);
 		list.setModel(model);
 
-		list.revalidate();
+		repaintItems(model.getFilteredItems());
+
+		renderer.repaint();
 		list.repaint();
 
-		scrollPane.revalidate();
+		remove(scrollPane);
+		add(scrollPane);
 		scrollPane.repaint();
 
 		revalidate();
@@ -105,13 +111,30 @@ public class ItemShareItemListPanel extends JPanel
 
 	private void addIcon(ItemShareRenderItem item)
 	{
-		item.setIcon(getIcon(itemManager, item));
+		AsyncBufferedImage icon = getIcon(itemManager, item);
+		item.setIcon(icon);
+		icon.onLoaded(() -> repaintItem(item));
 	}
 
 	private AsyncBufferedImage getIcon(ItemManager itemManager, ItemShareRenderItem renderItem)
 	{
 		ItemShareItem item = renderItem.getItem();
 		return itemManager.getImage(item.getId(), item.getQuantity(), item.getQuantity() > 1);
+	}
+
+	private void repaintItems(List<ItemShareRenderItem> items)
+	{
+		items.forEach(this::repaintItem);
+	}
+
+	private void repaintItem(ItemShareRenderItem item)
+	{
+		int index = model.getIndex(item);
+
+		if (index >= 0)
+		{
+			list.repaint(list.getCellBounds(index, index));
+		}
 	}
 
 	private List<ItemShareRenderItem> getRenderItems(List<ItemShareItem> items)
