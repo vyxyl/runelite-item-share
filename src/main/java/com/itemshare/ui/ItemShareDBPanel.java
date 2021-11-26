@@ -54,6 +54,10 @@ public class ItemShareDBPanel extends JPanel
 		selfHostCheckbox = new JCheckBox("Self-host your own database", isSelfHostEnabled);
 		selfHostCheckbox.addItemListener(event -> onSelfHostSelection(configManager));
 		setFullWidthStyling(selfHostCheckbox, 30);
+
+		ItemShareGroupIDPanel groupId = new ItemShareGroupIDPanel(configManager);
+
+		add(groupId);
 		add(selfHostCheckbox);
 
 		if (isSelfHostEnabled)

@@ -11,6 +11,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,7 +24,7 @@ public class ItemShareNavigationPanel extends JPanel
 	Timer timer;
 	ItemSharePlayer player;
 
-	protected ItemShareNavigationPanel()
+	protected ItemShareNavigationPanel(ConfigManager configManager)
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));

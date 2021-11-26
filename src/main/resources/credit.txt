@@ -1,0 +1,2 @@
+"close", "copy", "edit", "save" icons made by https://www.flaticon.com/authors/pixel-perfect from https://www.flaticon.com/
+all other icons come from https://oldschool.runescape.wiki

@@ -4,7 +4,6 @@ import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;

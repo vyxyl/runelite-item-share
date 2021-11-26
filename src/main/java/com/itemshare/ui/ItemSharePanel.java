@@ -24,7 +24,7 @@ public class ItemSharePanel extends PluginPanel
 	private final ItemShareTitlePanel titlePanel = new ItemShareTitlePanel();
 	private final JButton settingsButton = createSettingsButton();
 	private final ItemShareDBPanel dbPanel;
-	private final ItemShareNavigationPanel navPanel = new ItemShareNavigationPanel();
+	private final ItemShareNavigationPanel navPanel;
 	private final ImageIcon settingsIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_SETTINGS_BUTTON));
 	private final ImageIcon closeIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_CLOSE_BUTTON));
 
@@ -36,6 +36,7 @@ public class ItemSharePanel extends PluginPanel
 		setLayout(new BorderLayout());
 
 		titlePanel.add(getControls());
+		navPanel = new ItemShareNavigationPanel(configManager);
 		dbPanel = new ItemShareDBPanel(configManager, db, this::showSharedItems);
 
 		add(titlePanel, BorderLayout.PAGE_START);
