@@ -1,8 +1,12 @@
 package com.itemshare;
 
 import com.google.inject.Provides;
+import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
+import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_NAV_BUTTON;
-import static com.itemshare.constant.ItemShareConstants.MONGODB_SYNC_FREQUENCY_MS;
+import static com.itemshare.constant.ItemShareConstants.DB_SYNC_FREQUENCY_MS;
+import com.itemshare.db.ItemShareCentralDB;
+import com.itemshare.db.ItemShareDB;
 import com.itemshare.db.ItemShareMongoDB;
 import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemShareItems;
@@ -18,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
@@ -64,7 +70,10 @@ public class ItemSharePlugin extends Plugin
 	private ItemShareConfigService configService;
 
 	@Inject
-	private ItemShareMongoDB db;
+	private ItemShareMongoDB mongoDB;
+
+	@Inject
+	private ItemShareCentralDB centralDB;
 
 	@Inject
 	private ClientToolbar toolbar;
@@ -79,7 +88,11 @@ public class ItemSharePlugin extends Plugin
 	private ItemShareData data;
 	private ItemSharePlayer player;
 	private ItemSharePanel panel;
+	private Timer syncTimer;
 	private Instant lastSync;
+	private boolean connected;
+	private ItemShareDB db;
+	private String groupId;
 
 	@Provides
 	ItemShareConfig provideConfig(ConfigManager configManager)
@@ -90,11 +103,45 @@ public class ItemSharePlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
+		loadGroupId();
+
+//		db = mongoDB;
+		db = centralDB;
+
 		loadUI();
 		loadLocalData();
 		updateUI();
 
+		connect(db);
+	}
+
+	private String loadGroupId()
+	{
+		if (StringUtils.isEmpty(groupId))
+		{
+			groupId = configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID);
+		}
+
+		if (StringUtils.isEmpty(groupId))
+		{
+			String newGroupId = UUID.randomUUID().toString();
+			configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, newGroupId);
+
+			groupId = newGroupId;
+		}
+
+		if (player != null && StringUtils.isEmpty(player.getGroupId()))
+		{
+			player.setGroupId(groupId);
+		}
+
+		return groupId;
+	}
+
+	private void connect(ItemShareDB db)
+	{
 		db.connect(this::onConnectionSuccess, this::onConnectionFailure);
+		this.db = db;
 	}
 
 	@Override
@@ -116,18 +163,16 @@ public class ItemSharePlugin extends Plugin
 
 		boolean isNotLoggedIn = e.getGameState().equals(GameState.LOGGED_IN);
 
-		if (isValidState() && !isNotLoggedIn)
+		if (isLocalPlayerAvailable() && !isNotLoggedIn)
 		{
 			saveData();
 		}
-
-		updateUI();
 	}
 
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		if (isValidState())
+		if (isLocalPlayerAvailable())
 		{
 			loadItems(event);
 		}
@@ -135,29 +180,46 @@ public class ItemSharePlugin extends Plugin
 
 	private void onConnectionSuccess()
 	{
-		syncData();
-		updateUI();
+		if (!connected)
+		{
+			connected = true;
+			createSyncTimer();
+		}
 	}
 
 	private void onConnectionFailure()
 	{
+		connected = false;
 		updateUI();
+	}
+
+	private void createSyncTimer()
+	{
+		if (syncTimer == null)
+		{
+			syncTimer = new Timer();
+			syncTimer.scheduleAtFixedRate(new TimerTask()
+			{
+				@Override
+				public void run()
+				{
+					syncData();
+				}
+			}, 0, DB_SYNC_FREQUENCY_MS);
+		}
 	}
 
 	private void syncData()
 	{
 		if (lastSync == null || db.isConnected() && isSyncExpired())
 		{
-			lastSync = Instant.now();
-			savePlayer();
-			loadPlayers();
-			updateUI();
+			syncPlayers();
 		}
 	}
 
 	private boolean isSyncExpired()
 	{
-		return Duration.between(lastSync, Instant.now()).toMillis() > MONGODB_SYNC_FREQUENCY_MS;
+		return Duration.between(lastSync, Instant.now()).toMillis() > DB_SYNC_FREQUENCY_MS;
 	}
 
 	private boolean isSupportedWorld()
@@ -175,10 +237,22 @@ public class ItemSharePlugin extends Plugin
 		data = configService.getLocalData();
 	}
 
-	private void loadPlayers()
+	private void syncPlayers()
 	{
-		List<ItemSharePlayer> dbPlayers = db.getPlayers();
-		data.setPlayers(dbPlayers);
+		if (db.isConnected() && player != null && !StringUtils.isEmpty(player.getName()))
+		{
+			loadGroupId();
+
+			db.savePlayer(player, () -> {
+				db.getPlayers(player.getGroupId(), players -> {
+					data.setPlayers(players);
+					lastSync = Instant.now();
+					updateUI();
+				}, () -> {
+				});
+			}, () -> {
+			});
+		}
 	}
 
 	private void loadItems(ItemContainerChanged event)
@@ -202,25 +276,16 @@ public class ItemSharePlugin extends Plugin
 	private void loadBank(ItemContainer container)
 	{
 		player.setBank(dataService.getBankContainer(container));
-		player.setUpdatedDate(new Date());
-
-		updateUI();
 	}
 
 	private void loadInventory(ItemContainer container)
 	{
 		player.setInventory(dataService.getInventoryContainer(container));
-		player.setUpdatedDate(new Date());
-
-		updateUI();
 	}
 
 	private void loadEquipment(ItemContainer container)
 	{
 		player.setEquipment(dataService.getEquipmentContainer(container));
-		player.setUpdatedDate(new Date());
-
-		updateUI();
 	}
 
 	private void loadPlayer()
@@ -232,7 +297,6 @@ public class ItemSharePlugin extends Plugin
 		else if (player == null)
 		{
 			player = getPlayer();
-			updateUI();
 		}
 	}
 
@@ -244,7 +308,16 @@ public class ItemSharePlugin extends Plugin
 
 	private ItemSharePlayer getPlayer()
 	{
-		return findPlayer().orElseGet(this::addNewPlayer);
+		ItemSharePlayer player = findPlayer().orElseGet(this::getNewPlayer);
+		player.setGroupId(loadGroupId());
+
+		return player.toBuilder()
+			.name(player.getName())
+			.groupId(player.getGroupId())
+			.bank(player.getBank().toBuilder().build())
+			.equipment(player.getEquipment().toBuilder().build())
+			.inventory(player.getInventory().toBuilder().build())
+			.build();
 	}
 
 	private Optional<ItemSharePlayer> findPlayer()
@@ -254,21 +327,19 @@ public class ItemSharePlugin extends Plugin
 			.findFirst();
 	}
 
-	private ItemSharePlayer addNewPlayer()
+	private ItemSharePlayer getNewPlayer()
 	{
-		ItemSharePlayer player = ItemSharePlayer.builder()
+		return ItemSharePlayer.builder()
+			.groupId(loadGroupId())
 			.name(playerName)
 			.updatedDate(new Date())
 			.bank(ItemShareItems.builder().items(new ArrayList<>()).build())
 			.equipment(ItemShareSlots.builder().slots(new HashMap<>()).build())
 			.inventory(ItemShareItems.builder().items(new ArrayList<>()).build())
 			.build();
-
-		data.getPlayers().add(player);
-		return player;
 	}
 
-	private boolean isValidState()
+	private boolean isLocalPlayerAvailable()
 	{
 		return isSupportedWorld()
 			&& player != null
@@ -305,9 +376,11 @@ public class ItemSharePlugin extends Plugin
 
 	private void savePlayer()
 	{
-		if (db.isConnected() && player != null && player.getName() != null)
+		if (db.isConnected() && player != null && !StringUtils.isEmpty(player.getName()))
 		{
-			db.savePlayer(player);
+			db.savePlayer(player, () -> {
+			}, () -> {
+			});
 		}
 	}
 }

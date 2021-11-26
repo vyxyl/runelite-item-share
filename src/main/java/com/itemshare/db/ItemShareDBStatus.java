@@ -1,6 +1,6 @@
 package com.itemshare.db;
 
-public enum ItemShareMongoDBStatus
+public enum ItemShareDBStatus
 {
 	LOADING,
 	UNINITIALIZED,

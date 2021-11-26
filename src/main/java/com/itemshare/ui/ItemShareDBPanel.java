@@ -4,16 +4,18 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_CLUSTER_DOMAIN;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_COLLECTION_NAME;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_DATABASE_NAME;
+import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_ENABLED;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_PASSWORD;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_USERNAME;
-import com.itemshare.db.ItemShareMongoDB;
-import com.itemshare.db.ItemShareMongoDBStatus;
+import com.itemshare.db.ItemShareDB;
+import com.itemshare.db.ItemShareDBStatus;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,15 +27,17 @@ import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.FlatTextField;
 
-public class ItemShareMongoDBPanel extends JPanel
+public class ItemShareDBPanel extends JPanel
 {
 	private final ConfigManager configManager;
 	private final JLabel statusLabel = new JLabel();
 	private final JButton connectButton;
 	private final Runnable onConnected;
-	private ItemShareMongoDBStatus lastStatus;
+	private ItemShareDBStatus lastStatus;
+	private final JCheckBox selfHostCheckbox;
+	private final JPanel selfHostPanel;
 
-	public ItemShareMongoDBPanel(ConfigManager configManager, ItemShareMongoDB db, Runnable onConnected)
+	public ItemShareDBPanel(ConfigManager configManager, ItemShareDB db, Runnable onConnected)
 	{
 		super(false);
 
@@ -41,29 +45,76 @@ public class ItemShareMongoDBPanel extends JPanel
 		this.configManager = configManager;
 
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-
-		add(getSetting("Database Name", CONFIG_MONGODB_DATABASE_NAME));
-		add(getSetting("Collection Name", CONFIG_MONGODB_COLLECTION_NAME));
-		add(getSetting("Cluster Domain", CONFIG_MONGODB_CLUSTER_DOMAIN));
-		add(getSetting("Username", CONFIG_MONGODB_USERNAME));
-		add(getPasswordSetting());
-
-		JPanel spacer = new JPanel();
-		setFullWidthStyling(spacer, 15);
 
 		connectButton = createConnectButton(db);
+		selfHostPanel = createSelfHostPanel(db);
+
+		boolean isSelfHostEnabled = Boolean.parseBoolean(configManager.getConfiguration(CONFIG_BASE, CONFIG_MONGODB_ENABLED));
+		
+		selfHostCheckbox = new JCheckBox("Self-host your own database", isSelfHostEnabled);
+		selfHostCheckbox.addItemListener(event -> onSelfHostSelection(configManager));
+		setFullWidthStyling(selfHostCheckbox, 30);
+		add(selfHostCheckbox);
+
+		if (isSelfHostEnabled)
+		{
+			add(selfHostPanel);
+		}
+	}
+
+	private void onSelfHostSelection(ConfigManager configManager)
+	{
+		boolean isSelected = selfHostCheckbox.isSelected();
+		configManager.setConfiguration(CONFIG_BASE, CONFIG_MONGODB_ENABLED, isSelected);
+
+		if (isSelected)
+		{
+			add(selfHostPanel);
+		}
+		else
+		{
+			remove(selfHostPanel);
+		}
+
+		selfHostPanel.repaint();
+		selfHostPanel.revalidate();
+
+		repaint();
+		revalidate();
+	}
+
+	private JPanel createSelfHostPanel(ItemShareDB db)
+	{
+		JPanel footer = createSelfHostFooter(db);
+		setFullWidthStyling(footer, 100);
+
+		JPanel selfHostDb = new JPanel();
+		selfHostDb.setLayout(new BoxLayout(selfHostDb, BoxLayout.PAGE_AXIS));
+
+		selfHostDb.add(getSetting("MongoDB Database Name", CONFIG_MONGODB_DATABASE_NAME));
+		selfHostDb.add(getSetting("MongoDB Collection Name", CONFIG_MONGODB_COLLECTION_NAME));
+		selfHostDb.add(getSetting("MongoDB Cluster Domain", CONFIG_MONGODB_CLUSTER_DOMAIN));
+		selfHostDb.add(getSetting("MongoDB Username", CONFIG_MONGODB_USERNAME));
+		selfHostDb.add(getPasswordSetting());
+		selfHostDb.add(footer);
+
+		return selfHostDb;
+	}
+
+	private JPanel createSelfHostFooter(ItemShareDB db)
+	{
+		JPanel spacer = new JPanel();
+		setFullWidthStyling(spacer, 15);
 		statusLabel.setForeground(Color.WHITE);
 
 		JPanel footer = new JPanel();
 		footer.add(spacer);
 		footer.add(connectButton);
 		footer.add(statusLabel);
-
-		add(footer);
+		return footer;
 	}
 
-	private JButton createConnectButton(ItemShareMongoDB db)
+	private JButton createConnectButton(ItemShareDB db)
 	{
 		JButton button = new JButton();
 		button.setText("Re-Connect");
@@ -80,7 +131,7 @@ public class ItemShareMongoDBPanel extends JPanel
 		return button;
 	}
 
-	public void update(ItemShareMongoDBStatus status)
+	public void update(ItemShareDBStatus status)
 	{
 		switch (status)
 		{
@@ -95,7 +146,7 @@ public class ItemShareMongoDBPanel extends JPanel
 			case CONNECTED:
 				statusLabel.setText("Connection Status: Connected");
 				connectButton.setEnabled(true);
-				if (lastStatus != ItemShareMongoDBStatus.CONNECTED)
+				if (lastStatus != ItemShareDBStatus.CONNECTED)
 				{
 					onConnected.run();
 				}
@@ -116,7 +167,7 @@ public class ItemShareMongoDBPanel extends JPanel
 
 	private JPanel getPasswordSetting()
 	{
-		JLabel label = getLabel("Password");
+		JLabel label = getLabel("MongoDB Password");
 		setFullWidthStyling(label, 30);
 
 		JPasswordField value = new JPasswordField();
@@ -155,6 +206,14 @@ public class ItemShareMongoDBPanel extends JPanel
 		component.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, height));
 		component.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, height));
 		component.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, height));
+	}
+
+	private JLabel getFullLabel(String name)
+	{
+		JLabel label = getLabel(name);
+		setFullWidthStyling(label, 30);
+
+		return label;
 	}
 
 	private JLabel getLabel(String name)

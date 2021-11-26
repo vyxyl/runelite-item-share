@@ -6,7 +6,7 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_COLLECTIO
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_DATABASE_NAME;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_PASSWORD;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_USERNAME;
-import static com.itemshare.constant.ItemShareConstants.MONGODB_SYNC_FREQUENCY_MS;
+import static com.itemshare.constant.ItemShareConstants.DB_SYNC_FREQUENCY_MS;
 import com.mongodb.Block;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -36,16 +36,16 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 	private Runnable onSuccess;
 	private Runnable onFailure;
 
-	private ItemShareMongoDBStatus status = ItemShareMongoDBStatus.UNINITIALIZED;
+	private ItemShareDBStatus status = ItemShareDBStatus.UNINITIALIZED;
 
-	public ItemShareMongoDBStatus getStatus()
+	public ItemShareDBStatus getStatus()
 	{
 		return status;
 	}
 
 	public void connect(Runnable onSuccess, Runnable onFailure)
 	{
-		status = ItemShareMongoDBStatus.LOADING;
+		status = ItemShareDBStatus.LOADING;
 
 		this.onSuccess = onSuccess;
 		this.onFailure = onFailure;
@@ -60,7 +60,7 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 			}
 			catch (Exception ex)
 			{
-				updateStatus(onFailure, ItemShareMongoDBStatus.DISCONNECTED);
+				updateStatus(onFailure, ItemShareDBStatus.DISCONNECTED);
 			}
 		}
 	}
@@ -72,7 +72,7 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 
 	public boolean isConnected()
 	{
-		return status == ItemShareMongoDBStatus.CONNECTED;
+		return status == ItemShareDBStatus.CONNECTED;
 	}
 
 	public MongoCollection<Document> getCollection()
@@ -91,7 +91,7 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 	{
 		if (onSuccess != null)
 		{
-			updateStatus(onSuccess, ItemShareMongoDBStatus.CONNECTED);
+			updateStatus(onSuccess, ItemShareDBStatus.CONNECTED);
 		}
 	}
 
@@ -100,11 +100,11 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 	{
 		if (onFailure != null)
 		{
-			updateStatus(onFailure, ItemShareMongoDBStatus.DISCONNECTED);
+			updateStatus(onFailure, ItemShareDBStatus.DISCONNECTED);
 		}
 	}
 
-	private void updateStatus(Runnable runnable, ItemShareMongoDBStatus disconnected)
+	private void updateStatus(Runnable runnable, ItemShareDBStatus disconnected)
 	{
 		status = disconnected;
 		runnable.run();
@@ -134,7 +134,7 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 		return "mongodb+srv://" + getUsername() + ":" + getPassword() + "@" + getClusterDomain() + "/" + getDatabaseName()
 			+ "?retryWrites=true"
 			+ "&w=majority"
-			+ "&heartbeatFrequencyMS=" + MONGODB_SYNC_FREQUENCY_MS;
+			+ "&heartbeatFrequencyMS=" + DB_SYNC_FREQUENCY_MS;
 	}
 
 	public boolean hasEnvironmentVariables()

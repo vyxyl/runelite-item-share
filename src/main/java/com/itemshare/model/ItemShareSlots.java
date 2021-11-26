@@ -11,7 +11,7 @@ import net.runelite.api.EquipmentInventorySlot;
 
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder=true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemShareSlots

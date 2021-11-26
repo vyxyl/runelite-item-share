@@ -12,6 +12,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.runelite.client.game.ItemManager;
+import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareNavigationPanel extends JPanel
 {
@@ -44,17 +45,17 @@ public class ItemShareNavigationPanel extends JPanel
 
 	public void update(ItemManager itemManager, ItemShareData data)
 	{
-		updateData(itemManager);
+		updateData(itemManager, data);
 
 		playerDropdown.update(data);
-		playerDropdown.setItemListener(event -> onPlayerSelected(itemManager, event));
+		playerDropdown.setItemListener(event -> onPlayerSelected(itemManager, data, event));
 	}
 
-	private void onPlayerSelected(ItemManager itemManager, ItemEvent event)
+	private void onPlayerSelected(ItemManager itemManager, ItemShareData data, ItemEvent event)
 	{
 		if (event.getStateChange() == ItemEvent.SELECTED)
 		{
-			updateData(itemManager);
+			updateData(itemManager, data);
 			updateMessage();
 		}
 	}
@@ -70,7 +71,7 @@ public class ItemShareNavigationPanel extends JPanel
 				updateMessage();
 			}
 
-		}, 1000, 1000);
+		}, 0, 1000);
 
 		return timer;
 	}
@@ -99,39 +100,52 @@ public class ItemShareNavigationPanel extends JPanel
 
 			if (days > 0)
 			{
-				return getLastSavedMessage(days, "day");
+				return getSavedMessage(days, "day");
 			}
 			else if (hours > 0)
 			{
-				return getLastSavedMessage(hours, "hour");
+				return getSavedMessage(hours, "hour");
 			}
 			else if (minutes > 0)
 			{
-				return getLastSavedMessage(minutes, "minute");
+				return getSavedMessage(minutes, "minute");
 			}
 			else
 			{
-				if (seconds == 0)
+				if (seconds > 0)
 				{
-					return "Last Saved: just now";
+					return getSavedMessage(seconds, "second");
 				}
 				else
 				{
-					return getLastSavedMessage(seconds, "second");
+					return "Last Saved: just now";
 				}
 			}
 		}
 	}
 
-	private String getLastSavedMessage(long amount, String unit)
+	private String getSavedMessage(long amount, String unit)
 	{
 		String plural = amount > 1 ? "s" : "";
 		return "Last Saved: " + amount + " " + unit + plural + " ago";
 	}
 
-	private void updateData(ItemManager itemManager)
+	private void updateData(ItemManager itemManager, ItemShareData data)
 	{
-		player = playerDropdown.getSelectedPlayer();
+		ItemSharePlayer selectedPlayer = playerDropdown.getSelectedPlayer();
+		player = findPlayer(data, selectedPlayer);
 		playerPanel.update(itemManager, player);
+	}
+
+	private ItemSharePlayer findPlayer(ItemShareData data, ItemSharePlayer defaultPlayer)
+	{
+		if (data == null || data.getPlayers() == null)
+		{
+			return defaultPlayer;
+		}
+		else
+		{
+			return data.getPlayers().stream().filter(p -> StringUtils.equals(p.getName(), defaultPlayer.getName())).findFirst().orElse(defaultPlayer);
+		}
 	}
 }

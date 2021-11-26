@@ -4,6 +4,10 @@ public class ItemShareConstants
 {
 	public static final String CONFIG_BASE = "itemshare";
 	public static final String CONFIG_DATA = "data";
+
+	public static final String CONFIG_GROUP_ID = "groupId";
+
+	public static final String CONFIG_MONGODB_ENABLED = "mongoDbDatabaseEnabled";
 	public static final String CONFIG_MONGODB_DATABASE_NAME = "mongoDbDatabaseName";
 	public static final String CONFIG_MONGODB_COLLECTION_NAME = "mongoDbCollectionName";
 	public static final String CONFIG_MONGODB_CLUSTER_DOMAIN = "mongoDbClusterDomain";
@@ -20,5 +24,5 @@ public class ItemShareConstants
 
 	public static final String OPTION_NO_PLAYER = "Select a player";
 
-	public static final long MONGODB_SYNC_FREQUENCY_MS = 15 * 1000;
+	public static final long DB_SYNC_FREQUENCY_MS = 15 * 1000;
 }

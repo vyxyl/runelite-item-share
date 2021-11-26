@@ -3,8 +3,8 @@ package com.itemshare.ui;
 import com.itemshare.ItemSharePlugin;
 import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS_BUTTON;
-import com.itemshare.db.ItemShareMongoDB;
-import com.itemshare.db.ItemShareMongoDBStatus;
+import com.itemshare.db.ItemShareDB;
+import com.itemshare.db.ItemShareDBStatus;
 import com.itemshare.model.ItemShareData;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -23,12 +23,12 @@ public class ItemSharePanel extends PluginPanel
 {
 	private final ItemShareTitlePanel titlePanel = new ItemShareTitlePanel();
 	private final JButton settingsButton = createSettingsButton();
-	private final ItemShareMongoDBPanel mongoDbPanel;
+	private final ItemShareDBPanel dbPanel;
 	private final ItemShareNavigationPanel navPanel = new ItemShareNavigationPanel();
 	private final ImageIcon settingsIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_SETTINGS_BUTTON));
 	private final ImageIcon closeIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_CLOSE_BUTTON));
 
-	public ItemSharePanel(ConfigManager configManager, ItemShareMongoDB db)
+	public ItemSharePanel(ConfigManager configManager, ItemShareDB db)
 	{
 		super(false);
 
@@ -36,18 +36,18 @@ public class ItemSharePanel extends PluginPanel
 		setLayout(new BorderLayout());
 
 		titlePanel.add(getControls());
-		mongoDbPanel = new ItemShareMongoDBPanel(configManager, db, this::showSharedItems);
+		dbPanel = new ItemShareDBPanel(configManager, db, this::showSharedItems);
 
 		add(titlePanel, BorderLayout.PAGE_START);
-		add(mongoDbPanel, BorderLayout.CENTER);
+		add(dbPanel, BorderLayout.CENTER);
 		add(navPanel, BorderLayout.CENTER);
 
 		showMongoDB();
 	}
 
-	public void update(ItemManager itemManager, ItemShareData data, ItemShareMongoDBStatus status)
+	public void update(ItemManager itemManager, ItemShareData data, ItemShareDBStatus status)
 	{
-		mongoDbPanel.update(status);
+		dbPanel.update(status);
 		navPanel.update(itemManager, data);
 	}
 
@@ -56,7 +56,7 @@ public class ItemSharePanel extends PluginPanel
 		settingsButton.setIcon(settingsIcon);
 		titlePanel.setTitleName("Item Share");
 		add(navPanel);
-		remove(mongoDbPanel);
+		remove(dbPanel);
 
 		repaintAll();
 	}
@@ -64,17 +64,17 @@ public class ItemSharePanel extends PluginPanel
 	private void showMongoDB()
 	{
 		settingsButton.setIcon(closeIcon);
-		titlePanel.setTitleName("MongoDB Settings");
+		titlePanel.setTitleName("Settings");
 		remove(navPanel);
-		add(mongoDbPanel);
+		add(dbPanel);
 
 		repaintAll();
 	}
 
 	private void repaintAll()
 	{
-		mongoDbPanel.revalidate();
-		mongoDbPanel.repaint();
+		dbPanel.revalidate();
+		dbPanel.repaint();
 
 		titlePanel.repaint();
 

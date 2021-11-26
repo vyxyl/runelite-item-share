@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder=true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemShareData

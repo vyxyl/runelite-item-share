@@ -133,7 +133,15 @@ public class ItemShareItemListPanel extends JPanel
 
 		if (index >= 0)
 		{
-			list.repaint(list.getCellBounds(index, index));
+			try
+			{
+				list.repaint(list.getCellBounds(index, index));
+			}
+			catch (Exception e)
+			{
+				//
+			}
+
 		}
 	}
 
