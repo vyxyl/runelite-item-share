@@ -2,6 +2,7 @@ package com.itemshare.ui;
 
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.service.ItemSharePanelService;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.AsyncBufferedImage;
 
@@ -57,26 +57,26 @@ public class ItemShareInventoryPanel extends JPanel
 		panel.add(itemPanel, c);
 	}
 
-	public void update(ItemManager itemManager, ItemSharePlayer player)
+	public void update(ItemSharePlayer player)
 	{
 		List<ItemShareItem> items = player.getInventory().getItems();
-		updateItems(itemManager, items);
+		updateItems(items);
 		repaint();
 	}
 
-	private void updateItems(ItemManager itemManager, List<ItemShareItem> items)
+	private void updateItems(List<ItemShareItem> items)
 	{
 		if (items == null || items.size() <= 0)
 		{
-			IntStream.range(0, 28).forEach(this::removeIconAtIndex);
+			IntStream.range(0, 28).forEach(this::removeIcon);
 		}
 		else
 		{
-			IntStream.range(0, items.size()).forEach(index -> updateItem(itemManager, items, index));
+			IntStream.range(0, items.size()).forEach(index -> updateItem(items, index));
 		}
 	}
 
-	private void updateItem(ItemManager itemManager, List<ItemShareItem> items, int index)
+	private void updateItem(List<ItemShareItem> items, int index)
 	{
 		JPanel itemPanel = itemPanels.get(index);
 		ItemShareItem item = items.get(index);
@@ -87,7 +87,7 @@ public class ItemShareInventoryPanel extends JPanel
 		}
 		else if (item.getId() >= 0)
 		{
-			addIcon(itemManager, itemPanel, item);
+			addIcon(itemPanel, item);
 		}
 		else
 		{
@@ -95,15 +95,15 @@ public class ItemShareInventoryPanel extends JPanel
 		}
 	}
 
-	private void addIcon(ItemManager itemManager, JPanel itemPanel, ItemShareItem item)
+	private void addIcon(JPanel itemPanel, ItemShareItem item)
 	{
 		JLabel label = (JLabel) itemPanel.getComponent(0);
-		AsyncBufferedImage icon = getIcon(itemManager, item);
+		AsyncBufferedImage icon = ItemSharePanelService.getIcon(item);
 		label.setToolTipText(item.getName());
 		icon.addTo(label);
 	}
 
-	private void removeIconAtIndex(int index)
+	private void removeIcon(int index)
 	{
 		JPanel itemPanel = itemPanels.get(index);
 		removeIcon(itemPanel);
@@ -116,10 +116,5 @@ public class ItemShareInventoryPanel extends JPanel
 		label.setIcon(null);
 		label.repaint();
 		itemPanel.repaint();
-	}
-
-	private AsyncBufferedImage getIcon(ItemManager itemManager, ItemShareItem item)
-	{
-		return itemManager.getImage(item.getId(), item.getQuantity(), item.getQuantity() > 1);
 	}
 }

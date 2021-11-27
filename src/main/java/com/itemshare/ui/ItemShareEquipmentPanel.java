@@ -2,6 +2,7 @@ package com.itemshare.ui;
 
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.service.ItemSharePanelService;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,7 +13,6 @@ import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.util.AsyncBufferedImage;
 
@@ -63,7 +63,7 @@ public class ItemShareEquipmentPanel extends JPanel
 		c.gridx = x;
 		c.gridy = y;
 
-		JPanel slotPanel = getBlackSlotPanel();
+		JPanel slotPanel = getSlotPanel();
 		slotPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
 		slotPanels.put(slot, slotPanel);
@@ -75,22 +75,13 @@ public class ItemShareEquipmentPanel extends JPanel
 		c.gridx = x;
 		c.gridy = y;
 
-		JPanel slotPanel = getBlackSlotPanel();
+		JPanel slotPanel = getSlotPanel();
 		panel.add(slotPanel, c);
 	}
 
-	private JLabel getCenteredLabel()
+	private JPanel getSlotPanel()
 	{
-		JLabel label = new JLabel();
-		label.setVerticalAlignment(JLabel.CENTER);
-		label.setHorizontalAlignment(JLabel.CENTER);
-
-		return label;
-	}
-
-	private JPanel getBlackSlotPanel()
-	{
-		JLabel label = getCenteredLabel();
+		JLabel label = getLabel();
 
 		JPanel item = new JPanel();
 		item.setPreferredSize(new Dimension(36, 36));
@@ -99,19 +90,28 @@ public class ItemShareEquipmentPanel extends JPanel
 		return item;
 	}
 
-	public void update(ItemManager itemManager, ItemSharePlayer player)
+	private JLabel getLabel()
+	{
+		JLabel label = new JLabel();
+		label.setVerticalAlignment(JLabel.CENTER);
+		label.setHorizontalAlignment(JLabel.CENTER);
+
+		return label;
+	}
+
+	public void update(ItemSharePlayer player)
 	{
 		Map<EquipmentInventorySlot, ItemShareItem> slots = player.getEquipment().getSlots();
-		updateItems(itemManager, slots);
+		updateItems(slots);
 		repaint();
 	}
 
-	private void updateItems(ItemManager itemManager, Map<EquipmentInventorySlot, ItemShareItem> slots)
+	private void updateItems(Map<EquipmentInventorySlot, ItemShareItem> slots)
 	{
-		Arrays.stream(EquipmentInventorySlot.values()).forEach(slot -> updateItem(itemManager, slots, slot));
+		Arrays.stream(EquipmentInventorySlot.values()).forEach(slot -> updateItem(slots, slot));
 	}
 
-	private void updateItem(ItemManager itemManager, Map<EquipmentInventorySlot, ItemShareItem> slots, EquipmentInventorySlot slot)
+	private void updateItem(Map<EquipmentInventorySlot, ItemShareItem> slots, EquipmentInventorySlot slot)
 	{
 		JPanel slotPanel = slotPanels.get(slot);
 		ItemShareItem item = slots.get(slot);
@@ -122,7 +122,7 @@ public class ItemShareEquipmentPanel extends JPanel
 		}
 		else if (item.getId() >= 0)
 		{
-			addIcon(itemManager, slotPanel, item);
+			addIcon(slotPanel, item);
 		}
 		else
 		{
@@ -130,10 +130,10 @@ public class ItemShareEquipmentPanel extends JPanel
 		}
 	}
 
-	private void addIcon(ItemManager itemManager, JPanel itemPanel, ItemShareItem item)
+	private void addIcon(JPanel itemPanel, ItemShareItem item)
 	{
 		JLabel label = (JLabel) itemPanel.getComponent(0);
-		AsyncBufferedImage icon = getIcon(itemManager, item);
+		AsyncBufferedImage icon = ItemSharePanelService.getIcon(item);
 		label.setToolTipText(item.getName());
 		icon.addTo(label);
 	}
@@ -145,10 +145,5 @@ public class ItemShareEquipmentPanel extends JPanel
 		label.setIcon(null);
 		label.repaint();
 		itemPanel.repaint();
-	}
-
-	private AsyncBufferedImage getIcon(ItemManager itemManager, ItemShareItem item)
-	{
-		return itemManager.getImage(item.getId(), item.getQuantity(), item.getQuantity() > 1);
 	}
 }

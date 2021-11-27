@@ -40,8 +40,9 @@ public class ItemShareSyncService
 			ItemShareGroupIdService.load();
 
 			ItemShareState.db.savePlayer(ItemShareState.player, () -> {
-				ItemShareState.db.getPlayers(ItemShareState.player.getGroupId(), players -> {
+				ItemShareState.db.getPlayers(ItemShareState.groupId, players -> {
 					ItemShareState.data.setPlayers(players);
+
 					syncTime = Instant.now();
 					ItemShareUIService.update();
 				}, () -> {

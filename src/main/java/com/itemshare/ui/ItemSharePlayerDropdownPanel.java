@@ -1,6 +1,7 @@
 package com.itemshare.ui;
 
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;

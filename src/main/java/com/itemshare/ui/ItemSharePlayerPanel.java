@@ -50,11 +50,11 @@ public class ItemSharePlayerPanel extends JPanel
 		return new ImageIcon(image.getScaledInstance(16, 16, SCALE_SMOOTH));
 	}
 
-	public void update(ItemManager itemManager, ItemSharePlayer player)
+	public void update(ItemSharePlayer player)
 	{
-		equipment.update(itemManager, player);
-		inventory.update(itemManager, player);
-		bank.update(itemManager, player.getBank());
+		equipment.update(player);
+		inventory.update(player);
+		bank.update(player.getBank());
 
 		revalidate();
 		repaint();

@@ -21,6 +21,9 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 	@Inject
 	private ItemShareMongoDBConnection connection;
 
+	private Runnable onSuccess;
+	private Runnable onFailure;
+
 	private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
 	public boolean isConnected()
@@ -33,7 +36,12 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 		return connection.getStatus();
 	}
 
-	public void connect(Runnable onSuccess, Runnable onFailure)
+	public void setCallbacks(Runnable onSuccess, Runnable onFailure) {
+		this.onSuccess = onSuccess;
+		this.onFailure = onFailure;
+	}
+
+	public void connect()
 	{
 		connection.connect(onSuccess, onFailure);
 	}

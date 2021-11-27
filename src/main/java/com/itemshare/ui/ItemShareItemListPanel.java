@@ -3,6 +3,7 @@ package com.itemshare.ui;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemShareRenderItem;
+import com.itemshare.service.ItemSharePanelService;
 import java.awt.Dimension;
 import java.util.Comparator;
 import java.util.List;
@@ -12,7 +13,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.AsyncBufferedImage;
 
@@ -24,7 +24,6 @@ public class ItemShareItemListPanel extends JPanel
 
 	private final JScrollPane scrollPane;
 	private final JList<ItemShareRenderItem> list;
-	private ItemManager itemManager;
 
 	protected ItemShareItemListPanel()
 	{
@@ -51,16 +50,14 @@ public class ItemShareItemListPanel extends JPanel
 		repaintAll();
 	}
 
-	public void update(ItemManager itemManager, ItemShareItems data)
+	public void update(ItemShareItems data)
 	{
-		updateItems(itemManager, data.getItems());
+		updateItems(data.getItems());
 		repaintAll();
 	}
 
-	private void updateItems(ItemManager itemManager, List<ItemShareItem> items)
+	private void updateItems(List<ItemShareItem> items)
 	{
-		this.itemManager = itemManager;
-
 		if (items == null || items.isEmpty())
 		{
 			removeAllItems();
@@ -111,15 +108,15 @@ public class ItemShareItemListPanel extends JPanel
 
 	private void addIcon(ItemShareRenderItem item)
 	{
-		AsyncBufferedImage icon = getIcon(itemManager, item);
+		AsyncBufferedImage icon = getIcon(item);
 		item.setIcon(icon);
 		icon.onLoaded(() -> repaintItem(item));
 	}
 
-	private AsyncBufferedImage getIcon(ItemManager itemManager, ItemShareRenderItem renderItem)
+	private AsyncBufferedImage getIcon(ItemShareRenderItem renderItem)
 	{
 		ItemShareItem item = renderItem.getItem();
-		return itemManager.getImage(item.getId(), item.getQuantity(), item.getQuantity() > 1);
+		return ItemSharePanelService.getIcon(item);
 	}
 
 	private void repaintItems(List<ItemShareRenderItem> items)
@@ -141,7 +138,6 @@ public class ItemShareItemListPanel extends JPanel
 			{
 				//
 			}
-
 		}
 	}
 

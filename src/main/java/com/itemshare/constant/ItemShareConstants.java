@@ -28,4 +28,6 @@ public class ItemShareConstants
 	public static final String OPTION_NO_PLAYER = "Select a player";
 
 	public static final long DB_SYNC_FREQUENCY_MS = 15 * 1000;
+	public static final String AWS_X_API_KEY = "PXS5OXyQtb22QuJI5PKaL8Gg8MXNi56O4t5BGUoJ";
+	public static final String AWS_BASE_URL = "https://dcc7edfbqc.execute-api.us-east-2.amazonaws.com/prod/item-share";
 }

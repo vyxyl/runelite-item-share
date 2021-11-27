@@ -9,7 +9,8 @@ public class ItemShareDBService
 	public static void connect()
 	{
 		connected = false;
-		ItemShareState.db.connect(ItemShareDBService::onSuccess, ItemShareDBService::onFailure);
+		ItemShareState.db.setCallbacks(ItemShareDBService::onSuccess, ItemShareDBService::onFailure);
+		ItemShareState.db.connect();
 	}
 
 	private static void onSuccess()

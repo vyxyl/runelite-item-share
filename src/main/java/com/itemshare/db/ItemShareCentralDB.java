@@ -2,38 +2,32 @@ package com.itemshare.db;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import static com.itemshare.constant.ItemShareConstants.AWS_BASE_URL;
+import static com.itemshare.constant.ItemShareConstants.AWS_X_API_KEY;
 import com.itemshare.model.ItemSharePlayer;
-import java.io.IOException;
+import com.itemshare.service.ItemShareRestService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ItemShareCentralDB implements ItemShareDB
 {
-	private final String X_API_KEY = "PXS5OXyQtb22QuJI5PKaL8Gg8MXNi56O4t5BGUoJ";
-	private final String BASE_URL = "https://dcc7edfbqc.execute-api.us-east-2.amazonaws.com/prod/item-share";
-	private final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
-
-	private final Logger logger = LoggerFactory.getLogger(ItemShareCentralDB.class);
 	private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+	private final Logger logger = LoggerFactory.getLogger(ItemShareCentralDB.class);
 
 	@Inject
-	private OkHttpClient okHttpClient;
+	private ItemShareRestService httpService;
 
-	@Inject
-	private GsonBuilder gsonBuilder;
+	private Runnable onSuccess;
+	private Runnable onFailure;
 
 	public boolean isConnected()
 	{
@@ -45,7 +39,13 @@ public class ItemShareCentralDB implements ItemShareDB
 		return ItemShareDBStatus.CONNECTED;
 	}
 
-	public void connect(Runnable onSuccess, Runnable onFailure)
+	public void setCallbacks(Runnable onSuccess, Runnable onFailure)
+	{
+		this.onSuccess = onSuccess;
+		this.onFailure = onFailure;
+	}
+
+	public void connect()
 	{
 		onSuccess.run();
 	}
@@ -59,15 +59,16 @@ public class ItemShareCentralDB implements ItemShareDB
 	{
 		if (player != null && player.getGroupId() != null)
 		{
-			Request request = new Request.Builder()
-				.url(BASE_URL + "?groupId=" + player.getGroupId())
-				.addHeader("x-api-key", X_API_KEY)
-				.post(RequestBody.create(JSON_MEDIA_TYPE, gson.toJson(player)))
-				.build();
+			Request request = buildSaveRequest(player);
 
-			call(request, "Save player",
-				json -> onSuccess.run(),
-				errorString -> onFailure.run());
+			httpService.call(request,
+				json -> {
+					onSuccess.run();
+				},
+				error -> {
+					logger.error("Failed to Save player: " + error);
+					onFailure.run();
+				});
 		}
 		else
 		{
@@ -79,15 +80,16 @@ public class ItemShareCentralDB implements ItemShareDB
 	{
 		if (!StringUtils.isEmpty(groupId))
 		{
-			Request request = new Request.Builder()
-				.url(BASE_URL + "?groupId=" + groupId)
-				.addHeader("x-api-key", X_API_KEY)
-				.get()
-				.build();
+			Request request = buildGetRequest(groupId);
 
-			call(request, "Get players",
-				json -> onSuccess.accept(toPlayers(json)),
-				errorString -> onFailure.run());
+			httpService.call(request,
+				json -> {
+					onSuccess.accept(toPlayers(json));
+				},
+				error -> {
+					logger.error("Failed to Get players: " + error);
+					onFailure.run();
+				});
 		}
 		else
 		{
@@ -95,56 +97,34 @@ public class ItemShareCentralDB implements ItemShareDB
 		}
 	}
 
+	private Request buildSaveRequest(ItemSharePlayer player)
+	{
+		return new Request.Builder()
+			.url(AWS_BASE_URL + "?groupId=" + player.getGroupId())
+			.addHeader("x-api-key", AWS_X_API_KEY)
+			.post(toBody(player))
+			.build();
+	}
+
+	private Request buildGetRequest(String groupId)
+	{
+		return new Request.Builder()
+			.url(AWS_BASE_URL + "?groupId=" + groupId)
+			.addHeader("x-api-key", AWS_X_API_KEY)
+			.get()
+			.build();
+	}
+
+	private RequestBody toBody(ItemSharePlayer player)
+	{
+		return RequestBody.create(
+			MediaType.parse("application/json; charset=utf-8"),
+			gson.toJson(player));
+	}
+
 	private List<ItemSharePlayer> toPlayers(String json)
 	{
 		ItemSharePlayer[] players = gson.fromJson(json, ItemSharePlayer[].class);
 		return Arrays.stream(players).collect(Collectors.toList());
-	}
-
-	private void call(Request request, String message, Consumer<String> onSuccess, Consumer<String> onFailure)
-	{
-		okHttpClient.newCall(request).enqueue(new Callback()
-		{
-			@Override
-			public void onFailure(Call call, IOException exception)
-			{
-				logger.error("Failed to " + message, exception);
-
-				onFailure.accept("Failed to" + message);
-			}
-
-			@Override
-			public void onResponse(Call call, Response response)
-			{
-				try
-				{
-					if (response.isSuccessful() && response.body() != null)
-					{
-						onSuccess.accept(response.body().string());
-					}
-					else
-					{
-						if (response.body() != null)
-						{
-							logger.error("Failed to" + message + response.body().string());
-						}
-						else
-						{
-							logger.error("Failed to" + message);
-						}
-
-						onFailure.accept("Failed to" + message);
-					}
-				}
-				catch (Exception e)
-				{
-					onFailure.accept("Failed to" + message);
-				}
-				finally
-				{
-					response.close();
-				}
-			}
-		});
 	}
 }

@@ -1,12 +1,10 @@
 package com.itemshare.ui;
 
-import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import net.runelite.client.ui.ColorScheme;
-import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.IconTextField;
 
 public class ItemShareItemSearchBoxPanel extends JPanel

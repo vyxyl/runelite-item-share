@@ -38,16 +38,16 @@ public class ItemSharePlugin extends Plugin
 	private Client client;
 
 	@Inject
-	private ItemManager itemManager;
+	private ClientToolbar toolbar;
 
 	@Inject
-	private ConfigManager configManager;
+	private ItemManager itemManager;
 
 	@Inject
 	private ItemShareConfig config;
 
 	@Inject
-	private ClientToolbar toolbar;
+	private ConfigManager configManager;
 
 	@Inject
 	private ItemShareMongoDB mongoDB;
