@@ -1,7 +1,7 @@
 package com.itemshare.ui;
 
-import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.state.ItemShareState;
 import java.awt.event.ItemEvent;
 import java.util.Date;
 import java.util.Timer;
@@ -11,8 +11,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.game.ItemManager;
 import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareNavigationPanel extends JPanel
@@ -24,7 +22,7 @@ public class ItemShareNavigationPanel extends JPanel
 	Timer timer;
 	ItemSharePlayer player;
 
-	protected ItemShareNavigationPanel(ConfigManager configManager)
+	protected ItemShareNavigationPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -44,19 +42,19 @@ public class ItemShareNavigationPanel extends JPanel
 		timer = createUpdateTimer();
 	}
 
-	public void update(ItemManager itemManager, ItemShareData data)
+	public void update()
 	{
-		updateData(itemManager, data);
+		updateData();
 
-		playerDropdown.update(data);
-		playerDropdown.setItemListener(event -> onPlayerSelected(itemManager, data, event));
+		playerDropdown.update();
+		playerDropdown.setItemListener(this::onPlayerSelected);
 	}
 
-	private void onPlayerSelected(ItemManager itemManager, ItemShareData data, ItemEvent event)
+	private void onPlayerSelected(ItemEvent event)
 	{
 		if (event.getStateChange() == ItemEvent.SELECTED)
 		{
-			updateData(itemManager, data);
+			updateData();
 			updateMessage();
 		}
 	}
@@ -131,22 +129,22 @@ public class ItemShareNavigationPanel extends JPanel
 		return "Last Saved: " + amount + " " + unit + plural + " ago";
 	}
 
-	private void updateData(ItemManager itemManager, ItemShareData data)
+	private void updateData()
 	{
 		ItemSharePlayer selectedPlayer = playerDropdown.getSelectedPlayer();
-		player = findPlayer(data, selectedPlayer);
-		playerPanel.update(itemManager, player);
+		player = findPlayer(selectedPlayer);
+		playerPanel.update(ItemShareState.itemManager, player);
 	}
 
-	private ItemSharePlayer findPlayer(ItemShareData data, ItemSharePlayer defaultPlayer)
+	private ItemSharePlayer findPlayer(ItemSharePlayer defaultPlayer)
 	{
-		if (data == null || data.getPlayers() == null)
+		if (ItemShareState.data == null || ItemShareState.data.getPlayers() == null)
 		{
 			return defaultPlayer;
 		}
 		else
 		{
-			return data.getPlayers().stream().filter(p -> StringUtils.equals(p.getName(), defaultPlayer.getName())).findFirst().orElse(defaultPlayer);
+			return ItemShareState.data.getPlayers().stream().filter(p -> StringUtils.equals(p.getName(), defaultPlayer.getName())).findFirst().orElse(defaultPlayer);
 		}
 	}
 }

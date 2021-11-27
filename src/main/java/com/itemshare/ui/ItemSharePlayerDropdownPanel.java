@@ -1,7 +1,7 @@
 package com.itemshare.ui;
 
-import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.state.ItemShareState;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;
 import javax.swing.BoxLayout;
@@ -41,8 +41,8 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		return model.getSelectedItem();
 	}
 
-	public void update(ItemShareData data)
+	public void update()
 	{
-		model.setItems(data.getPlayers());
+		model.setItems(ItemShareState.data.getPlayers());
 	}
 }

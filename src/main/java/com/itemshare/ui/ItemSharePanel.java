@@ -3,17 +3,12 @@ package com.itemshare.ui;
 import com.itemshare.ItemSharePlugin;
 import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS_BUTTON;
-import com.itemshare.db.ItemShareDB;
-import com.itemshare.db.ItemShareDBStatus;
-import com.itemshare.model.ItemShareData;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.plaf.basic.BasicButtonUI;
-import net.runelite.client.config.ConfigManager;
-import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
@@ -28,7 +23,7 @@ public class ItemSharePanel extends PluginPanel
 	private final ImageIcon settingsIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_SETTINGS_BUTTON));
 	private final ImageIcon closeIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_CLOSE_BUTTON));
 
-	public ItemSharePanel(ConfigManager configManager, ItemShareDB db)
+	public ItemSharePanel()
 	{
 		super(false);
 
@@ -36,8 +31,8 @@ public class ItemSharePanel extends PluginPanel
 		setLayout(new BorderLayout());
 
 		titlePanel.add(getControls());
-		navPanel = new ItemShareNavigationPanel(configManager);
-		dbPanel = new ItemShareDBPanel(configManager, db, this::showSharedItems);
+		navPanel = new ItemShareNavigationPanel();
+		dbPanel = new ItemShareDBPanel(this::showSharedItems);
 
 		add(titlePanel, BorderLayout.PAGE_START);
 		add(dbPanel, BorderLayout.CENTER);
@@ -46,10 +41,10 @@ public class ItemSharePanel extends PluginPanel
 		showMongoDB();
 	}
 
-	public void update(ItemManager itemManager, ItemShareData data, ItemShareDBStatus status)
+	public void update()
 	{
-		dbPanel.update(status);
-		navPanel.update(itemManager, data);
+		dbPanel.update();
+		navPanel.update();
 	}
 
 	private void showSharedItems()

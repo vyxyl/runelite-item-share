@@ -6,6 +6,7 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_COPY_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_EDIT_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
+import com.itemshare.state.ItemShareState;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,7 +15,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonModel;
@@ -25,10 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicButtonUI;
-import net.runelite.client.config.ConfigManager;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.FlatTextField;
@@ -37,15 +34,13 @@ import net.runelite.client.util.SwingUtil;
 
 public class ItemShareGroupIDPanel extends JPanel
 {
-	private final ConfigManager configManager;
 	ImageIcon editIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_EDIT_BUTTON));
 	ImageIcon saveIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_SAVE_BUTTON));
 	ImageIcon copyIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_COPY_BUTTON));
 
-	protected ItemShareGroupIDPanel(ConfigManager configManager)
+	protected ItemShareGroupIDPanel()
 	{
 		super(false);
-		this.configManager = configManager;
 
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
@@ -185,7 +180,7 @@ public class ItemShareGroupIDPanel extends JPanel
 		FlatTextField textField = new FlatTextField();
 		textField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		textField.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
-		textField.setText(configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID));
+		textField.setText(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID));
 		setDimension(textField, getWidth(0.80), 40);
 
 		JButton copyButton = getCopyGroupIDButton();
@@ -226,6 +221,6 @@ public class ItemShareGroupIDPanel extends JPanel
 
 	private void updateGroupId(String value)
 	{
-		configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, value);
+		ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, value);
 	}
 }

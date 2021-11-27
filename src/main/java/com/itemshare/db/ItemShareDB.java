@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 
 public interface ItemShareDB
 {
-	boolean isCentralDB();
 	boolean isConnected();
 	ItemShareDBStatus getStatus();
 	void connect(Runnable onSuccess, Runnable onFailure);

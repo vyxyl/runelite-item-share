@@ -35,11 +35,6 @@ public class ItemShareCentralDB implements ItemShareDB
 	@Inject
 	private GsonBuilder gsonBuilder;
 
-	public boolean isCentralDB()
-	{
-		return true;
-	}
-
 	public boolean isConnected()
 	{
 		return true;

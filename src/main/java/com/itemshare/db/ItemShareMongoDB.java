@@ -23,11 +23,6 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 
 	private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
-	public boolean isCentralDB()
-	{
-		return false;
-	}
-
 	public boolean isConnected()
 	{
 		return connection.isConnected();

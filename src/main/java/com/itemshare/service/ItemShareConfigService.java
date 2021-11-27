@@ -1,30 +1,20 @@
 package com.itemshare.service;
 
-import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
-import static com.itemshare.constant.ItemShareConstants.CONFIG_DATA;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
+import static com.itemshare.constant.ItemShareConstants.CONFIG_DATA;
+import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_ENABLED;
 import com.itemshare.model.ItemShareData;
+import com.itemshare.state.ItemShareState;
 import java.util.ArrayList;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import net.runelite.client.config.ConfigManager;
+import org.apache.commons.lang3.StringUtils;
 
-@Singleton
 public class ItemShareConfigService
 {
-	private final Gson gson;
-	private final ConfigManager configManager;
+	private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
-	@Inject
-	private ItemShareConfigService(final ConfigManager configManager)
-	{
-		this.configManager = configManager;
-		this.gson = new GsonBuilder().disableHtmlEscaping().create();
-	}
-
-	public ItemShareData getLocalData()
+	public static ItemShareData getLocalData()
 	{
 		String json = getDataJson();
 
@@ -33,25 +23,32 @@ public class ItemShareConfigService
 			: getData(json);
 	}
 
-	private String getDataJson()
+	private static String getDataJson()
 	{
-		return configManager.getConfiguration(CONFIG_BASE, CONFIG_DATA);
+		return ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_DATA);
 	}
 
-	private ItemShareData getData(String json)
+	private static ItemShareData getData(String json)
 	{
 		return gson.fromJson(json, ItemShareData.class);
 	}
 
-	private ItemShareData getDefaultData()
+	private static ItemShareData getDefaultData()
 	{
 		return ItemShareData.builder()
 			.players(new ArrayList<>())
 			.build();
 	}
 
-	public void saveLocalData(ItemShareData data)
+	public static void saveLocalData(ItemShareData data)
 	{
-		configManager.setConfiguration(CONFIG_BASE, CONFIG_DATA, gson.toJson(data));
+		ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_DATA, gson.toJson(data));
+	}
+
+	public static boolean isSelfHost()
+	{
+		String value = ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_MONGODB_ENABLED);
+
+		return StringUtils.equals(value, "true");
 	}
 }
