@@ -1,6 +1,6 @@
 package com.itemshare.state;
 
-import com.itemshare.db.ItemShareCentralDB;
+import com.itemshare.db.ItemShareDedicatedDB;
 import com.itemshare.db.ItemShareDB;
 import com.itemshare.db.ItemShareMongoDB;
 import com.itemshare.model.ItemShareData;
@@ -21,7 +21,7 @@ public class ItemShareState
 	// database
 	public static ItemShareDB db;
 	public static ItemShareMongoDB mongoDB;
-	public static ItemShareCentralDB centralDB;
+	public static ItemShareDedicatedDB dedicatedDB;
 
 	// plugin
 	public static ItemShareData data;

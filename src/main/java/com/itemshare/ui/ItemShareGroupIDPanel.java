@@ -5,7 +5,9 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_COPY_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_EDIT_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.ICON_GENERATE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
+import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.state.ItemShareState;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -22,6 +24,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.CLOSED_OPTION;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -34,9 +38,12 @@ import net.runelite.client.util.SwingUtil;
 
 public class ItemShareGroupIDPanel extends JPanel
 {
+	FlatTextField textField;
+
 	ImageIcon editIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_EDIT_BUTTON));
 	ImageIcon saveIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_SAVE_BUTTON));
 	ImageIcon copyIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_COPY_BUTTON));
+	ImageIcon generateIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_GENERATE_BUTTON));
 
 	protected ItemShareGroupIDPanel()
 	{
@@ -67,32 +74,32 @@ public class ItemShareGroupIDPanel extends JPanel
 		return (int) (PluginPanel.PANEL_WIDTH * v);
 	}
 
-	private JButton getCopyGroupIDButton()
+	private JButton getCopyButton()
 	{
-		JButton button = new JButton();
-		SwingUtil.removeButtonDecorations(button);
-
-		button.setIcon(copyIcon);
-		button.setToolTipText("Copy Group ID");
-		button.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		button.setUI(new BasicButtonUI());
-		addInteractionStyling(button);
-
-		return button;
+		return getButton(copyIcon, "Copy Group ID");
 	}
 
-	private JButton getEditGroupIDButton()
+	private JButton getEditButton()
+	{
+		return getButton(editIcon, "Edit Group ID");
+	}
+
+	private JButton getGenerateButton()
+	{
+		return getButton(generateIcon, "Generate Group ID");
+	}
+
+	private JButton getButton(ImageIcon editIcon, String s)
 	{
 		JButton button = new JButton();
 		SwingUtil.removeButtonDecorations(button);
 
 		button.setIcon(editIcon);
-		button.setToolTipText("Edit Group ID");
+		button.setToolTipText(s);
 		button.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		button.setUI(new BasicButtonUI());
 
 		addInteractionStyling(button);
-
 		return button;
 	}
 
@@ -129,15 +136,31 @@ public class ItemShareGroupIDPanel extends JPanel
 		button.setToolTipText("Edit Group ID");
 	}
 
-	private void addCopyTextListener(FlatTextField field, JButton copyButton)
+	private void addCopyTextListener(FlatTextField field, JButton button)
 	{
-		copyButton.addActionListener(new ActionListener()
+		button.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				StringSelection stringSelection = new StringSelection(field.getTextField().getText());
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				clipboard.setContents(stringSelection, null);
+			}
+		});
+	}
+
+	private void addGenerateIdListener(FlatTextField field, JButton button)
+	{
+		JComponent root = this;
+
+		button.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JPanel panel = new JPanel();
+				panel.setMinimumSize(new Dimension(200, 200));
+
+				JOptionPane.showOptionDialog(root, panel, "Edit Group ID", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new String[]{}, null);
 			}
 		});
 	}
@@ -177,26 +200,31 @@ public class ItemShareGroupIDPanel extends JPanel
 
 	private JPanel getField()
 	{
-		FlatTextField textField = new FlatTextField();
+		textField = new FlatTextField();
 		textField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		textField.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
 		textField.setText(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID));
-		setDimension(textField, getWidth(0.80), 40);
+		setDimension(textField, getWidth(0.70), 40);
 
-		JButton copyButton = getCopyGroupIDButton();
+		JButton copyButton = getCopyButton();
 		addCopyTextListener(textField, copyButton);
 		setDimension(copyButton, getWidth(0.10), 30);
 
-		JButton editButton = getEditGroupIDButton();
+		JButton editButton = getEditButton();
 		addToggleEditListener(textField, editButton);
 		disableEditing(textField, editButton);
 		setDimension(editButton, getWidth(0.10), 30);
+
+		JButton generateButton = getGenerateButton();
+		addGenerateIdListener(textField, generateButton);
+		setDimension(generateButton, getWidth(0.10), 30);
 
 		JPanel field = new JPanel();
 		field.setLayout(new BoxLayout(field, BoxLayout.LINE_AXIS));
 		field.add(textField);
 		field.add(copyButton);
 		field.add(editButton);
+		field.add(generateButton);
 
 		return field;
 	}

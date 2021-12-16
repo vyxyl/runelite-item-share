@@ -18,10 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ItemShareCentralDB implements ItemShareDB
+public class ItemShareDedicatedDB implements ItemShareDB
 {
 	private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-	private final Logger logger = LoggerFactory.getLogger(ItemShareCentralDB.class);
+	private final Logger logger = LoggerFactory.getLogger(ItemShareDedicatedDB.class);
 
 	@Inject
 	private ItemShareRestService httpService;
@@ -52,7 +52,7 @@ public class ItemShareCentralDB implements ItemShareDB
 
 	public void reconnect()
 	{
-		//
+		onSuccess.run();
 	}
 
 	public void savePlayer(ItemSharePlayer player, Runnable onSuccess, Runnable onFailure)

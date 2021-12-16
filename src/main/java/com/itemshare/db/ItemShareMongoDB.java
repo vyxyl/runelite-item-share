@@ -36,7 +36,8 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 		return connection.getStatus();
 	}
 
-	public void setCallbacks(Runnable onSuccess, Runnable onFailure) {
+	public void setCallbacks(Runnable onSuccess, Runnable onFailure)
+	{
 		this.onSuccess = onSuccess;
 		this.onFailure = onFailure;
 	}
@@ -63,9 +64,10 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 
 				String json = gson.toJson(playerToSave);
 				Document data = Document.parse(json);
+				Bson filter = getPlayerFilter(playerToSave);
 
 				connection.getCollection().updateOne(
-					getUniqueIdFilter(playerToSave),
+					filter,
 					new Document("$set", data),
 					new UpdateOptions().upsert(true));
 
@@ -109,7 +111,7 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 		}
 	}
 
-	private Bson getUniqueIdFilter(ItemSharePlayer player)
+	private Bson getPlayerFilter(ItemSharePlayer player)
 	{
 		return Filters.and(
 			Filters.eq("groupId", player.getGroupId()),

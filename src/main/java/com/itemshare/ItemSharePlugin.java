@@ -1,7 +1,7 @@
 package com.itemshare;
 
 import com.google.inject.Provides;
-import com.itemshare.db.ItemShareCentralDB;
+import com.itemshare.db.ItemShareDedicatedDB;
 import com.itemshare.db.ItemShareMongoDB;
 import com.itemshare.service.ItemShareConfigService;
 import com.itemshare.service.ItemShareContainerService;
@@ -53,7 +53,7 @@ public class ItemSharePlugin extends Plugin
 	private ItemShareMongoDB mongoDB;
 
 	@Inject
-	private ItemShareCentralDB centralDB;
+	private ItemShareDedicatedDB dedicatedDB;
 
 	@Provides
 	ItemShareConfig provideConfig(ConfigManager configManager)
@@ -70,12 +70,12 @@ public class ItemSharePlugin extends Plugin
 		ItemShareState.configManager = configManager;
 
 		ItemShareState.mongoDB = mongoDB;
-		ItemShareState.centralDB = centralDB;
-		ItemShareState.db = ItemShareConfigService.isSelfHost() ? mongoDB : centralDB;
+		ItemShareState.dedicatedDB = dedicatedDB;
+		ItemShareState.db = ItemShareConfigService.isSelfHost() ? mongoDB : dedicatedDB;
 
 		ItemShareState.data = ItemShareConfigService.getLocalData();
 
-		ItemShareGroupIdService.load();
+		ItemShareGroupIdService.loadExistingId();
 
 		ItemShareUIService.load();
 		ItemShareUIService.update();

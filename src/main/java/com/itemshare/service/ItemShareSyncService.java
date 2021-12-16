@@ -37,7 +37,7 @@ public class ItemShareSyncService
 	{
 		if (shouldSync())
 		{
-			ItemShareGroupIdService.load();
+			ItemShareGroupIdService.loadExistingId();
 
 			ItemShareState.db.savePlayer(ItemShareState.player, () -> {
 				ItemShareState.db.getPlayers(ItemShareState.groupId, players -> {

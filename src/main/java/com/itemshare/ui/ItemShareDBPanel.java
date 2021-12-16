@@ -75,7 +75,7 @@ public class ItemShareDBPanel extends JPanel
 		}
 		else
 		{
-			ItemShareState.db = ItemShareState.centralDB;
+			ItemShareState.db = ItemShareState.dedicatedDB;
 			remove(selfHostPanel);
 		}
 

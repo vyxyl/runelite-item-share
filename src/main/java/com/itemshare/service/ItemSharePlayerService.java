@@ -40,7 +40,7 @@ public class ItemSharePlayerService
 	private static ItemSharePlayer getPlayer()
 	{
 		ItemSharePlayer player = findPlayer().orElseGet(ItemSharePlayerService::getNewPlayer);
-		player.setGroupId(ItemShareGroupIdService.load());
+		player.setGroupId(ItemShareGroupIdService.loadExistingId());
 		return getClone(player);
 	}
 
@@ -65,7 +65,7 @@ public class ItemSharePlayerService
 	private static ItemSharePlayer getNewPlayer()
 	{
 		return ItemSharePlayer.builder()
-			.groupId(ItemShareGroupIdService.load())
+			.groupId(ItemShareGroupIdService.loadExistingId())
 			.name(ItemShareState.playerName)
 			.updatedDate(new Date())
 			.bank(ItemShareItems.builder().items(new ArrayList<>()).build())
