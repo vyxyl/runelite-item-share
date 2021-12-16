@@ -11,12 +11,14 @@ import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.state.ItemShareState;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonModel;
@@ -25,7 +27,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import static javax.swing.JOptionPane.CLOSED_OPTION;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -49,24 +50,41 @@ public class ItemShareGroupIDPanel extends JPanel
 	{
 		super(false);
 
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		JPanel groupIdInput = getGroupIdInput();
-		add(groupIdInput);
-	}
+		JLabel titleLabel = new JLabel("Group ID");
+		titleLabel.setForeground(Color.WHITE);
+		titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
 
-	private JPanel getGroupIdInput()
-	{
-		JLabel label = getLabel();
-		JPanel field = getField();
-		JPanel setting = createStyledSetting(label, field);
-		setDimension(setting, getWidth(1), 40);
+		textField = new FlatTextField();
+		textField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+		textField.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
+		textField.setText(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID));
+		setDimension(textField, getWidth(1), 40);
+		textField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-		JPanel groupIdInput = new JPanel();
-		groupIdInput.setLayout(new BoxLayout(groupIdInput, BoxLayout.LINE_AXIS));
-		groupIdInput.add(setting);
+		JPanel copyButton = getCopyButton();
+		addCopyTextListener(textField, (JButton) copyButton.getComponent(0));
+		setDimension(copyButton, getWidth(1), 30);
+		copyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-		return groupIdInput;
+		JPanel editButton = getEditButton();
+		addToggleEditListener(textField, (JButton) editButton.getComponent(0));
+		disableEditing(textField, (JButton) editButton.getComponent(0));
+		setDimension(editButton, getWidth(1), 30);
+		editButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		JPanel generateButton = getGenerateButton();
+		addGenerateIdListener(textField, (JButton) generateButton.getComponent(0));
+		setDimension(generateButton, getWidth(1), 30);
+		generateButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		add(titleLabel);
+		add(textField);
+		add(copyButton);
+		add(editButton);
+		add(generateButton);
 	}
 
 	private int getWidth(double v)
@@ -74,33 +92,42 @@ public class ItemShareGroupIDPanel extends JPanel
 		return (int) (PluginPanel.PANEL_WIDTH * v);
 	}
 
-	private JButton getCopyButton()
+	private JPanel getCopyButton()
 	{
-		return getButton(copyIcon, "Copy Group ID");
+		return getButton(copyIcon, "Copy ID");
 	}
 
-	private JButton getEditButton()
+	private JPanel getEditButton()
 	{
-		return getButton(editIcon, "Edit Group ID");
+		return getButton(editIcon, "Edit ID");
 	}
 
-	private JButton getGenerateButton()
+	private JPanel getGenerateButton()
 	{
-		return getButton(generateIcon, "Generate Group ID");
+		return getButton(generateIcon, "Generate New ID");
 	}
 
-	private JButton getButton(ImageIcon editIcon, String s)
+	private JPanel getButton(ImageIcon icon, String name)
 	{
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+
+		JLabel buttonLabel = new JLabel(name, JLabel.CENTER);
+		buttonLabel.setForeground(Color.WHITE);
+		buttonLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
 		JButton button = new JButton();
 		SwingUtil.removeButtonDecorations(button);
 
-		button.setIcon(editIcon);
-		button.setToolTipText(s);
+		button.setIcon(icon);
 		button.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		button.setUI(new BasicButtonUI());
-
 		addInteractionStyling(button);
-		return button;
+
+		buttonPanel.add(button);
+		buttonPanel.add(buttonLabel);
+
+		return buttonPanel;
 	}
 
 	private void addToggleEditListener(FlatTextField field, JButton button)
@@ -157,10 +184,17 @@ public class ItemShareGroupIDPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				JPanel panel = new JPanel();
-				panel.setMinimumSize(new Dimension(200, 200));
+				String[] options = {"Confirm", "Cancel"};
 
-				JOptionPane.showOptionDialog(root, panel, "Edit Group ID", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new String[]{}, null);
+				int choice = JOptionPane.showOptionDialog(root,
+					"This will overwrite your ID with a new one", "Are you sure?",
+					JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
+
+				if (choice == 0)
+				{
+					String groupId = ItemShareGroupIdService.loadNewGroupId();
+					field.getTextField().setText(groupId);
+				}
 			}
 		});
 	}
@@ -188,56 +222,6 @@ public class ItemShareGroupIDPanel extends JPanel
 				}
 			}
 		});
-	}
-
-	private JLabel getLabel()
-	{
-		JLabel label = new JLabel("Group ID");
-		label.setForeground(Color.WHITE);
-
-		return label;
-	}
-
-	private JPanel getField()
-	{
-		textField = new FlatTextField();
-		textField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-		textField.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
-		textField.setText(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID));
-		setDimension(textField, getWidth(0.70), 40);
-
-		JButton copyButton = getCopyButton();
-		addCopyTextListener(textField, copyButton);
-		setDimension(copyButton, getWidth(0.10), 30);
-
-		JButton editButton = getEditButton();
-		addToggleEditListener(textField, editButton);
-		disableEditing(textField, editButton);
-		setDimension(editButton, getWidth(0.10), 30);
-
-		JButton generateButton = getGenerateButton();
-		addGenerateIdListener(textField, generateButton);
-		setDimension(generateButton, getWidth(0.10), 30);
-
-		JPanel field = new JPanel();
-		field.setLayout(new BoxLayout(field, BoxLayout.LINE_AXIS));
-		field.add(textField);
-		field.add(copyButton);
-		field.add(editButton);
-		field.add(generateButton);
-
-		return field;
-	}
-
-	private JPanel createStyledSetting(JComponent label, JComponent value)
-	{
-		JPanel setting = new JPanel();
-		setting.setLayout(new BorderLayout());
-		setting.add(label, BorderLayout.PAGE_START);
-		setting.add(value, BorderLayout.CENTER);
-		setting.add(Box.createVerticalGlue(), BorderLayout.PAGE_END);
-
-		return setting;
 	}
 
 	private void setDimension(JComponent component, int width, int height)
