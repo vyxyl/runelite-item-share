@@ -9,7 +9,6 @@ import static com.itemshare.constant.ItemShareConstants.ICON_GENERATE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
 import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.state.ItemShareState;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -19,7 +18,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
+import javax.swing.BoundedRangeModel;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
@@ -28,6 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicButtonUI;
@@ -64,6 +64,8 @@ public class ItemShareGroupIDPanel extends JPanel
 		setDimension(textField, getWidth(1), 40);
 		textField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+		JPanel scrollableTextField = getScrollableTextField();
+
 		JPanel copyButton = getCopyButton();
 		addCopyTextListener(textField, (JButton) copyButton.getComponent(0));
 		setDimension(copyButton, getWidth(1), 30);
@@ -81,10 +83,25 @@ public class ItemShareGroupIDPanel extends JPanel
 		generateButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		add(titleLabel);
-		add(textField);
-		add(copyButton);
+		add(scrollableTextField);
 		add(editButton);
+		add(copyButton);
 		add(generateButton);
+	}
+
+	private JPanel getScrollableTextField()
+	{
+		JScrollBar textScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+
+		JPanel textScrollPanel = new JPanel();
+		textScrollPanel.setLayout(new BoxLayout(textScrollPanel, BoxLayout.Y_AXIS));
+
+		BoundedRangeModel brm = textField.getTextField().getHorizontalVisibility();
+		textScrollBar.setModel(brm);
+		textScrollPanel.add(textField);
+		textScrollPanel.add(textScrollBar);
+
+		return textScrollPanel;
 	}
 
 	private int getWidth(double v)
@@ -112,11 +129,8 @@ public class ItemShareGroupIDPanel extends JPanel
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
-		JLabel buttonLabel = new JLabel(name, JLabel.CENTER);
-		buttonLabel.setForeground(Color.WHITE);
-		buttonLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
 		JButton button = new JButton();
+		button.setText(name);
 		SwingUtil.removeButtonDecorations(button);
 
 		button.setIcon(icon);
@@ -125,7 +139,6 @@ public class ItemShareGroupIDPanel extends JPanel
 		addInteractionStyling(button);
 
 		buttonPanel.add(button);
-		buttonPanel.add(buttonLabel);
 
 		return buttonPanel;
 	}
@@ -140,10 +153,12 @@ public class ItemShareGroupIDPanel extends JPanel
 				{
 					disableEditing(field, button);
 					updateGroupId(field.getText());
+					button.setText("Edit ID");
 				}
 				else
 				{
 					enableEditing(field, button);
+					button.setText("Save ID");
 				}
 			}
 		});
