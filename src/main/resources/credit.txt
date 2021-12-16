@@ -1,2 +1,4 @@
-"close", "copy", "edit", "save" icons made by https://www.flaticon.com/authors/pixel-perfect from https://www.flaticon.com/
-all other icons come from https://oldschool.runescape.wiki
+The following icons are made by https://www.flaticon.com/authors/pixel-perfect
+	"close", "copy", "edit", "save", "valid", "invalid"
+
+All other icons come from https://oldschool.runescape.wiki

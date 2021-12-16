@@ -21,6 +21,8 @@ public class ItemShareConstants
 	public static final String ICON_COPY_BUTTON = "/copy.png";
 	public static final String ICON_EDIT_BUTTON = "/edit.png";
 	public static final String ICON_SAVE_BUTTON = "/save.png";
+	public static final String ICON_VALID_ID = "/valid.png";
+	public static final String ICON_INVALID_ID = "/invalid.png";
 
 	public static final String ICON_BANK = "/bank.png";
 	public static final String ICON_EQUIPMENT = "/equipment.png";

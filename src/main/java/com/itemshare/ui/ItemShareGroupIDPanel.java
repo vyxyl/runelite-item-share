@@ -6,9 +6,12 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_COPY_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_EDIT_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_GENERATE_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.ICON_INVALID_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.ICON_VALID_ID;
 import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.state.ItemShareState;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -17,8 +20,11 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonModel;
 import javax.swing.ImageIcon;
@@ -39,12 +45,21 @@ import net.runelite.client.util.SwingUtil;
 
 public class ItemShareGroupIDPanel extends JPanel
 {
+	JPanel titlePanel;
 	FlatTextField textField;
 
 	ImageIcon editIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_EDIT_BUTTON));
 	ImageIcon saveIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_SAVE_BUTTON));
 	ImageIcon copyIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_COPY_BUTTON));
 	ImageIcon generateIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_GENERATE_BUTTON));
+	ImageIcon validIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_VALID_ID));
+	ImageIcon invalidIcon = new ImageIcon(ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_INVALID_ID));
+
+	JLabel invalidMessageLabel;
+	JLabel invalidMessageIcon;
+
+	JLabel validMessageLabel;
+	JLabel validMessageIcon;
 
 	protected ItemShareGroupIDPanel()
 	{
@@ -52,19 +67,15 @@ public class ItemShareGroupIDPanel extends JPanel
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-		JLabel titleLabel = new JLabel("Group ID");
-		titleLabel.setForeground(Color.WHITE);
-		titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		titlePanel = getTitlePanel();
 
 		textField = new FlatTextField();
 		textField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		textField.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
 		textField.setText(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID));
-		setDimension(textField, getWidth(1), 40);
+		setDimension(textField, getWidth(1), 25);
 		textField.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-		JPanel scrollableTextField = getScrollableTextField();
+		textField.addKeyListener(getKeyListener(this::updateValidTitle));
 
 		JPanel copyButton = getCopyButton();
 		addCopyTextListener(textField, (JButton) copyButton.getComponent(0));
@@ -82,14 +93,122 @@ public class ItemShareGroupIDPanel extends JPanel
 		setDimension(generateButton, getWidth(1), 30);
 		generateButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-		add(titleLabel);
+		JPanel scrollableTextField = getScrollableTextField(textField);
+
+		add(titlePanel);
 		add(scrollableTextField);
 		add(editButton);
 		add(copyButton);
 		add(generateButton);
 	}
 
-	private JPanel getScrollableTextField()
+	private JPanel getTitlePanel()
+	{
+		invalidMessageLabel = new JLabel("Invalid ID");
+		invalidMessageLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		invalidMessageLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+		invalidMessageLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+		setDimension(invalidMessageLabel, getWidth(0.30), 30);
+
+		invalidMessageIcon = new JLabel(invalidIcon);
+		invalidMessageIcon.setAlignmentX(Component.LEFT_ALIGNMENT);
+		invalidMessageIcon.setAlignmentY(Component.CENTER_ALIGNMENT);
+		invalidMessageIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+		setDimension(invalidMessageIcon, 15, 30);
+
+		validMessageLabel = new JLabel("Valid ID");
+		validMessageLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		validMessageLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+		validMessageLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+		setDimension(invalidMessageLabel, getWidth(0.30), 30);
+
+		validMessageIcon = new JLabel(validIcon);
+		validMessageIcon.setAlignmentX(Component.LEFT_ALIGNMENT);
+		validMessageIcon.setAlignmentY(Component.CENTER_ALIGNMENT);
+		validMessageIcon.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+		setDimension(validMessageIcon, 15, 30);
+
+		JLabel label = new JLabel("Group ID");
+		label.setForeground(Color.WHITE);
+		label.setAlignmentX(Component.LEFT_ALIGNMENT);
+		label.setAlignmentY(Component.CENTER_ALIGNMENT);
+		setDimension(label, getWidth(0.30), 30);
+
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		panel.setAlignmentY(Component.CENTER_ALIGNMENT);
+		setDimension(panel, getWidth(1), 30);
+
+		panel.add(label);
+		panel.add(Box.createHorizontalGlue(), BorderLayout.LINE_END);
+		panel.add(invalidMessageLabel);
+		panel.add(invalidMessageIcon);
+		panel.add(validMessageLabel);
+		panel.add(validMessageIcon);
+		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		panel.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+		showValidMessage();
+
+		return panel;
+	}
+
+	private void showValidMessage()
+	{
+		invalidMessageLabel.setVisible(false);
+		invalidMessageIcon.setVisible(false);
+
+		validMessageLabel.setVisible(true);
+		validMessageIcon.setVisible(true);
+	}
+
+	private void showInvalidMessage()
+	{
+		invalidMessageLabel.setVisible(false);
+		invalidMessageIcon.setVisible(false);
+
+		validMessageLabel.setVisible(true);
+		validMessageIcon.setVisible(true);
+
+		titlePanel.repaint();
+	}
+
+	private void updateValidTitle()
+	{
+		String value = textField.getTextField().getText();
+
+		if (ItemShareGroupIdService.isValidGroupID(value))
+		{
+//			titlePanel.add()
+		}
+	}
+
+	private KeyListener getKeyListener(Runnable runnable)
+	{
+		return new KeyListener()
+		{
+			@Override
+			public void keyTyped(KeyEvent e)
+			{
+				runnable.run();
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+				runnable.run();
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				runnable.run();
+			}
+		};
+	}
+
+	private JPanel getScrollableTextField(FlatTextField textField)
 	{
 		JScrollBar textScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
 

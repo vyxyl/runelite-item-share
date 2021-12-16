@@ -4,10 +4,13 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import com.itemshare.state.ItemShareState;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareGroupIdService
 {
+	private final static Pattern REGEX_VALID_UUID = Pattern.compile("^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$");
+
 	public static String loadExistingId()
 	{
 		if (StringUtils.isEmpty(ItemShareState.groupId))
@@ -35,5 +38,10 @@ public class ItemShareGroupIdService
 		}
 
 		return ItemShareState.groupId;
+	}
+
+	public static boolean isValidGroupID(String value)
+	{
+		return value != null && REGEX_VALID_UUID.matcher(value).matches();
 	}
 }
