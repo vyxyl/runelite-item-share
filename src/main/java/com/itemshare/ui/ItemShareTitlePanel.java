@@ -1,35 +1,37 @@
 package com.itemshare.ui;
 
-import java.awt.BorderLayout;
+import com.itemshare.service.ItemSharePanelService;
 import java.awt.Color;
-import javax.swing.BorderFactory;
+import java.awt.Component;
 import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 
 public class ItemShareTitlePanel extends PluginPanel
 {
-	JPanel titlePanel = new JPanel();
-	JLabel titleLabel = new JLabel();
-
-	public ItemShareTitlePanel()
+	public ItemShareTitlePanel(String label, Icon icon, Runnable onClick)
 	{
 		super(false);
+
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
-		setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+		JLabel titleLabel = new JLabel();
+		titleLabel.setText(label);
 		titleLabel.setForeground(Color.WHITE);
-		titlePanel.setLayout(new BorderLayout());
-		titlePanel.add(titleLabel, BorderLayout.WEST);
 
-		add(titlePanel);
-	}
+		JButton button = ItemSharePanelService.getButton(icon, null, onClick);
 
-	public void setTitleName(String name) {
-		titleLabel.setText(name);
-		repaint();
+		ItemSharePanelService.setSize(titleLabel, 0.90, 30);
+		ItemSharePanelService.setSize(button, 20, 20);
+
+		titleLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+		button.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+		add(titleLabel);
+		add(button);
 	}
 }

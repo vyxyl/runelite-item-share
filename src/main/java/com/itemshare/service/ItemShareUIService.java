@@ -1,13 +1,11 @@
 package com.itemshare.service;
 
-import com.itemshare.ItemSharePlugin;
 import static com.itemshare.constant.ItemShareConstants.ICON_NAV_BUTTON;
 import com.itemshare.state.ItemShareState;
 import com.itemshare.ui.ItemSharePanel;
 import java.awt.image.BufferedImage;
 import javax.swing.SwingUtilities;
 import net.runelite.client.ui.NavigationButton;
-import net.runelite.client.util.ImageUtil;
 
 public class ItemShareUIService
 {
@@ -26,15 +24,10 @@ public class ItemShareUIService
 		assert SwingUtilities.isEventDispatchThread();
 		panel = new ItemSharePanel();
 
-		BufferedImage icon = getPluginIcon();
-		NavigationButton button = getNavigationButton(icon);
+		BufferedImage image = ItemSharePanelService.loadImage(ICON_NAV_BUTTON);
+		NavigationButton button = getNavigationButton(image);
 
 		ItemShareState.toolbar.addNavigation(button);
-	}
-
-	private static BufferedImage getPluginIcon()
-	{
-		return ImageUtil.loadImageResource(ItemSharePlugin.class, ICON_NAV_BUTTON);
 	}
 
 	private static NavigationButton getNavigationButton(BufferedImage icon)
