@@ -2,6 +2,7 @@ package com.itemshare.ui;
 
 import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
+import static com.itemshare.constant.ItemShareConstants.ICON_BACK;
 import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_COPY_BUTTON;
 import com.itemshare.service.ItemSharePanelService;
@@ -19,16 +20,15 @@ import net.runelite.client.ui.components.FlatTextField;
 
 public class ItemShareCopyGroupPanel extends JPanel
 {
-	public ItemShareCopyGroupPanel(Runnable onClose)
+	public ItemShareCopyGroupPanel(Runnable onBack)
 	{
 		super(false);
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-
-		ImageIcon closeIcon = ItemSharePanelService.loadIcon(ICON_CLOSE_BUTTON);
-		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel("Settings - Share Group", closeIcon, onClose);
+		ImageIcon backIcon = ItemSharePanelService.loadIcon(ICON_BACK);
+		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel("Item Share / Settings / Share", backIcon, onBack);
 
 		FlatTextField textField = getGroupIdTextField();
 		JPanel scrollableTextField = ItemSharePanelService.getScrollableTextField(textField);
@@ -44,8 +44,11 @@ public class ItemShareCopyGroupPanel extends JPanel
 		ItemSharePanelService.setHeight(copyButton, 30);
 
 		add(titlePanel);
+		add(ItemSharePanelService.getPadding(10));
 		add(scrollableTextField);
+		add(ItemSharePanelService.getPadding(10));
 		add(copyButton);
+		add(ItemSharePanelService.getPadding(10));
 	}
 
 	private FlatTextField getGroupIdTextField()

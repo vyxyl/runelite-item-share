@@ -3,6 +3,9 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_ENABLED;
 import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.ICON_JOIN;
+import static com.itemshare.constant.ItemShareConstants.ICON_SHARE;
+import com.itemshare.service.ItemShareConfigService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
 import java.awt.Component;
@@ -44,14 +47,17 @@ public class ItemShareSettingsPanel extends JPanel
 		setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
 
 		ImageIcon closeIcon = ItemSharePanelService.loadIcon(ICON_CLOSE_BUTTON);
-		titlePanel = new ItemShareTitlePanel("Settings", closeIcon, onClose);
+		titlePanel = new ItemShareTitlePanel("Item Share / Settings", closeIcon, onClose);
 
 		shareGroupPanel = new ItemShareCopyGroupPanel(() -> onSettingClick(ItemShareSetting.MAIN));
 		joinGroupPanel = new ItemShareJoinGroupPanel(() -> onSettingClick(ItemShareSetting.MAIN));
 		selfHostPanel = new ItemShareSelfHostPanel();
 
-		shareGroupButton = ItemSharePanelService.getButton(null, "Share Group", () -> onSettingClick(ItemShareSetting.SHARE_GROUP));
-		joinGroupButton = ItemSharePanelService.getButton(null, "Join Group", () -> onSettingClick(ItemShareSetting.JOIN_GROUP));
+		ImageIcon shareIcon = ItemSharePanelService.loadIcon(ICON_SHARE);
+		ImageIcon joinIcon = ItemSharePanelService.loadIcon(ICON_JOIN);
+
+		shareGroupButton = ItemSharePanelService.getButton(shareIcon, "Share Group", () -> onSettingClick(ItemShareSetting.SHARE_GROUP));
+		joinGroupButton = ItemSharePanelService.getButton(joinIcon, "Join Group", () -> onSettingClick(ItemShareSetting.JOIN_GROUP));
 		selfHostCheckbox = createSelHostCheckBox();
 
 		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -82,12 +88,24 @@ public class ItemShareSettingsPanel extends JPanel
 	{
 		isSelfHostEnabled = checkbox.isSelected();
 		ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_MONGODB_ENABLED, isSelfHostEnabled);
+
+		if (ItemShareConfigService.isSelfHost())
+		{
+			ItemShareState.mongoDB.connect();
+			ItemShareState.db = ItemShareState.mongoDB;
+		}
+		else
+		{
+			ItemShareState.db = ItemShareState.dedicatedDB;
+		}
+
+		selfHostPanel.updateStatus();
 		rebuild();
 	}
 
-	public void update()
+	public void updateStatus()
 	{
-		selfHostPanel.update();
+		selfHostPanel.updateStatus();
 	}
 
 	private void onSettingClick(ItemShareSetting setting)
@@ -126,13 +144,18 @@ public class ItemShareSettingsPanel extends JPanel
 	private void rebuildMain()
 	{
 		add(titlePanel);
+		add(ItemSharePanelService.getPadding(10));
 		add(shareGroupButton);
+		add(ItemSharePanelService.getPadding(10));
 		add(joinGroupButton);
+		add(ItemSharePanelService.getPadding(10));
 		add(selfHostCheckbox);
+		add(ItemSharePanelService.getPadding(10));
 
 		if (isSelfHostEnabled)
 		{
 			add(selfHostPanel);
+			add(ItemSharePanelService.getPadding(10));
 		}
 	}
 }

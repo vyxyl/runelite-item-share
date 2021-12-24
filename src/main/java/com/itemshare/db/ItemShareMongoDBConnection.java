@@ -43,12 +43,27 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 		return status;
 	}
 
+	public void disconnect()
+	{
+		if (client != null)
+		{
+			client.close();
+			client = null;
+			database = null;
+			collection = null;
+		}
+
+		updateStatus(onFailure, ItemShareDBStatus.DISCONNECTED);
+	}
+
 	public void connect(Runnable onSuccess, Runnable onFailure)
 	{
-		status = ItemShareDBStatus.LOADING;
-
 		this.onSuccess = onSuccess;
 		this.onFailure = onFailure;
+
+		disconnect();
+
+		updateStatus(onFailure, ItemShareDBStatus.LOADING);
 
 		if (this.hasEnvironmentVariables())
 		{
@@ -60,8 +75,12 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 			}
 			catch (Exception ex)
 			{
-				updateStatus(onFailure, ItemShareDBStatus.DISCONNECTED);
+				disconnect();
 			}
+		}
+		else
+		{
+			disconnect();
 		}
 	}
 
@@ -100,7 +119,7 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 	{
 		if (onFailure != null)
 		{
-			updateStatus(onFailure, ItemShareDBStatus.DISCONNECTED);
+			disconnect();
 		}
 	}
 

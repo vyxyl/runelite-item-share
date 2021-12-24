@@ -20,12 +20,13 @@ public class ItemShareConstants
 	public static final String ICON_NAV_BUTTON = "/icon.png";
 	public static final String ICON_CLOSE_BUTTON = "/close.png";
 	public static final String ICON_SETTINGS_BUTTON = "/settings.png";
-	public static final String ICON_GENERATE_BUTTON = "/generate.png";
 	public static final String ICON_COPY_BUTTON = "/copy.png";
-	public static final String ICON_EDIT_BUTTON = "/edit.png";
 	public static final String ICON_SAVE_BUTTON = "/save.png";
 	public static final String ICON_VALID_ID = "/valid.png";
 	public static final String ICON_INVALID_ID = "/invalid.png";
+	public static final String ICON_BACK = "/back.png";
+	public static final String ICON_JOIN = "/join.png";
+	public static final String ICON_SHARE = "/share.png";
 
 	public static final String ICON_BANK = "/bank.png";
 	public static final String ICON_EQUIPMENT = "/equipment.png";

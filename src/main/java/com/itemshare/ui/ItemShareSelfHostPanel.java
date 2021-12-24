@@ -47,7 +47,7 @@ public class ItemShareSelfHostPanel extends JPanel
 		add(footer);
 	}
 
-	public void update()
+	public void updateStatus()
 	{
 		ItemShareDBStatus status = ItemShareState.db.getStatus();
 
@@ -80,7 +80,7 @@ public class ItemShareSelfHostPanel extends JPanel
 	private JButton createConnectButton()
 	{
 		JButton button = new JButton();
-		button.setText("Re-Connect");
+		button.setText("Connect");
 		button.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		button.addMouseListener(new java.awt.event.MouseAdapter()
 		{

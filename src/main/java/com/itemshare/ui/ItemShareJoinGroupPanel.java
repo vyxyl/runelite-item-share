@@ -2,6 +2,7 @@ package com.itemshare.ui;
 
 import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
+import static com.itemshare.constant.ItemShareConstants.ICON_BACK;
 import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_INVALID_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
@@ -23,21 +24,21 @@ public class ItemShareJoinGroupPanel extends JPanel
 	ImageIcon validIcon = ItemSharePanelService.loadIcon(ICON_VALID_ID);
 	ImageIcon invalidIcon = ItemSharePanelService.loadIcon(ICON_INVALID_ID);
 
-	protected ItemShareJoinGroupPanel(Runnable onClose)
+	protected ItemShareJoinGroupPanel(Runnable onBack)
 	{
 		super(false);
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-		ImageIcon closeIcon = ItemSharePanelService.loadIcon(ICON_CLOSE_BUTTON);
-		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel("Settings - Join Group", closeIcon, onClose);
+		ImageIcon backIcon = ItemSharePanelService.loadIcon(ICON_BACK);
+		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel("Item Share / Settings / Join", backIcon, onBack);
 
 		textField = getGroupIdTextField();
 		JPanel scrollableTextField = ItemSharePanelService.getScrollableTextField(textField);
 
 		ImageIcon saveIcon = ItemSharePanelService.loadIcon(ICON_SAVE_BUTTON);
-		JButton saveButton = ItemSharePanelService.getButton(saveIcon, "Join", () -> {});
+		JButton saveButton = ItemSharePanelService.getButton(saveIcon, "Save", () -> {});
 
 		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		scrollableTextField.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -47,8 +48,11 @@ public class ItemShareJoinGroupPanel extends JPanel
 		ItemSharePanelService.setHeight(saveButton, 30);
 
 		add(titlePanel);
+		add(ItemSharePanelService.getPadding(10));
 		add(scrollableTextField);
+		add(ItemSharePanelService.getPadding(10));
 		add(saveButton);
+		add(ItemSharePanelService.getPadding(10));
 	}
 
 	private FlatTextField getGroupIdTextField()

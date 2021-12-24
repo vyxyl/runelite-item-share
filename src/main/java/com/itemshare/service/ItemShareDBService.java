@@ -19,12 +19,13 @@ public class ItemShareDBService
 		{
 			connected = true;
 			ItemShareSyncService.start();
+			ItemShareUIService.updateStatus();
 		}
 	}
 
 	private static void onFailure()
 	{
 		connected = false;
-		ItemShareUIService.update();
+		ItemShareUIService.updateStatus();
 	}
 }

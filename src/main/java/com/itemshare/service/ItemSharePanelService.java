@@ -3,6 +3,7 @@ package com.itemshare.service;
 import com.itemshare.ItemSharePlugin;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.state.ItemShareState;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -39,9 +40,9 @@ public class ItemSharePanelService
 		button.getModel().addChangeListener(new ChangeListener()
 		{
 			@Override
-			public void stateChanged(ChangeEvent e)
+			public void stateChanged(ChangeEvent event)
 			{
-				ButtonModel model = (ButtonModel) e.getSource();
+				ButtonModel model = (ButtonModel) event.getSource();
 
 				if (model.isPressed())
 				{
@@ -62,17 +63,26 @@ public class ItemSharePanelService
 	public static JButton getButton(Icon icon, String label, Runnable onClick)
 	{
 		JButton button = new JButton();
-		addButtonInteractionStyling(button);
 		button.setIcon(icon);
 		button.setText(label);
+		button.setFocusPainted(false);
 		button.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		button.addMouseListener(new MouseAdapter()
 		{
-			public void mousePressed(MouseEvent evt)
+			public void mousePressed(MouseEvent event)
 			{
 				onClick.run();
+
+				ButtonModel model = button.getModel();
+				model.setPressed(false);
+				model.setRollover(false);
+				model.setSelected(false);
+
+				button.setBackground(ColorScheme.DARK_GRAY_COLOR);
 			}
 		});
+
+		addButtonInteractionStyling(button);
 
 		return button;
 	}
@@ -124,5 +134,15 @@ public class ItemSharePanelService
 	public static BufferedImage loadImage(String path)
 	{
 		return ImageUtil.loadImageResource(ItemSharePlugin.class, path);
+	}
+
+	public static JPanel getPadding(int height)
+	{
+		JPanel panel = new JPanel();
+		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		setSize(panel, PluginPanel.PANEL_WIDTH, height);
+
+		return panel;
 	}
 }

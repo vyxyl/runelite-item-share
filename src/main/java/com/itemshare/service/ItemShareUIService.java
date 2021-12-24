@@ -11,6 +11,14 @@ public class ItemShareUIService
 {
 	private static ItemSharePanel panel;
 
+	public static void updateStatus()
+	{
+		if (panel != null)
+		{
+			SwingUtilities.invokeLater(() -> panel.updateStatus());
+		}
+	}
+
 	public static void update()
 	{
 		if (panel != null)
