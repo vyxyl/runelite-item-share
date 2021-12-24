@@ -47,6 +47,11 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 		connection.connect(onSuccess, onFailure);
 	}
 
+	public void disconnect()
+	{
+		connection.disconnect();
+	}
+
 	public void reconnect()
 	{
 		connection.reconnect();

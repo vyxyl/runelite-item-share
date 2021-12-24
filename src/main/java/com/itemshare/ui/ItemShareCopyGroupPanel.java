@@ -3,7 +3,6 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_BACK;
-import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_COPY_BUTTON;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
@@ -15,6 +14,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.components.FlatTextField;
 
@@ -35,13 +35,16 @@ public class ItemShareCopyGroupPanel extends JPanel
 
 		ImageIcon copyIcon = ItemSharePanelService.loadIcon(ICON_COPY_BUTTON);
 		JButton copyButton = ItemSharePanelService.getButton(copyIcon, "Copy to Clipboard", () -> copyId(textField));
+		JTextPane textPane = ItemSharePanelService.getCenteredTextPane("Copy + share your \nGroup Id with other players\n\nPlayers with the same Group ID \nwill be able to see each other's items");
 
 		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		scrollableTextField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		copyButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+		textPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		ItemSharePanelService.setHeight(scrollableTextField, 30);
 		ItemSharePanelService.setHeight(copyButton, 30);
+		ItemSharePanelService.setHeight(textPane, 90);
 
 		add(titlePanel);
 		add(ItemSharePanelService.getPadding(10));
@@ -49,6 +52,7 @@ public class ItemShareCopyGroupPanel extends JPanel
 		add(ItemSharePanelService.getPadding(10));
 		add(copyButton);
 		add(ItemSharePanelService.getPadding(10));
+		add(textPane);
 	}
 
 	private FlatTextField getGroupIdTextField()

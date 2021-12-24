@@ -17,8 +17,12 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
+import javax.swing.JTextPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.FlatTextField;
@@ -144,5 +148,19 @@ public class ItemSharePanelService
 		setSize(panel, PluginPanel.PANEL_WIDTH, height);
 
 		return panel;
+	}
+
+	public static JTextPane getCenteredTextPane(String text)
+	{
+		JTextPane textPane = new JTextPane();
+		textPane.setEditable(false);
+		textPane.setFocusable(false);
+		textPane.setText(text);
+
+		StyledDocument doc = textPane.getStyledDocument();
+		SimpleAttributeSet center = new SimpleAttributeSet();
+		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+		doc.setParagraphAttributes(0, doc.getLength(), center, false);
+		return textPane;
 	}
 }

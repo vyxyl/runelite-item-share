@@ -96,6 +96,7 @@ public class ItemShareSettingsPanel extends JPanel
 		}
 		else
 		{
+			ItemShareState.mongoDB.disconnect();
 			ItemShareState.db = ItemShareState.dedicatedDB;
 		}
 

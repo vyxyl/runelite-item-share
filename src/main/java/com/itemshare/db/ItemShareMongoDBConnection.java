@@ -62,7 +62,6 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 		this.onFailure = onFailure;
 
 		disconnect();
-
 		updateStatus(onFailure, ItemShareDBStatus.LOADING);
 
 		if (this.hasEnvironmentVariables())
@@ -108,25 +107,23 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 	@Override
 	public void serverHeartbeatSucceeded(ServerHeartbeatSucceededEvent succeededEvent)
 	{
-		if (onSuccess != null)
-		{
-			updateStatus(onSuccess, ItemShareDBStatus.CONNECTED);
-		}
+		updateStatus(onSuccess, ItemShareDBStatus.CONNECTED);
 	}
 
 	@Override
 	public void serverHeartbeatFailed(ServerHeartbeatFailedEvent failedEvent)
 	{
-		if (onFailure != null)
-		{
-			disconnect();
-		}
+		disconnect();
 	}
 
 	private void updateStatus(Runnable runnable, ItemShareDBStatus disconnected)
 	{
 		status = disconnected;
-		runnable.run();
+
+		if (runnable != null)
+		{
+			runnable.run();
+		}
 	}
 
 	private MongoClient createClient()

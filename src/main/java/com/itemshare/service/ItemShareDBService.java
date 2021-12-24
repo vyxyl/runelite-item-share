@@ -19,8 +19,9 @@ public class ItemShareDBService
 		{
 			connected = true;
 			ItemShareSyncService.start();
-			ItemShareUIService.updateStatus();
 		}
+
+		ItemShareUIService.updateStatus();
 	}
 
 	private static void onFailure()

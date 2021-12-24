@@ -3,7 +3,6 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_BACK;
-import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_INVALID_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_VALID_ID;
@@ -14,6 +13,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.components.FlatTextField;
 
@@ -38,14 +38,17 @@ public class ItemShareJoinGroupPanel extends JPanel
 		JPanel scrollableTextField = ItemSharePanelService.getScrollableTextField(textField);
 
 		ImageIcon saveIcon = ItemSharePanelService.loadIcon(ICON_SAVE_BUTTON);
-		JButton saveButton = ItemSharePanelService.getButton(saveIcon, "Save", () -> {});
+		JButton saveButton = ItemSharePanelService.getButton(saveIcon, "Save", () -> updateGroupId(textField.getText()));
+		JTextPane textPane = ItemSharePanelService.getCenteredTextPane("Copy + paste another \nplayer's Group Id here\n\nPlayers with the same Group ID \nwill be able to see each other's items");
 
 		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		scrollableTextField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		saveButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+		textPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		ItemSharePanelService.setHeight(scrollableTextField, 30);
 		ItemSharePanelService.setHeight(saveButton, 30);
+		ItemSharePanelService.setHeight(textPane, 90);
 
 		add(titlePanel);
 		add(ItemSharePanelService.getPadding(10));
@@ -53,6 +56,7 @@ public class ItemShareJoinGroupPanel extends JPanel
 		add(ItemSharePanelService.getPadding(10));
 		add(saveButton);
 		add(ItemSharePanelService.getPadding(10));
+		add(textPane);
 	}
 
 	private FlatTextField getGroupIdTextField()

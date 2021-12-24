@@ -79,17 +79,12 @@ public class ItemShareSelfHostPanel extends JPanel
 
 	private JButton createConnectButton()
 	{
-		JButton button = new JButton();
-		button.setText("Connect");
-		button.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		button.addMouseListener(new java.awt.event.MouseAdapter()
-		{
-			public void mousePressed(java.awt.event.MouseEvent evt)
-			{
-				statusLabel.setText("Connection Status: Loading...");
-				ItemShareState.db.reconnect();
-			}
+		JButton button = ItemSharePanelService.getButton(null, "Connect", () -> {
+			statusLabel.setText("Connection Status: Loading...");
+			ItemShareState.mongoDB.reconnect();
 		});
+
+		ItemSharePanelService.setHeight(button, 30);
 
 		return button;
 	}
