@@ -11,6 +11,7 @@ import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.util.concurrent.Callable;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -20,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import lombok.SneakyThrows;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.components.FlatTextField;
 
@@ -32,7 +34,9 @@ public class ItemShareSelfHostPanel extends JPanel
 	{
 		super(false);
 
-		connectButton = createConnectButton();
+		statusLabel.setForeground(Color.WHITE);
+		connectButton = getConnectButton();
+		JPanel footer = getFooter();
 
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -40,10 +44,7 @@ public class ItemShareSelfHostPanel extends JPanel
 		add(getSetting("MongoDB Collection Name", CONFIG_MONGODB_COLLECTION_NAME));
 		add(getSetting("MongoDB Cluster Domain", CONFIG_MONGODB_CLUSTER_DOMAIN));
 		add(getSetting("MongoDB Username", CONFIG_MONGODB_USERNAME));
-		add(getPasswordSetting());
-
-		JPanel footer = createSelfHostFooter();
-
+		add(getPasswordSetting("MongoDB Password", CONFIG_MONGODB_PASSWORD));
 		add(footer);
 	}
 
@@ -51,51 +52,48 @@ public class ItemShareSelfHostPanel extends JPanel
 	{
 		ItemShareDBStatus status = ItemShareState.db.getStatus();
 
+		connectButton.setEnabled(true);
+
 		switch (status)
 		{
 			case UNINITIALIZED:
-				statusLabel.setText("Connection Status: Uninitialized");
-				connectButton.setEnabled(true);
+				updateStatus("Uninitialized");
 				break;
 			case LOADING:
-				statusLabel.setText("Connection Status: Loading...");
 				connectButton.setEnabled(false);
+				updateStatus("Loading...");
 				break;
 			case CONNECTED:
-				statusLabel.setText("Connection Status: Connected");
-				connectButton.setEnabled(true);
+				updateStatus("Connected");
 				break;
 			case DISCONNECTED:
-				statusLabel.setText("Connection Status: Disconnected");
-				connectButton.setEnabled(true);
+				updateStatus("Disconnected");
 				break;
 			default:
-				statusLabel.setText("Connection Status: Unknown");
-				connectButton.setEnabled(true);
+				updateStatus("Unknown");
+				break;
 		}
 
 		repaint();
 	}
 
-	private JButton createConnectButton()
+	private void updateStatus(String text)
 	{
-		JButton button = ItemSharePanelService.getButton(null, "Connect", () -> {
-			statusLabel.setText("Connection Status: Loading...");
-			ItemShareState.mongoDB.reconnect();
-		});
+		statusLabel.setText("Connection Status: " + text);
+	}
 
+	private JButton getConnectButton()
+	{
+		JButton button = ItemSharePanelService.getButton(null, "Connect", ItemShareState.mongoDB::reconnect);
 		ItemSharePanelService.setHeight(button, 30);
-
 		return button;
 	}
 
-	private JPanel createSelfHostFooter()
+	private JPanel getFooter()
 	{
-		JPanel spacer = new JPanel();
-		ItemSharePanelService.setHeight(spacer, 15);
-		statusLabel.setForeground(Color.WHITE);
-
+		JPanel spacer = ItemSharePanelService.getSpacer(15);
 		JPanel footer = new JPanel();
+
 		footer.add(spacer);
 		footer.add(connectButton);
 		footer.add(statusLabel);
@@ -105,43 +103,17 @@ public class ItemShareSelfHostPanel extends JPanel
 		return footer;
 	}
 
-	private JPanel getPasswordSetting()
+	private JPanel getPasswordSetting(String name, String key)
 	{
-		JLabel label = getLabel("MongoDB Password");
-		ItemSharePanelService.setHeight(label, 30);
-
-		JPasswordField value = new JPasswordField();
-		value.setText(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_MONGODB_PASSWORD));
-		value.getDocument().addDocumentListener(getListener(value));
-		ItemSharePanelService.setHeight(value, 30);
-
-		return createStyledSetting(label, value);
+		return getStyledSetting(getSettingLabel(name), getPasswordValue(key));
 	}
 
 	private JPanel getSetting(String name, String key)
 	{
-		JLabel label = getLabel(name);
-		ItemSharePanelService.setHeight(label, 30);
-
-		FlatTextField value = getValue(key);
-		ItemSharePanelService.setHeight(value, 30);
-
-		return createStyledSetting(label, value);
+		return getStyledSetting(getSettingLabel(name), getSettingValue(key));
 	}
 
-	private JPanel createStyledSetting(JComponent label, JComponent value)
-	{
-		JPanel setting = new JPanel();
-		setting.setLayout(new BorderLayout());
-		setting.add(label, BorderLayout.PAGE_START);
-		setting.add(value, BorderLayout.CENTER);
-		setting.add(Box.createVerticalGlue(), BorderLayout.PAGE_END);
-		ItemSharePanelService.setHeight(setting, 60);
-
-		return setting;
-	}
-
-	private JLabel getLabel(String name)
+	private JLabel getSettingLabel(String name)
 	{
 		JLabel label = new JLabel(name);
 		label.setForeground(Color.WHITE);
@@ -149,61 +121,64 @@ public class ItemShareSelfHostPanel extends JPanel
 		return label;
 	}
 
-	private FlatTextField getValue(String key)
+	private FlatTextField getSettingValue(String key)
 	{
 		FlatTextField field = new FlatTextField();
 		field.setText(ItemShareState.configManager.getConfiguration(CONFIG_BASE, key));
 		field.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		field.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
-		field.getDocument().addDocumentListener(getListener(key, field));
+		field.getDocument().addDocumentListener(getListener(key, field::getText));
 
 		return field;
 	}
 
-	private DocumentListener getListener(String key, FlatTextField field)
+	private JPasswordField getPasswordValue(String key)
 	{
-		return new DocumentListener()
-		{
-			@Override
-			public void insertUpdate(DocumentEvent e)
-			{
-				updateSetting(key, field.getText());
-			}
+		JPasswordField value = new JPasswordField();
+		value.setText(ItemShareState.configManager.getConfiguration(CONFIG_BASE, key));
+		value.getDocument().addDocumentListener(getListener(key, () -> new String(value.getPassword())));
 
-			@Override
-			public void removeUpdate(DocumentEvent e)
-			{
-				updateSetting(key, field.getText());
-			}
-
-			@Override
-			public void changedUpdate(DocumentEvent e)
-			{
-				updateSetting(key, field.getText());
-			}
-		};
+		return value;
 	}
 
-	private DocumentListener getListener(JPasswordField field)
+	private JPanel getStyledSetting(JComponent label, JComponent value)
+	{
+		JPanel setting = new JPanel();
+		setting.setLayout(new BorderLayout());
+		setting.add(label, BorderLayout.PAGE_START);
+		setting.add(value, BorderLayout.CENTER);
+		setting.add(Box.createVerticalGlue(), BorderLayout.PAGE_END);
+
+		ItemSharePanelService.setHeight(label, 30);
+		ItemSharePanelService.setHeight(value, 30);
+		ItemSharePanelService.setHeight(setting, 60);
+
+		return setting;
+	}
+
+	private DocumentListener getListener(String key, Callable<String> getValue)
 	{
 		return new DocumentListener()
 		{
+			@SneakyThrows
 			@Override
 			public void insertUpdate(DocumentEvent e)
 			{
-				updateSetting(CONFIG_MONGODB_PASSWORD, new String(field.getPassword()));
+				updateSetting(key, getValue.call());
 			}
 
+			@SneakyThrows
 			@Override
 			public void removeUpdate(DocumentEvent e)
 			{
-				updateSetting(CONFIG_MONGODB_PASSWORD, new String(field.getPassword()));
+				updateSetting(key, getValue.call());
 			}
 
+			@SneakyThrows
 			@Override
 			public void changedUpdate(DocumentEvent e)
 			{
-				updateSetting(CONFIG_MONGODB_PASSWORD, new String(field.getPassword()));
+				updateSetting(key, getValue.call());
 			}
 		};
 	}

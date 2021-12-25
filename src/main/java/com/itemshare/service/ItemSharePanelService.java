@@ -5,6 +5,8 @@ import com.itemshare.model.ItemShareItem;
 import com.itemshare.state.ItemShareState;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -115,6 +117,13 @@ public class ItemSharePanelService
 		component.setMaximumSize(dimension);
 	}
 
+	public static JPanel getSpacer(int height)
+	{
+		JPanel spacer = new JPanel();
+		ItemSharePanelService.setHeight(spacer, height);
+		return spacer;
+	}
+
 	public static JPanel getScrollableTextField(FlatTextField textField)
 	{
 		BoundedRangeModel brm = textField.getTextField().getHorizontalVisibility();
@@ -162,5 +171,29 @@ public class ItemSharePanelService
 		StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
 		doc.setParagraphAttributes(0, doc.getLength(), center, false);
 		return textPane;
+	}
+
+	public static KeyListener getKeyListener(Runnable runnable)
+	{
+		return new KeyListener()
+		{
+			@Override
+			public void keyTyped(KeyEvent e)
+			{
+				runnable.run();
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e)
+			{
+				runnable.run();
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e)
+			{
+				runnable.run();
+			}
+		};
 	}
 }

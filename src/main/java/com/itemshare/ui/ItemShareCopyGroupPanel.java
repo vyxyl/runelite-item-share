@@ -35,7 +35,7 @@ public class ItemShareCopyGroupPanel extends JPanel
 
 		ImageIcon copyIcon = ItemSharePanelService.loadIcon(ICON_COPY_BUTTON);
 		JButton copyButton = ItemSharePanelService.getButton(copyIcon, "Copy to Clipboard", () -> copyId(textField));
-		JTextPane textPane = ItemSharePanelService.getCenteredTextPane("Copy + share your \nGroup Id with other players\n\nPlayers with the same Group ID \nwill be able to see each other's items");
+		JTextPane textPane = ItemSharePanelService.getCenteredTextPane("Share your Group ID with other players\n\nPlayers with the same Group ID \nwill be able to see each other's items");
 
 		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		scrollableTextField.setAlignmentX(Component.LEFT_ALIGNMENT);

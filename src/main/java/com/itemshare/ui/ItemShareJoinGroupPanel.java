@@ -3,9 +3,8 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_BACK;
-import static com.itemshare.constant.ItemShareConstants.ICON_INVALID_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
-import static com.itemshare.constant.ItemShareConstants.ICON_VALID_ID;
+import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
 import java.awt.Component;
@@ -19,10 +18,8 @@ import net.runelite.client.ui.components.FlatTextField;
 
 public class ItemShareJoinGroupPanel extends JPanel
 {
+	JTextPane statusTextPane;
 	FlatTextField textField;
-
-	ImageIcon validIcon = ItemSharePanelService.loadIcon(ICON_VALID_ID);
-	ImageIcon invalidIcon = ItemSharePanelService.loadIcon(ICON_INVALID_ID);
 
 	protected ItemShareJoinGroupPanel(Runnable onBack)
 	{
@@ -39,15 +36,18 @@ public class ItemShareJoinGroupPanel extends JPanel
 
 		ImageIcon saveIcon = ItemSharePanelService.loadIcon(ICON_SAVE_BUTTON);
 		JButton saveButton = ItemSharePanelService.getButton(saveIcon, "Save", () -> updateGroupId(textField.getText()));
-		JTextPane textPane = ItemSharePanelService.getCenteredTextPane("Copy + paste another \nplayer's Group Id here\n\nPlayers with the same Group ID \nwill be able to see each other's items");
+		statusTextPane = ItemSharePanelService.getCenteredTextPane("");
+		JTextPane textPane = ItemSharePanelService.getCenteredTextPane("Copy + paste a Group ID here\n\nPlayers with the same Group ID \nwill be able to see each other's items");
 
 		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		scrollableTextField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		saveButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+		statusTextPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 		textPane.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		ItemSharePanelService.setHeight(scrollableTextField, 30);
 		ItemSharePanelService.setHeight(saveButton, 30);
+		ItemSharePanelService.setHeight(statusTextPane, 30);
 		ItemSharePanelService.setHeight(textPane, 90);
 
 		add(titlePanel);
@@ -55,6 +55,8 @@ public class ItemShareJoinGroupPanel extends JPanel
 		add(scrollableTextField);
 		add(ItemSharePanelService.getPadding(10));
 		add(saveButton);
+		add(ItemSharePanelService.getPadding(10));
+		add(statusTextPane);
 		add(ItemSharePanelService.getPadding(10));
 		add(textPane);
 	}
@@ -66,6 +68,7 @@ public class ItemShareJoinGroupPanel extends JPanel
 		textField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		textField.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
 		textField.setText("");
+		textField.addKeyListener(ItemSharePanelService.getKeyListener(() -> statusTextPane.setText("")));
 
 		return textField;
 	}
@@ -73,10 +76,21 @@ public class ItemShareJoinGroupPanel extends JPanel
 	public void reset()
 	{
 		textField.setText("");
+		statusTextPane.setText("");
 	}
 
 	private void updateGroupId(String value)
 	{
-		ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, value);
+		String trimmedValue = value.trim();
+
+		if (ItemShareGroupIdService.isValidId(trimmedValue))
+		{
+			ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, trimmedValue);
+			statusTextPane.setText("Successfully Joined the Group!");
+		}
+		else
+		{
+			statusTextPane.setText("Invalid Group ID, please try again");
+		}
 	}
 }

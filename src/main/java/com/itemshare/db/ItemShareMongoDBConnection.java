@@ -7,14 +7,12 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_DATABASE_
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_PASSWORD;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_USERNAME;
 import static com.itemshare.constant.ItemShareConstants.DB_SYNC_FREQUENCY_MS;
-import com.mongodb.Block;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.connection.ServerSettings;
 import com.mongodb.event.ServerHeartbeatFailedEvent;
 import com.mongodb.event.ServerHeartbeatStartedEvent;
 import com.mongodb.event.ServerHeartbeatSucceededEvent;
@@ -133,15 +131,9 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 
 		MongoClientSettings settings = MongoClientSettings.builder()
 			.applyConnectionString(connection)
-			.applyToServerSettings(new Block<ServerSettings.Builder>()
-			{
-				@Override
-				public void apply(final ServerSettings.Builder builder)
-				{
-					builder.addServerMonitorListener(listener);
-				}
-			})
+			.applyToServerSettings(builder -> builder.addServerMonitorListener(listener))
 			.build();
+
 		return MongoClients.create(settings);
 	}
 
@@ -164,26 +156,31 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 
 	private String getUsername()
 	{
-		return configManager.getConfiguration(CONFIG_BASE, CONFIG_MONGODB_USERNAME);
+		return getConfig(CONFIG_MONGODB_USERNAME);
 	}
 
 	private String getPassword()
 	{
-		return configManager.getConfiguration(CONFIG_BASE, CONFIG_MONGODB_PASSWORD);
+		return getConfig(CONFIG_MONGODB_PASSWORD);
 	}
 
 	private String getClusterDomain()
 	{
-		return configManager.getConfiguration(CONFIG_BASE, CONFIG_MONGODB_CLUSTER_DOMAIN);
+		return getConfig(CONFIG_MONGODB_CLUSTER_DOMAIN);
 	}
 
 	private String getDatabaseName()
 	{
-		return configManager.getConfiguration(CONFIG_BASE, CONFIG_MONGODB_DATABASE_NAME);
+		return getConfig(CONFIG_MONGODB_DATABASE_NAME);
 	}
 
 	private String getCollectionName()
 	{
-		return configManager.getConfiguration(CONFIG_BASE, CONFIG_MONGODB_COLLECTION_NAME);
+		return getConfig(CONFIG_MONGODB_COLLECTION_NAME);
+	}
+
+	private String getConfig(String configMongodbUsername)
+	{
+		return configManager.getConfiguration(CONFIG_BASE, configMongodbUsername);
 	}
 }

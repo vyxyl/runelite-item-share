@@ -1,7 +1,6 @@
 package com.itemshare.ui;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import com.itemshare.service.ItemSharePanelService;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import net.runelite.client.ui.ColorScheme;
@@ -27,7 +26,7 @@ public class ItemShareItemSearchBoxPanel extends JPanel
 	public void addListener(Runnable runnable)
 	{
 		searchBox.addClearListener(runnable);
-		searchBox.addKeyListener(createListener(runnable));
+		searchBox.addKeyListener(ItemSharePanelService.getKeyListener(runnable));
 	}
 
 	public String getText()
@@ -35,27 +34,5 @@ public class ItemShareItemSearchBoxPanel extends JPanel
 		return searchBox.getText();
 	}
 
-	private KeyListener createListener(Runnable runnable)
-	{
-		return new KeyListener()
-		{
-			@Override
-			public void keyTyped(KeyEvent e)
-			{
-				runnable.run();
-			}
 
-			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				runnable.run();
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e)
-			{
-				runnable.run();
-			}
-		};
-	}
 }
