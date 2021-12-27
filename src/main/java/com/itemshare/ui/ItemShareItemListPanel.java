@@ -2,9 +2,11 @@ package com.itemshare.ui;
 
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareItems;
+import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemShareRenderItem;
 import com.itemshare.service.ItemSharePanelService;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,9 +52,11 @@ public class ItemShareItemListPanel extends JPanel
 		repaintAll();
 	}
 
-	public void update(ItemShareItems data)
+	public void update(ItemSharePlayer player)
 	{
-		updateItems(data.getItems());
+		ItemShareItems bank = player.getBank();
+		List<ItemShareItem> items = bank == null ? new ArrayList<>() : bank.getItems();
+		updateItems(items);
 		repaintAll();
 	}
 

@@ -6,6 +6,7 @@ import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.ICON_JOIN;
 import static com.itemshare.constant.ItemShareConstants.ICON_SHARE;
 import com.itemshare.service.ItemShareConfigService;
+import com.itemshare.service.ItemShareDBService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
 import java.awt.Component;
@@ -91,14 +92,14 @@ public class ItemShareSettingsPanel extends JPanel
 
 		if (ItemShareConfigService.isSelfHost())
 		{
-			ItemShareState.mongoDB.connect();
-			ItemShareState.db = ItemShareState.mongoDB;
+			ItemShareState.selfHostDb.connect();
 		}
 		else
 		{
-			ItemShareState.mongoDB.disconnect();
-			ItemShareState.db = ItemShareState.dedicatedDB;
+			ItemShareState.selfHostDb.disconnect();
 		}
+
+		ItemShareDBService.loadPlayerNames(names -> ItemShareState.playerNames = names);
 
 		selfHostPanel.updateStatus();
 		rebuild();

@@ -1,11 +1,12 @@
 package com.itemshare.ui;
 
 import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.service.ItemShareDBService;
 import com.itemshare.service.ItemSharePanelService;
-import com.itemshare.state.ItemShareState;
+import com.itemshare.service.ItemSharePlayerService;
 import java.awt.event.ItemEvent;
-import java.util.Optional;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -60,27 +61,28 @@ public class ItemShareNavigationPanel extends JPanel
 
 	private void updateData()
 	{
-		ItemSharePlayer player = findPlayer();
+		String playerName = playerDropdown.getSelectedPlayerName();
+
+		if (StringUtils.equals(playerName, OPTION_NO_PLAYER))
+		{
+			loadEmptyPlayer();
+		}
+		else
+		{
+			ItemShareDBService.getPlayer(playerName, this::loadPlayer, this::loadEmptyPlayer);
+		}
+	}
+
+	private void loadEmptyPlayer()
+	{
+		ItemSharePlayer player = ItemSharePlayerService.getEmptyPlayer();
 		updateMessagePanel.update(player.getUpdatedDate());
 		playerPanel.update(player);
 	}
 
-	private ItemSharePlayer findPlayer()
+	private void loadPlayer(ItemSharePlayer player)
 	{
-		ItemSharePlayer player = playerDropdown.getSelectedPlayer();
-
-		if (ItemShareState.data == null || ItemShareState.data.getPlayers() == null)
-		{
-			return player;
-		}
-		else
-		{
-			return findPlayerByName(player.getName()).orElse(player);
-		}
-	}
-
-	private Optional<ItemSharePlayer> findPlayerByName(String name)
-	{
-		return ItemShareState.data.getPlayers().stream().filter(p -> StringUtils.equals(p.getName(), name)).findFirst();
+		updateMessagePanel.update(player.getUpdatedDate());
+		playerPanel.update(player);
 	}
 }

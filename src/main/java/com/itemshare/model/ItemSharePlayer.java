@@ -14,7 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ItemSharePlayer
 {
-	private String groupId;
 	private String name;
 	private ItemShareItems bank;
 	private ItemShareItems inventory;

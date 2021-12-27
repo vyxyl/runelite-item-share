@@ -5,24 +5,23 @@ import com.google.gson.GsonBuilder;
 import com.itemshare.model.ItemSharePlayer;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
-import com.mongodb.event.ServerMonitorListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
+public class ItemShareMongoDB
 {
 	@Inject
 	private ItemShareMongoDBConnection connection;
-
-	private Runnable onSuccess;
-	private Runnable onFailure;
 
 	private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
@@ -36,15 +35,9 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 		return connection.getStatus();
 	}
 
-	public void setCallbacks(Runnable onSuccess, Runnable onFailure)
-	{
-		this.onSuccess = onSuccess;
-		this.onFailure = onFailure;
-	}
-
 	public void connect()
 	{
-		connection.connect(onSuccess, onFailure);
+		connection.connect();
 	}
 
 	public void disconnect()
@@ -52,16 +45,11 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 		connection.disconnect();
 	}
 
-	public void reconnect()
-	{
-		connection.reconnect();
-	}
-
-	public void savePlayer(ItemSharePlayer player, Runnable onSuccess, Runnable onFailure)
+	public void savePlayer(String groupId, ItemSharePlayer player, Runnable onSuccess, Runnable onFailure)
 	{
 		try
 		{
-			if (connection.isConnected() && player != null && player.getGroupId() != null)
+			if (connection.isConnected() && player != null && !StringUtils.isEmpty(groupId))
 			{
 				ItemSharePlayer playerToSave = player.toBuilder()
 					.updatedDate(new Date())
@@ -69,7 +57,7 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 
 				String json = gson.toJson(playerToSave);
 				Document data = Document.parse(json);
-				Bson filter = getPlayerFilter(playerToSave);
+				Bson filter = getPlayerFilter(groupId, player.getName());
 
 				connection.getCollection().updateOne(
 					filter,
@@ -89,21 +77,18 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 		}
 	}
 
-	public void getPlayers(String groupId, Consumer<List<ItemSharePlayer>> onSuccess, Runnable onFailure)
+	public void getPlayer(String groupId, String playerName, Consumer<ItemSharePlayer> onSuccess, Runnable onFailure)
 	{
 		try
 		{
 			if (connection.isConnected())
 			{
-				FindIterable<Document> iterable = connection.getCollection().find(Filters.eq("groupId", groupId));
-				List<Document> documents = new ArrayList<>();
-				iterable.forEach(documents::add);
+				Bson filter = getPlayerFilter(groupId, playerName);
+				FindIterable<Document> iterable = connection.getCollection().find(filter);
+				String json = Objects.requireNonNull(iterable.first()).toJson();
+				ItemSharePlayer player = gson.fromJson(json, ItemSharePlayer.class);
 
-				List<ItemSharePlayer> players = documents.stream()
-					.map(document -> gson.fromJson(document.toJson(), ItemSharePlayer.class))
-					.collect(Collectors.toList());
-
-				onSuccess.accept(players);
+				onSuccess.accept(player);
 			}
 			else
 			{
@@ -116,10 +101,40 @@ public class ItemShareMongoDB implements ServerMonitorListener, ItemShareDB
 		}
 	}
 
-	private Bson getPlayerFilter(ItemSharePlayer player)
+	public void getPlayerNames(String groupId, Consumer<List<String>> onSuccess, Runnable onFailure)
+	{
+		try
+		{
+			if (connection.isConnected())
+			{
+				Bson filter = Filters.eq("groupId", groupId);
+				Bson projection = Projections.fields(Projections.include("name"));
+				FindIterable<Document> iterable = connection.getCollection().find(filter).projection(projection);
+				List<Document> documents = new ArrayList<>();
+				iterable.forEach(documents::add);
+
+				List<String> names = documents.stream()
+					.map(document -> gson.fromJson(document.toJson(), ItemSharePlayer.class))
+					.map(ItemSharePlayer::getName)
+					.collect(Collectors.toList());
+
+				onSuccess.accept(names);
+			}
+			else
+			{
+				onFailure.run();
+			}
+		}
+		catch (Exception e)
+		{
+			onFailure.run();
+		}
+	}
+
+	private Bson getPlayerFilter(String groupId, String playerName)
 	{
 		return Filters.and(
-			Filters.eq("groupId", player.getGroupId()),
-			Filters.eq("name", player.getName()));
+			Filters.eq("groupId", groupId),
+			Filters.eq("name", playerName));
 	}
 }

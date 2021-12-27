@@ -2,8 +2,8 @@ package com.itemshare.db;
 
 public enum ItemShareDBStatus
 {
-	LOADING,
 	UNINITIALIZED,
+	LOADING,
 	CONNECTED,
 	DISCONNECTED
 }

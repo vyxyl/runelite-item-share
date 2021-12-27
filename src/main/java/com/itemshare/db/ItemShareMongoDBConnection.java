@@ -7,6 +7,7 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_DATABASE_
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_PASSWORD;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_MONGODB_USERNAME;
 import static com.itemshare.constant.ItemShareConstants.DB_SYNC_FREQUENCY_MS;
+import com.itemshare.state.ItemShareState;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -21,6 +22,7 @@ import javax.inject.Inject;
 import net.runelite.client.config.ConfigManager;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
+import sun.jvm.hotspot.utilities.soql.Callable;
 
 public class ItemShareMongoDBConnection implements ServerMonitorListener
 {
@@ -31,9 +33,6 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 	private MongoDatabase database;
 	private MongoCollection<Document> collection;
 
-	private Runnable onSuccess;
-	private Runnable onFailure;
-
 	private ItemShareDBStatus status = ItemShareDBStatus.UNINITIALIZED;
 
 	public ItemShareDBStatus getStatus()
@@ -41,26 +40,10 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 		return status;
 	}
 
-	public void disconnect()
+	public void connect()
 	{
-		if (client != null)
-		{
-			client.close();
-			client = null;
-			database = null;
-			collection = null;
-		}
-
-		updateStatus(onFailure, ItemShareDBStatus.DISCONNECTED);
-	}
-
-	public void connect(Runnable onSuccess, Runnable onFailure)
-	{
-		this.onSuccess = onSuccess;
-		this.onFailure = onFailure;
-
-		disconnect();
-		updateStatus(onFailure, ItemShareDBStatus.LOADING);
+		closeConnection();
+		updateStatus(ItemShareDBStatus.LOADING);
 
 		if (this.hasEnvironmentVariables())
 		{
@@ -81,9 +64,10 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 		}
 	}
 
-	public void reconnect()
+	public void disconnect()
 	{
-		connect(onSuccess, onFailure);
+		closeConnection();
+		updateStatus(ItemShareDBStatus.DISCONNECTED);
 	}
 
 	public boolean isConnected()
@@ -99,13 +83,14 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 	@Override
 	public void serverHearbeatStarted(ServerHeartbeatStartedEvent startedEvent)
 	{
-		// Ping Started
+		updateStatus(ItemShareDBStatus.LOADING);
 	}
 
 	@Override
 	public void serverHeartbeatSucceeded(ServerHeartbeatSucceededEvent succeededEvent)
 	{
-		updateStatus(onSuccess, ItemShareDBStatus.CONNECTED);
+		ItemShareState.onSelfHostSuccess.run();
+		updateStatus(ItemShareDBStatus.CONNECTED);
 	}
 
 	@Override
@@ -114,14 +99,20 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 		disconnect();
 	}
 
-	private void updateStatus(Runnable runnable, ItemShareDBStatus disconnected)
+	private void closeConnection()
 	{
-		status = disconnected;
-
-		if (runnable != null)
+		if (client != null)
 		{
-			runnable.run();
+			client.close();
+			client = null;
+			database = null;
+			collection = null;
 		}
+	}
+
+	private void updateStatus(ItemShareDBStatus status)
+	{
+		this.status = status;
 	}
 
 	private MongoClient createClient()
@@ -139,7 +130,8 @@ public class ItemShareMongoDBConnection implements ServerMonitorListener
 
 	private String getConnectionString()
 	{
-		return "mongodb+srv://" + getUsername() + ":" + getPassword() + "@" + getClusterDomain() + "/" + getDatabaseName()
+		return "mongodb+srv://"
+			+ getUsername() + ":" + getPassword() + "@" + getClusterDomain() + "/" + getDatabaseName()
 			+ "?retryWrites=true"
 			+ "&w=majority"
 			+ "&heartbeatFrequencyMS=" + DB_SYNC_FREQUENCY_MS;

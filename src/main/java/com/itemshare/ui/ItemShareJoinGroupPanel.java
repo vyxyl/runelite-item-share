@@ -4,6 +4,7 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_BACK;
 import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
+import com.itemshare.service.ItemShareDBService;
 import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
@@ -86,6 +87,9 @@ public class ItemShareJoinGroupPanel extends JPanel
 		if (ItemShareGroupIdService.isValidId(trimmedValue))
 		{
 			ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, trimmedValue);
+			ItemShareState.groupId = trimmedValue;
+			ItemShareDBService.load();
+
 			statusTextPane.setText("Successfully Joined the Group!");
 		}
 		else

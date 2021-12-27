@@ -1,7 +1,5 @@
 package com.itemshare.ui;
 
-import com.itemshare.model.ItemSharePlayer;
-import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;
@@ -13,7 +11,7 @@ import net.runelite.client.ui.PluginPanel;
 public class ItemSharePlayerDropdownPanel extends JPanel
 {
 	private final ItemSharePlayerDropdownModel model;
-	private final JComboBox<ItemSharePlayer> dropdown;
+	private final JComboBox<String> dropdown;
 
 	protected ItemSharePlayerDropdownPanel()
 	{
@@ -37,13 +35,15 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		dropdown.addItemListener(listener);
 	}
 
-	public ItemSharePlayer getSelectedPlayer()
+	public String getSelectedPlayerName()
 	{
 		return model.getSelectedItem();
 	}
 
 	public void update()
 	{
-		model.setItems(ItemShareState.data.getPlayers());
+		model.setNames(ItemShareState.playerNames);
+		dropdown.setModel(model);
+		repaint();
 	}
 }

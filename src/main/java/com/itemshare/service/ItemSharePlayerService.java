@@ -1,5 +1,6 @@
 package com.itemshare.service;
 
+import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemShareSlots;
@@ -31,6 +32,17 @@ public class ItemSharePlayerService
 		}
 	}
 
+	public static ItemSharePlayer getEmptyPlayer()
+	{
+		return ItemSharePlayer.builder()
+			.name(OPTION_NO_PLAYER)
+			.updatedDate(null)
+			.bank(ItemShareItems.builder().items(new ArrayList<>()).build())
+			.equipment(ItemShareSlots.builder().slots(new HashMap<>()).build())
+			.inventory(ItemShareItems.builder().items(new ArrayList<>()).build())
+			.build();
+	}
+
 	private static String getName()
 	{
 		Player player = ItemShareState.client.getLocalPlayer();
@@ -40,13 +52,12 @@ public class ItemSharePlayerService
 	private static ItemSharePlayer getPlayer()
 	{
 		ItemSharePlayer player = findPlayer().orElseGet(ItemSharePlayerService::getNewPlayer);
-		player.setGroupId(ItemShareGroupIdService.loadExistingId());
 		return getClone(player);
 	}
 
 	private static Optional<ItemSharePlayer> findPlayer()
 	{
-		return ItemShareState.data.getPlayers().stream()
+		return ItemShareState.players.stream()
 			.filter(player -> StringUtils.equals(player.getName(), ItemShareState.playerName))
 			.findFirst();
 	}
@@ -55,7 +66,6 @@ public class ItemSharePlayerService
 	{
 		return player.toBuilder()
 			.name(player.getName())
-			.groupId(player.getGroupId())
 			.bank(player.getBank().toBuilder().build())
 			.equipment(player.getEquipment().toBuilder().build())
 			.inventory(player.getInventory().toBuilder().build())
@@ -65,7 +75,6 @@ public class ItemSharePlayerService
 	private static ItemSharePlayer getNewPlayer()
 	{
 		return ItemSharePlayer.builder()
-			.groupId(ItemShareGroupIdService.loadExistingId())
 			.name(ItemShareState.playerName)
 			.updatedDate(new Date())
 			.bank(ItemShareItems.builder().items(new ArrayList<>()).build())

@@ -1,58 +1,44 @@
 package com.itemshare.ui;
 
 import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
-import com.itemshare.model.ItemShareItems;
-import com.itemshare.model.ItemSharePlayer;
-import com.itemshare.model.ItemShareSlots;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.ComboBoxModel;
 import javax.swing.event.ListDataListener;
 import org.apache.commons.lang3.StringUtils;
 
-public class ItemSharePlayerDropdownModel implements ComboBoxModel<ItemSharePlayer>
+public class ItemSharePlayerDropdownModel implements ComboBoxModel<String>
 {
-	private final List<ItemSharePlayer> items;
-	private final ItemSharePlayer unselected;
+	private final List<String> names;
 
-	private ItemSharePlayer selected;
+	private String selected;
 
 	ItemSharePlayerDropdownModel()
 	{
-		unselected = ItemSharePlayer.builder()
-			.name(OPTION_NO_PLAYER)
-			.bank(getEmptyList())
-			.equipment(getEmptySlots())
-			.inventory(getEmptyList())
-			.build();
+		selected = OPTION_NO_PLAYER;
 
-		selected = unselected.toBuilder().build();
-
-		items = new ArrayList<>();
-		items.add(unselected);
+		names = new ArrayList<>();
+		names.add(OPTION_NO_PLAYER);
 	}
 
-	public void setItems(List<ItemSharePlayer> players)
+	public void setNames(List<String> names)
 	{
-		if (!items.containsAll(players))
-		{
-			items.clear();
-			items.add(unselected);
-			items.addAll(players);
-		}
+		this.names.clear();
+		this.names.add(OPTION_NO_PLAYER);
+		this.names.addAll(names);
 	}
 
 	@Override
 	public int getSize()
 	{
-		return items.size();
+		return names.size();
 	}
 
 	@Override
-	public ItemSharePlayer getElementAt(int index)
+	public String getElementAt(int index)
 	{
-		return items.get(index);
+		return names.get(index);
 	}
 
 	@Override
@@ -70,39 +56,29 @@ public class ItemSharePlayerDropdownModel implements ComboBoxModel<ItemSharePlay
 	@Override
 	public void setSelectedItem(Object item)
 	{
-		if (item instanceof ItemSharePlayer)
+		if (item instanceof String)
 		{
-			this.selected = (ItemSharePlayer) item;
+			this.selected = (String) item;
 		}
 		else
 		{
-			this.selected = null;
+			this.selected = OPTION_NO_PLAYER;
 		}
 	}
 
 	@Override
-	public ItemSharePlayer getSelectedItem()
+	public String getSelectedItem()
 	{
-		if (selected == null)
+		if (Objects.equals(selected, OPTION_NO_PLAYER))
 		{
-			return unselected;
+			return OPTION_NO_PLAYER;
 		}
 		else
 		{
-			return items.stream()
-				.filter(option -> StringUtils.equals(option.getName(), selected.getName()))
+			return names.stream()
+				.filter(option -> StringUtils.equals(option, selected))
 				.findFirst()
-				.orElse(unselected);
+				.orElse(OPTION_NO_PLAYER);
 		}
-	}
-
-	private ItemShareItems getEmptyList()
-	{
-		return ItemShareItems.builder().items(new ArrayList<>()).build();
-	}
-
-	private ItemShareSlots getEmptySlots()
-	{
-		return ItemShareSlots.builder().slots(new HashMap<>()).build();
 	}
 }

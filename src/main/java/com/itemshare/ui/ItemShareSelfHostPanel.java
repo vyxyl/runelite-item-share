@@ -50,7 +50,7 @@ public class ItemShareSelfHostPanel extends JPanel
 
 	public void updateStatus()
 	{
-		ItemShareDBStatus status = ItemShareState.db.getStatus();
+		ItemShareDBStatus status = ItemShareState.selfHostDb.getStatus();
 
 		connectButton.setEnabled(true);
 
@@ -84,7 +84,7 @@ public class ItemShareSelfHostPanel extends JPanel
 
 	private JButton getConnectButton()
 	{
-		JButton button = ItemSharePanelService.getButton(null, "Connect", ItemShareState.mongoDB::reconnect);
+		JButton button = ItemSharePanelService.getButton(null, "Connect", ItemShareState.selfHostDb::connect);
 		ItemSharePanelService.setHeight(button, 30);
 		return button;
 	}

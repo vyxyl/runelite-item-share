@@ -5,10 +5,9 @@ import com.itemshare.db.ItemShareDedicatedDB;
 import com.itemshare.db.ItemShareMongoDB;
 import com.itemshare.service.ItemShareConfigService;
 import com.itemshare.service.ItemShareContainerService;
-import com.itemshare.service.ItemShareDBService;
 import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.service.ItemSharePlayerService;
-import com.itemshare.service.ItemShareSaveService;
+import com.itemshare.service.ItemShareDBService;
 import com.itemshare.service.ItemShareUIService;
 import com.itemshare.state.ItemShareState;
 import javax.inject.Inject;
@@ -68,25 +67,19 @@ public class ItemSharePlugin extends Plugin
 		ItemShareState.toolbar = toolbar;
 		ItemShareState.itemManager = itemManager;
 		ItemShareState.configManager = configManager;
-
-		ItemShareState.mongoDB = mongoDB;
+		ItemShareState.selfHostDb = mongoDB;
 		ItemShareState.dedicatedDB = dedicatedDB;
-		ItemShareState.db = ItemShareConfigService.isSelfHost() ? mongoDB : dedicatedDB;
-
-		ItemShareState.data = ItemShareConfigService.getLocalData();
 
 		ItemShareGroupIdService.loadExistingId();
-
+		ItemShareDBService.load();
 		ItemShareUIService.load();
 		ItemShareUIService.update();
-
-		ItemShareDBService.connect();
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-		ItemShareSaveService.save();
+		ItemShareDBService.save();
 	}
 
 	@Subscribe
@@ -104,7 +97,7 @@ public class ItemSharePlugin extends Plugin
 
 		if (!isLoggedIn)
 		{
-			ItemShareSaveService.save();
+			ItemShareDBService.save();
 		}
 	}
 

@@ -1,6 +1,5 @@
 package com.itemshare.ui;
 
-import java.awt.Component;
 import javax.swing.BoxLayout;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;

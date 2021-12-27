@@ -1,6 +1,7 @@
 package com.itemshare.ui;
 
 import com.itemshare.model.ItemShareItem;
+import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemSharePanelService;
 import java.awt.Dimension;
@@ -59,7 +60,8 @@ public class ItemShareInventoryPanel extends JPanel
 
 	public void update(ItemSharePlayer player)
 	{
-		List<ItemShareItem> items = player.getInventory().getItems();
+		ItemShareItems inventory = player.getInventory();
+		List<ItemShareItem> items = inventory == null ? new ArrayList<>() : inventory.getItems();
 		updateItems(items);
 		repaint();
 	}

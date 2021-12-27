@@ -2,6 +2,7 @@ package com.itemshare.ui;
 
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.model.ItemShareSlots;
 import com.itemshare.service.ItemSharePanelService;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -101,7 +102,8 @@ public class ItemShareEquipmentPanel extends JPanel
 
 	public void update(ItemSharePlayer player)
 	{
-		Map<EquipmentInventorySlot, ItemShareItem> slots = player.getEquipment().getSlots();
+		ItemShareSlots equipment = player.getEquipment();
+		Map<EquipmentInventorySlot, ItemShareItem> slots = equipment == null ? new HashMap<>() : equipment.getSlots();
 		updateItems(slots);
 		repaint();
 	}

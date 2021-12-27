@@ -16,19 +16,14 @@ public class ItemShareGroupIdService
 		return !StringUtils.isEmpty(value) && REGEX_VALID_UUID.matcher(value).matches();
 	}
 
-	public static String loadExistingId()
+	public static void loadExistingId()
 	{
-		if (!isValidId(ItemShareState.groupId))
-		{
-			loadSavedId();
-		}
+		loadSavedId();
 
 		if (!isValidId(ItemShareState.groupId))
 		{
 			loadNewId();
 		}
-
-		return ItemShareState.groupId;
 	}
 
 	public static void loadNewId()
@@ -36,20 +31,10 @@ public class ItemShareGroupIdService
 		String uuid = UUID.randomUUID().toString();
 		ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, uuid);
 		ItemShareState.groupId = uuid;
-		setPlayerGroupId();
 	}
 
 	private static void loadSavedId()
 	{
 		ItemShareState.groupId = ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID);
-		setPlayerGroupId();
-	}
-
-	private static void setPlayerGroupId()
-	{
-		if (ItemShareState.player != null && !isValidId(ItemShareState.player.getGroupId()))
-		{
-			ItemShareState.player.setGroupId(ItemShareState.groupId);
-		}
 	}
 }

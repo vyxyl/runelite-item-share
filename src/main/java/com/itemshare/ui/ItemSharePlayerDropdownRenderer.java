@@ -34,10 +34,9 @@ public final class ItemSharePlayerDropdownRenderer extends DefaultListCellRender
 
 	private String getPlayerName(Object o)
 	{
-		if (o instanceof ItemSharePlayer)
+		if (o instanceof String)
 		{
-			ItemSharePlayer player = (ItemSharePlayer) o;
-			return player.getName();
+			return (String) o;
 		}
 		else
 		{
