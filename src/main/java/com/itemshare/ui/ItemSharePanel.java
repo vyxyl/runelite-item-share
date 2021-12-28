@@ -25,11 +25,6 @@ public class ItemSharePanel extends PluginPanel
 		showItems();
 	}
 
-	public void updateStatus()
-	{
-		settingsPanel.updateStatus();
-	}
-
 	public void update()
 	{
 		navPanel.update();

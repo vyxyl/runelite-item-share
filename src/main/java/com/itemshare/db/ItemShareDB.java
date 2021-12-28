@@ -5,14 +5,11 @@ import com.google.gson.GsonBuilder;
 import static com.itemshare.constant.ItemShareConstants.AWS_PLAYER_API;
 import static com.itemshare.constant.ItemShareConstants.AWS_PLAYER_NAMES_API;
 import static com.itemshare.constant.ItemShareConstants.AWS_X_API_KEY;
-import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemSharePlayerLite;
-import com.itemshare.model.ItemShareSlots;
 import com.itemshare.service.ItemSharePlayerLiteService;
 import com.itemshare.service.ItemShareRestService;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -24,10 +21,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ItemShareDedicatedDB
+public class ItemShareDB
 {
 	private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-	private final Logger logger = LoggerFactory.getLogger(ItemShareDedicatedDB.class);
+	private final Logger logger = LoggerFactory.getLogger(ItemShareDB.class);
 
 	@Inject
 	private ItemShareRestService httpService;
