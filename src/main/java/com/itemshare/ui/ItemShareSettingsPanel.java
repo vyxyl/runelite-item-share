@@ -54,21 +54,21 @@ public class ItemShareSettingsPanel extends JPanel
 		joinGroupPanel = new ItemShareJoinGroupPanel(() -> onSettingClick(ItemShareSetting.MAIN));
 		selfHostPanel = new ItemShareSelfHostPanel();
 
-		ImageIcon shareIcon = ItemSharePanelService.loadIcon(ICON_SHARE);
 		ImageIcon joinIcon = ItemSharePanelService.loadIcon(ICON_JOIN);
+		ImageIcon shareIcon = ItemSharePanelService.loadIcon(ICON_SHARE);
 
-		shareGroupButton = ItemSharePanelService.getButton(shareIcon, "Share Group", () -> onSettingClick(ItemShareSetting.SHARE_GROUP));
 		joinGroupButton = ItemSharePanelService.getButton(joinIcon, "Join Group", () -> onSettingClick(ItemShareSetting.JOIN_GROUP));
+		shareGroupButton = ItemSharePanelService.getButton(shareIcon, "Share Group", () -> onSettingClick(ItemShareSetting.SHARE_GROUP));
 		selfHostCheckbox = createSelHostCheckBox();
 
 		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		shareGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		joinGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+		shareGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		selfHostCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
 		selfHostPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-		ItemSharePanelService.setHeight(shareGroupButton, 30);
 		ItemSharePanelService.setHeight(joinGroupButton, 30);
+		ItemSharePanelService.setHeight(shareGroupButton, 30);
 		ItemSharePanelService.setHeight(selfHostCheckbox, 30);
 
 		rebuild();
@@ -99,8 +99,7 @@ public class ItemShareSettingsPanel extends JPanel
 			ItemShareState.selfHostDb.disconnect();
 		}
 
-		ItemShareDBService.loadPlayerNames(names -> ItemShareState.playerNames = names);
-
+		ItemShareDBService.loadPlayerNames();
 		selfHostPanel.updateStatus();
 		rebuild();
 	}
@@ -127,6 +126,7 @@ public class ItemShareSettingsPanel extends JPanel
 				rebuildMain();
 				break;
 			case SHARE_GROUP:
+				shareGroupPanel.reset();
 				add(shareGroupPanel);
 				shareGroupPanel.repaint();
 				shareGroupPanel.revalidate();

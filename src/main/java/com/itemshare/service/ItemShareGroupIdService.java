@@ -28,9 +28,14 @@ public class ItemShareGroupIdService
 
 	public static void loadNewId()
 	{
-		String uuid = UUID.randomUUID().toString();
+		String uuid = getNewId();
 		ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, uuid);
 		ItemShareState.groupId = uuid;
+	}
+
+	public static String getNewId()
+	{
+		return UUID.randomUUID().toString();
 	}
 
 	private static void loadSavedId()

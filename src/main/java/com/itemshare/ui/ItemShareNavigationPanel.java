@@ -3,20 +3,25 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.model.ItemSharePlayerLite;
 import com.itemshare.service.ItemShareDBService;
 import com.itemshare.service.ItemSharePanelService;
+import com.itemshare.service.ItemSharePlayerLiteService;
 import com.itemshare.service.ItemSharePlayerService;
+import com.itemshare.state.ItemShareState;
 import java.awt.event.ItemEvent;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import net.runelite.client.ui.ColorScheme;
 import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareNavigationPanel extends JPanel
 {
+	private final ItemSharePlayer emptyPlayer = ItemSharePlayerService.getEmptyPlayer();
 	private final ItemSharePlayerDropdownPanel playerDropdown = new ItemSharePlayerDropdownPanel();
 	private final ItemSharePlayerPanel playerPanel = new ItemSharePlayerPanel();
 	private final ItemShareUpdateMessagePanel updateMessagePanel = new ItemShareUpdateMessagePanel();
@@ -75,14 +80,17 @@ public class ItemShareNavigationPanel extends JPanel
 
 	private void loadEmptyPlayer()
 	{
-		ItemSharePlayer player = ItemSharePlayerService.getEmptyPlayer();
-		updateMessagePanel.update(player.getUpdatedDate());
-		playerPanel.update(player);
+		updateMessagePanel.update(emptyPlayer.getUpdatedDate());
+		emptyPlayer.setName(ItemShareState.playerName);
+		playerPanel.update(emptyPlayer);
 	}
 
-	private void loadPlayer(ItemSharePlayer player)
+	private void loadPlayer(ItemSharePlayerLite lite)
 	{
-		updateMessagePanel.update(player.getUpdatedDate());
-		playerPanel.update(player);
+		ItemShareState.clientThread.invokeLater(() -> {
+			ItemSharePlayer player = ItemSharePlayerLiteService.toPlayer(lite);
+			updateMessagePanel.update(player.getUpdatedDate());
+			playerPanel.update(player);
+		});
 	}
 }

@@ -5,9 +5,14 @@ import com.google.gson.GsonBuilder;
 import static com.itemshare.constant.ItemShareConstants.AWS_PLAYER_API;
 import static com.itemshare.constant.ItemShareConstants.AWS_PLAYER_NAMES_API;
 import static com.itemshare.constant.ItemShareConstants.AWS_X_API_KEY;
+import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.model.ItemSharePlayerLite;
+import com.itemshare.model.ItemShareSlots;
+import com.itemshare.service.ItemSharePlayerLiteService;
 import com.itemshare.service.ItemShareRestService;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -46,16 +51,16 @@ public class ItemShareDedicatedDB
 		}
 	}
 
-	public void getPlayer(String groupId, String playerName, Consumer<ItemSharePlayer> onSuccess, Runnable onFailure)
+	public void getPlayer(String groupId, String playerName, Consumer<ItemSharePlayerLite> onSuccess, Runnable onFailure)
 	{
 		if (!StringUtils.isEmpty(groupId))
 		{
 			Request request = buildGetPlayerRequest(groupId, playerName);
 
 			httpService.call(request,
-				json -> onSuccess.accept(toPlayer(json)),
+				json -> onSuccess.accept(toGetPlayerResponse(json)),
 				error -> {
-					logger.error("Failed to get players: " + error);
+					logger.error("Failed to get player: " + error);
 					onFailure.run();
 				});
 		}
@@ -72,7 +77,7 @@ public class ItemShareDedicatedDB
 			Request request = buildGetPlayerNamesRequest(groupId);
 
 			httpService.call(request,
-				json -> onSuccess.accept(toNames(json)),
+				json -> onSuccess.accept(toGetPlayerNamesResponse(json)),
 				error -> {
 					logger.error("Failed to get player names: " + error);
 					onFailure.run();
@@ -89,7 +94,7 @@ public class ItemShareDedicatedDB
 		return new Request.Builder()
 			.url(AWS_PLAYER_API + "?groupId=" + groupId + "&playerName=" + player.getName())
 			.addHeader("x-api-key", AWS_X_API_KEY)
-			.post(toSaveRequest(player))
+			.post(toSavePlayerRequest(player))
 			.build();
 	}
 
@@ -111,19 +116,23 @@ public class ItemShareDedicatedDB
 			.build();
 	}
 
-	private RequestBody toSaveRequest(ItemSharePlayer player)
+	private RequestBody toSavePlayerRequest(ItemSharePlayer player)
 	{
+		ItemSharePlayerLite lite = ItemSharePlayerLiteService.toPlayerLite((player));
+
 		return RequestBody.create(
 			MediaType.parse("application/json; charset=utf-8"),
-			gson.toJson(player));
+			gson.toJson(lite));
 	}
 
-	private ItemSharePlayer toPlayer(String json)
+	private ItemSharePlayerLite toGetPlayerResponse(String json)
 	{
-		return gson.fromJson(json, ItemSharePlayer.class);
+		return gson.fromJson(json, ItemSharePlayerLite.class);
+
+
 	}
 
-	private List<String> toNames(String json)
+	private List<String> toGetPlayerNamesResponse(String json)
 	{
 		String[] names = gson.fromJson(json, String[].class);
 		return Arrays.stream(names).collect(Collectors.toList());

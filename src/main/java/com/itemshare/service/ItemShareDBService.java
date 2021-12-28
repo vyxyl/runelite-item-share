@@ -1,8 +1,11 @@
 package com.itemshare.service;
 
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.model.ItemSharePlayerLite;
 import com.itemshare.state.ItemShareState;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
 public class ItemShareDBService
@@ -17,7 +20,7 @@ public class ItemShareDBService
 				if (!isSelfHostLoaded)
 				{
 					isSelfHostLoaded = true;
-					loadCommon();
+					loadPlayerNames();
 				}
 			};
 
@@ -27,29 +30,21 @@ public class ItemShareDBService
 		{
 			isSelfHostLoaded = false;
 			ItemShareState.selfHostDb.disconnect();
-			loadCommon();
+			loadPlayerNames();
 		}
 	}
 
-	private static void loadCommon()
-	{
-		ItemShareDBService.loadPlayerNames(names -> {
-			ItemShareState.playerNames = names;
-			ItemShareUIService.update();
-		});
-	}
-
-	public static void getPlayer(String playerName, Consumer<ItemSharePlayer> onSuccess, Runnable onFailure)
+	public static void getPlayer(String playerName, Consumer<ItemSharePlayerLite> onSuccess, Runnable onFailure)
 	{
 		boolean isSelfHost = ItemShareConfigService.isSelfHost();
 
 		if (isSelfHost && ItemShareState.selfHostDb.isConnected())
 		{
-			ItemShareState.selfHostDb.getPlayer(
-				ItemShareState.groupId,
-				playerName,
-				onSuccess,
-				onFailure);
+//			ItemShareState.selfHostDb.getPlayer(
+//				ItemShareState.groupId,
+//				playerName,
+//				onSuccess,
+//				onFailure);
 		}
 		else if (!isSelfHost)
 		{
@@ -65,27 +60,39 @@ public class ItemShareDBService
 		}
 	}
 
-	public static void loadPlayerNames(Consumer<List<String>> onSuccess)
+	public static void loadPlayerNames()
 	{
+		loadPlayerNames(() -> {
+		});
+	}
+
+	public static void loadPlayerNames(Runnable runnable)
+	{
+		Consumer<List<String>> loadNames = names -> {
+			ItemShareState.playerNames = names;
+			ItemShareUIService.update();
+			runnable.run();
+		};
+
 		boolean isSelfHost = ItemShareConfigService.isSelfHost();
 
 		if (isSelfHost && ItemShareState.selfHostDb.isConnected())
 		{
 			ItemShareState.selfHostDb.getPlayerNames(
 				ItemShareState.groupId,
-				onSuccess,
+				loadNames,
 				ItemShareDBService::onGetNamesFail);
 		}
 		else if (!isSelfHost)
 		{
 			ItemShareState.dedicatedDB.getPlayerNames(
 				ItemShareState.groupId,
-				onSuccess,
+				loadNames,
 				ItemShareDBService::onGetNamesFail);
 		}
 		else
 		{
-			onSaveFail();
+			onGetNamesFail();
 		}
 	}
 
@@ -126,7 +133,7 @@ public class ItemShareDBService
 
 	private static void onSaveSuccess()
 	{
-		//
+		ItemShareUIService.update();
 	}
 
 	private static void onSaveFail()
@@ -136,11 +143,6 @@ public class ItemShareDBService
 
 	private static void onGetNamesFail()
 	{
-		//
-	}
-
-	private static void onGetPlayerFail()
-	{
-		//
+		ItemShareState.playerNames = new ArrayList<>();
 	}
 }

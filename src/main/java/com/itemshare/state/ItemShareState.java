@@ -2,11 +2,12 @@ package com.itemshare.state;
 
 import com.itemshare.db.ItemShareDedicatedDB;
 import com.itemshare.db.ItemShareMongoDB;
-import com.itemshare.model.ItemShareData;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.model.ItemSharePlayerLite;
 import java.util.ArrayList;
 import java.util.List;
 import net.runelite.api.Client;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ClientToolbar;
@@ -22,12 +23,17 @@ public class ItemShareState
 	// database
 	public static ItemShareMongoDB selfHostDb;
 	public static ItemShareDedicatedDB dedicatedDB;
-	public static Runnable onSelfHostSuccess = () -> {};
+	public static Runnable onSelfHostSuccess = () -> {
+	};
 
 	// plugin
-	public static List<ItemSharePlayer> players;
-	public static ItemSharePlayer player;
+	public static List<ItemSharePlayer> players = new ArrayList<>();
 	public static List<String> playerNames = new ArrayList<>();
-	public static String playerName;
+
+	// async data
+	public static ClientThread clientThread;
+
+	public static ItemSharePlayer player;
+	public static String playerName = "";
 	public static String groupId;
 }

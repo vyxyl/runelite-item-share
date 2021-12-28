@@ -1,32 +1,28 @@
 package com.itemshare.ui;
 
+import com.itemshare.service.ItemSharePanelService;
+import java.awt.Component;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 public class ItemShareUpdateMessagePanel extends JPanel
 {
-	private final JLabel updateMessageLabel = new JLabel();
-
-	Timer timer;
-	Date updatedDate;
+	private final JLabel message = new JLabel();
+	private Date updatedDate;
 
 	protected ItemShareUpdateMessagePanel()
 	{
 		super(false);
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-		JPanel message = new JPanel();
-		message.setLayout(new BoxLayout(message, BoxLayout.LINE_AXIS));
-		message.add(updateMessageLabel);
-
+		message.setAlignmentX(Component.CENTER_ALIGNMENT);
+		message.setHorizontalAlignment(SwingConstants.CENTER);
+		ItemSharePanelService.setHeight(message, 20);
 		add(message);
-
-		timer = createUpdateTimer();
 	}
 
 	public void update(Date updatedDate)
@@ -35,25 +31,9 @@ public class ItemShareUpdateMessagePanel extends JPanel
 		updateMessage();
 	}
 
-	private Timer createUpdateTimer()
-	{
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(new TimerTask()
-		{
-			@Override
-			public void run()
-			{
-				updateMessage();
-			}
-
-		}, 0, 1000);
-
-		return timer;
-	}
-
 	private void updateMessage()
 	{
-		updateMessageLabel.setText(getMessageText());
+		message.setText(getMessageText());
 	}
 
 	private String getMessageText()

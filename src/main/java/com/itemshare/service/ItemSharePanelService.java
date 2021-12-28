@@ -151,10 +151,14 @@ public class ItemSharePanelService
 
 	public static JPanel getPadding(int height)
 	{
+		return getPadding(PluginPanel.PANEL_WIDTH, height);
+	}
+
+	public static JPanel getPadding(int width, int height)
+	{
 		JPanel panel = new JPanel();
 		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-		setSize(panel, PluginPanel.PANEL_WIDTH, height);
+		setSize(panel, width, height);
 
 		return panel;
 	}

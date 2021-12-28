@@ -17,6 +17,7 @@ import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -54,6 +55,9 @@ public class ItemSharePlugin extends Plugin
 	@Inject
 	private ItemShareDedicatedDB dedicatedDB;
 
+	@Inject
+	private ClientThread clientThread;
+
 	@Provides
 	ItemShareConfig provideConfig(ConfigManager configManager)
 	{
@@ -69,6 +73,7 @@ public class ItemSharePlugin extends Plugin
 		ItemShareState.configManager = configManager;
 		ItemShareState.selfHostDb = mongoDB;
 		ItemShareState.dedicatedDB = dedicatedDB;
+		ItemShareState.clientThread = clientThread;
 
 		ItemShareGroupIdService.loadExistingId();
 		ItemShareDBService.load();

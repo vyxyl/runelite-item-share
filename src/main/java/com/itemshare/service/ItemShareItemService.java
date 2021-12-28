@@ -41,6 +41,15 @@ public class ItemShareItemService
 			.build();
 	}
 
+	public static ItemShareItem getItem(int id, int quantity)
+	{
+		return ItemShareItem.builder()
+			.id(id)
+			.quantity(quantity)
+			.name(getItemName(id))
+			.build();
+	}
+
 	private static ArrayList<ItemShareItem> getBankItems(ItemContainer container)
 	{
 		return (ArrayList<ItemShareItem>) Arrays.stream(container.getItems())
@@ -77,18 +86,14 @@ public class ItemShareItemService
 		return ItemShareItem.builder()
 			.id(item.getId())
 			.quantity(item.getQuantity())
-			.name(getItemName(item))
+			.name(getItemName(item.getId()))
 			.slot(slot)
 			.build();
 	}
 
 	private static ItemShareItem getItem(Item item)
 	{
-		return ItemShareItem.builder()
-			.id(item.getId())
-			.quantity(item.getQuantity())
-			.name(getItemName(item))
-			.build();
+		return getItem(item.getId(), item.getQuantity());
 	}
 
 	private static boolean isBankItem(Item item)
@@ -96,13 +101,13 @@ public class ItemShareItemService
 		return item.getId() == ItemShareState.itemManager.canonicalize(item.getId());
 	}
 
-	private static String getItemName(Item item)
+	private static String getItemName(int id)
 	{
-		return getComposition(item).getName();
+		return getComposition(id).getName();
 	}
 
-	private static ItemComposition getComposition(Item item)
+	private static ItemComposition getComposition(int id)
 	{
-		return ItemShareState.itemManager.getItemComposition(item.getId());
+		return ItemShareState.itemManager.getItemComposition(id);
 	}
 }

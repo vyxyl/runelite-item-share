@@ -13,6 +13,7 @@ import java.awt.datatransfer.StringSelection;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import net.runelite.client.ui.ColorScheme;
@@ -20,6 +21,8 @@ import net.runelite.client.ui.components.FlatTextField;
 
 public class ItemShareCopyGroupPanel extends JPanel
 {
+	private final FlatTextField textField;
+
 	public ItemShareCopyGroupPanel(Runnable onBack)
 	{
 		super(false);
@@ -30,7 +33,8 @@ public class ItemShareCopyGroupPanel extends JPanel
 		ImageIcon backIcon = ItemSharePanelService.loadIcon(ICON_BACK);
 		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel("Item Share / Settings / Share", backIcon, onBack);
 
-		FlatTextField textField = getGroupIdTextField();
+		JLabel textFieldLabel = new JLabel("Group ID");
+		textField = getGroupIdTextField();
 		JPanel scrollableTextField = ItemSharePanelService.getScrollableTextField(textField);
 
 		ImageIcon copyIcon = ItemSharePanelService.loadIcon(ICON_COPY_BUTTON);
@@ -48,11 +52,22 @@ public class ItemShareCopyGroupPanel extends JPanel
 
 		add(titlePanel);
 		add(ItemSharePanelService.getPadding(10));
+		add(textFieldLabel);
 		add(scrollableTextField);
 		add(ItemSharePanelService.getPadding(10));
 		add(copyButton);
 		add(ItemSharePanelService.getPadding(10));
 		add(textPane);
+	}
+
+	public void reset()
+	{
+		loadId(textField);
+	}
+
+	private void loadId(FlatTextField textField)
+	{
+		textField.setText(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID));
 	}
 
 	private FlatTextField getGroupIdTextField()
@@ -61,7 +76,7 @@ public class ItemShareCopyGroupPanel extends JPanel
 		textField.setEditable(false);
 		textField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		textField.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
-		textField.setText(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID));
+		loadId(textField);
 
 		return textField;
 	}
