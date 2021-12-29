@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import net.runelite.api.EquipmentInventorySlot;
 import org.apache.commons.lang3.ArrayUtils;
@@ -82,13 +83,6 @@ public class ItemShareDataService
 		return ItemShareItemsLite.builder().currentTimeMs(ms).items(raw).build();
 	}
 
-	private static ItemShareItem toSlotItem(List<ItemShareItem> values, int index)
-	{
-		ItemShareItem item = values.get(index);
-		EquipmentInventorySlot slot = SLOTS[index];
-		return item == null ? getEmptyItem(slot) : item;
-	}
-
 	private static int[] toItemsRaw(Stream<ItemShareItem> stream)
 	{
 		Integer[] values = stream.filter(Objects::nonNull)
@@ -109,6 +103,14 @@ public class ItemShareDataService
 
 	public static ItemShareItems toItems(ItemShareItemsLite lite)
 	{
+		if (lite == null || lite.getItems().length % 2 != 0)
+		{
+			return ItemShareItems.builder()
+				.items(new ArrayList<>())
+				.updatedDate(null)
+				.build();
+		}
+
 		int[] raw = lite.getItems();
 		ArrayList<ItemShareItem> items = new ArrayList<>();
 
@@ -116,9 +118,7 @@ public class ItemShareDataService
 		{
 			int id = raw[i];
 			int quantity = raw[i + 1];
-
-			ItemShareItem item = ItemShareItemService.getItem(id, quantity);
-			items.add(item);
+			items.add(ItemShareItemService.getItem(id, quantity));
 		}
 
 		return ItemShareItems.builder()
@@ -129,6 +129,14 @@ public class ItemShareDataService
 
 	public static ItemShareSlots toSlots(ItemShareItemsLite lite)
 	{
+		if (lite == null || lite.getItems().length % 3 != 0)
+		{
+			return ItemShareSlots.builder()
+				.slots(new HashMap<>())
+				.updatedDate(null)
+				.build();
+		}
+
 		int[] raw = lite.getItems();
 		Map<EquipmentInventorySlot, ItemShareItem> slots = new HashMap<>();
 
@@ -138,9 +146,16 @@ public class ItemShareDataService
 			int quantity = raw[i + 1];
 			int slotId = raw[i + 2];
 
-			EquipmentInventorySlot slot = Arrays.stream(SLOTS).filter(s -> s.getSlotIdx() == slotId).findFirst().get();
-			ItemShareItem item = ItemShareItemService.getItem(id, quantity);
-			slots.put(slot, item);
+			Optional<EquipmentInventorySlot> matchingSlot = Arrays.stream(SLOTS).filter(s -> s.getSlotIdx() == slotId).findFirst();
+
+			if (matchingSlot.isPresent())
+			{
+				EquipmentInventorySlot slot = matchingSlot.get();
+				ItemShareItem item = ItemShareItemService.getItem(id, quantity);
+
+				item.setSlot(slot);
+				slots.put(slot, item);
+			}
 		}
 
 		return ItemShareSlots.builder()
@@ -152,10 +167,5 @@ public class ItemShareDataService
 	public static Date toDate(long ms)
 	{
 		return ms == 0 ? null : new Date(ms);
-	}
-
-	private static ItemShareItem getEmptyItem(EquipmentInventorySlot slot)
-	{
-		return ItemShareItem.builder().id(-1).quantity(0).name("").slot(slot).build();
 	}
 }
