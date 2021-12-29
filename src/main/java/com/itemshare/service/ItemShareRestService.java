@@ -42,6 +42,7 @@ public class ItemShareRestService
 				}
 				catch (Exception e)
 				{
+					e.printStackTrace();
 					onFailure.accept(e.getMessage());
 				}
 				finally

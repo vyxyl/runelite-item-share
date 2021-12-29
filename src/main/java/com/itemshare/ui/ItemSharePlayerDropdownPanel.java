@@ -2,7 +2,7 @@ package com.itemshare.ui;
 
 import static com.itemshare.constant.ItemShareConstants.ICON_RELOAD;
 import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
-import com.itemshare.service.ItemShareDBService;
+import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
 import java.awt.Component;
@@ -36,7 +36,7 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		button = ItemSharePanelService.getButton(icon, null, () -> {
 			if (button.isEnabled())
 			{
-				ItemShareDBService.loadPlayerNames(ItemShareDBService::save);
+				ItemShareAPIService.loadPlayerNames(ItemShareAPIService::save);
 				temporarilyDisableButton();
 			}
 		});

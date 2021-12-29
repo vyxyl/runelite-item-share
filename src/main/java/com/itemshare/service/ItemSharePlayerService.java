@@ -3,6 +3,7 @@ package com.itemshare.service;
 import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
+import com.itemshare.model.ItemSharePlayerLite;
 import com.itemshare.model.ItemShareSlots;
 import com.itemshare.state.ItemShareState;
 import java.util.ArrayList;
@@ -31,24 +32,38 @@ public class ItemSharePlayerService
 		{
 			isLoading = true;
 
-			ItemShareDBService.getPlayer(ItemShareState.playerName, lite -> {
-				ItemShareState.clientThread.invokeLater(() -> {
-					ItemShareState.player = ItemSharePlayerLiteService.toPlayer(lite);
-				});
-				isLoading = false;
-			}, () -> {
-				ItemShareState.player = getNewPlayer();
-				String name = ItemShareState.player.getName();
+			ItemShareAPIService.getPlayer(ItemShareState.playerName,
+				ItemSharePlayerService::loadExistingPlayer,
+				ItemSharePlayerService::loadNewPlayer);
+		}
+	}
 
-				if (!ItemShareState.playerNames.contains(name))
-				{
-					ItemShareState.playerNames.add(name);
-				}
-
-				ItemShareUIService.update();
+	private static void loadExistingPlayer(ItemSharePlayerLite lite)
+	{
+		if (lite == null)
+		{
+			loadNewPlayer();
+		}
+		else
+		{
+			ItemShareState.clientThread.invokeLater(() -> {
+				ItemShareState.player = ItemShareDataService.toPlayer(lite);
 				isLoading = false;
 			});
 		}
+	}
+
+	private static void loadNewPlayer()
+	{
+		ItemShareState.player = getNewPlayer();
+
+		if (!ItemShareState.playerNames.contains(ItemShareState.playerName))
+		{
+			ItemShareState.playerNames.add(ItemShareState.playerName);
+		}
+
+		ItemShareUIService.update();
+		isLoading = false;
 	}
 
 	private static String getName()

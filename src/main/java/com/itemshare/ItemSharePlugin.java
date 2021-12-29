@@ -1,11 +1,11 @@
 package com.itemshare;
 
 import com.google.inject.Provides;
-import com.itemshare.db.ItemShareDB;
+import com.itemshare.db.ItemShareAPI;
 import com.itemshare.service.ItemShareContainerService;
 import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.service.ItemSharePlayerService;
-import com.itemshare.service.ItemShareDBService;
+import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemShareUIService;
 import com.itemshare.state.ItemShareState;
 import javax.inject.Inject;
@@ -48,7 +48,7 @@ public class ItemSharePlugin extends Plugin
 	private ConfigManager configManager;
 
 	@Inject
-	private ItemShareDB dedicatedDB;
+	private ItemShareAPI dedicatedDB;
 
 	@Inject
 	private ClientThread clientThread;
@@ -66,11 +66,11 @@ public class ItemSharePlugin extends Plugin
 		ItemShareState.toolbar = toolbar;
 		ItemShareState.itemManager = itemManager;
 		ItemShareState.configManager = configManager;
-		ItemShareState.db = dedicatedDB;
+		ItemShareState.api = dedicatedDB;
 		ItemShareState.clientThread = clientThread;
 
 		ItemShareGroupIdService.loadExistingId();
-		ItemShareDBService.load();
+		ItemShareAPIService.load();
 		ItemShareUIService.load();
 		ItemShareUIService.update();
 	}
@@ -78,7 +78,7 @@ public class ItemSharePlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
-		ItemShareDBService.save();
+		ItemShareAPIService.save();
 	}
 
 	@Subscribe
@@ -96,7 +96,7 @@ public class ItemSharePlugin extends Plugin
 
 		if (!isLoggedIn)
 		{
-			ItemShareDBService.save();
+			ItemShareAPIService.save();
 		}
 	}
 

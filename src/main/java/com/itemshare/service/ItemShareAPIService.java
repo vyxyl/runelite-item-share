@@ -6,26 +6,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class ItemShareDBService
+public class ItemShareAPIService
 {
 	public static void load()
 	{
-		loadPlayerNames();
+		loadPlayerNames(() -> {
+		});
 	}
 
 	public static void getPlayer(String playerName, Consumer<ItemSharePlayerLite> onSuccess, Runnable onFailure)
 	{
-		ItemShareState.db.getPlayer(
+		ItemShareState.api.getPlayer(
 			ItemShareState.groupId,
 			playerName,
 			onSuccess,
 			onFailure);
-	}
-
-	public static void loadPlayerNames()
-	{
-		loadPlayerNames(() -> {
-		});
 	}
 
 	public static void loadPlayerNames(Runnable runnable)
@@ -36,42 +31,22 @@ public class ItemShareDBService
 			runnable.run();
 		};
 
-		ItemShareState.db.getPlayerNames(
+		ItemShareState.api.getPlayerNames(
 			ItemShareState.groupId,
 			loadNames,
-			ItemShareDBService::onGetNamesFail);
+			() -> ItemShareState.playerNames = new ArrayList<>());
 	}
 
 	public static void save()
 	{
-		if (isSavingAllowed())
+		if (ItemShareSupportedService.isSupported())
 		{
-			ItemShareState.db.savePlayer(
+			ItemShareState.api.savePlayer(
 				ItemShareState.groupId,
 				ItemShareState.player,
-				ItemShareDBService::onSaveSuccess,
-				ItemShareDBService::onSaveFail);
+				ItemShareUIService::update,
+				() -> {
+				});
 		}
-	}
-
-	private static boolean isSavingAllowed()
-	{
-		return ItemShareWorldService.isSupportedWorld()
-			&& ItemSharePlayerService.isAvailable();
-	}
-
-	private static void onSaveSuccess()
-	{
-		ItemShareUIService.update();
-	}
-
-	private static void onSaveFail()
-	{
-		//
-	}
-
-	private static void onGetNamesFail()
-	{
-		ItemShareState.playerNames = new ArrayList<>();
 	}
 }

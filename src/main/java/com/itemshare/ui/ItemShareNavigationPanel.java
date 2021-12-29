@@ -4,9 +4,9 @@ import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemSharePlayerLite;
-import com.itemshare.service.ItemShareDBService;
+import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemSharePanelService;
-import com.itemshare.service.ItemSharePlayerLiteService;
+import com.itemshare.service.ItemShareDataService;
 import com.itemshare.service.ItemSharePlayerService;
 import com.itemshare.state.ItemShareState;
 import java.awt.event.ItemEvent;
@@ -14,7 +14,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import net.runelite.client.ui.ColorScheme;
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +73,7 @@ public class ItemShareNavigationPanel extends JPanel
 		}
 		else
 		{
-			ItemShareDBService.getPlayer(playerName, this::loadPlayer, this::loadEmptyPlayer);
+			ItemShareAPIService.getPlayer(playerName, this::loadPlayer, this::loadEmptyPlayer);
 		}
 	}
 
@@ -87,10 +86,17 @@ public class ItemShareNavigationPanel extends JPanel
 
 	private void loadPlayer(ItemSharePlayerLite lite)
 	{
-		ItemShareState.clientThread.invokeLater(() -> {
-			ItemSharePlayer player = ItemSharePlayerLiteService.toPlayer(lite);
-			updateMessagePanel.update(player.getUpdatedDate());
-			playerPanel.update(player);
-		});
+		if (lite == null)
+		{
+			loadEmptyPlayer();
+		}
+		else
+		{
+			ItemShareState.clientThread.invokeLater(() -> {
+				ItemSharePlayer player = ItemShareDataService.toPlayer(lite);
+				updateMessagePanel.update(player.getUpdatedDate());
+				playerPanel.update(player);
+			});
+		}
 	}
 }

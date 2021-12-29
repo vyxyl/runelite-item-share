@@ -9,7 +9,7 @@ public class ItemShareContainerService
 {
 	public static void load(ItemContainerChanged event)
 	{
-		if (shouldLoad())
+		if (ItemShareSupportedService.isSupported())
 		{
 			ItemContainer container = event.getItemContainer();
 
@@ -41,11 +41,5 @@ public class ItemShareContainerService
 	private static void loadEquipment(ItemContainer container)
 	{
 		ItemShareState.player.setEquipment(ItemShareItemService.getEquipmentContainer(container));
-	}
-
-	private static boolean shouldLoad()
-	{
-		return ItemShareWorldService.isSupportedWorld()
-			&& ItemSharePlayerService.isAvailable();
 	}
 }

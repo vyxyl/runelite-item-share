@@ -7,7 +7,7 @@ import static com.itemshare.constant.ItemShareConstants.AWS_PLAYER_NAMES_API;
 import static com.itemshare.constant.ItemShareConstants.AWS_X_API_KEY;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemSharePlayerLite;
-import com.itemshare.service.ItemSharePlayerLiteService;
+import com.itemshare.service.ItemShareDataService;
 import com.itemshare.service.ItemShareRestService;
 import java.util.Arrays;
 import java.util.List;
@@ -21,10 +21,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ItemShareDB
+public class ItemShareAPI
 {
 	private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-	private final Logger logger = LoggerFactory.getLogger(ItemShareDB.class);
+	private final Logger logger = LoggerFactory.getLogger(ItemShareAPI.class);
 
 	@Inject
 	private ItemShareRestService httpService;
@@ -115,7 +115,7 @@ public class ItemShareDB
 
 	private RequestBody toSavePlayerRequest(ItemSharePlayer player)
 	{
-		ItemSharePlayerLite lite = ItemSharePlayerLiteService.toPlayerLite((player));
+		ItemSharePlayerLite lite = ItemShareDataService.toPlayerLite((player));
 
 		return RequestBody.create(
 			MediaType.parse("application/json; charset=utf-8"),

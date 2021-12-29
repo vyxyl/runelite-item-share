@@ -4,8 +4,14 @@ import com.itemshare.state.ItemShareState;
 import java.util.EnumSet;
 import net.runelite.api.WorldType;
 
-public class ItemShareWorldService
+public class ItemShareSupportedService
 {
+	public static boolean isSupported()
+	{
+		return ItemShareSupportedService.isSupportedWorld()
+			&& ItemSharePlayerService.isAvailable();
+	}
+
 	public static boolean isSupportedWorld()
 	{
 		return ItemShareState.client.getWorldType().stream().noneMatch(EnumSet.of(

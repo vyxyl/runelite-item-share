@@ -1,6 +1,6 @@
 package com.itemshare.state;
 
-import com.itemshare.db.ItemShareDB;
+import com.itemshare.db.ItemShareAPI;
 import com.itemshare.model.ItemSharePlayer;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,17 +12,13 @@ import net.runelite.client.ui.ClientToolbar;
 
 public class ItemShareState
 {
-	// client
 	public static Client client;
 	public static ClientThread clientThread;
 	public static ClientToolbar toolbar;
 	public static ItemManager itemManager;
 	public static ConfigManager configManager;
 
-	// database
-	public static ItemShareDB db;
-
-	// plugin
+	public static ItemShareAPI api;
 	public static String groupId;
 	public static String playerName = "";
 	public static ItemSharePlayer player;

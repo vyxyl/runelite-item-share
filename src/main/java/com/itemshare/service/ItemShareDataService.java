@@ -7,7 +7,7 @@ import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemSharePlayerLite;
 import com.itemshare.model.ItemShareSlots;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,17 +17,17 @@ import java.util.stream.Stream;
 import net.runelite.api.EquipmentInventorySlot;
 import org.apache.commons.lang3.ArrayUtils;
 
-public class ItemSharePlayerLiteService
+public class ItemShareDataService
 {
 	private static final EquipmentInventorySlot[] SLOTS = EquipmentInventorySlot.values();
 
 	public static ItemSharePlayer toPlayer(ItemSharePlayerLite lite)
 	{
 		String name = lite.getName();
-		Date updatedDate = ItemSharePlayerLiteService.toDate(lite.getCurrentTimeMs());
-		ItemShareItems bank = ItemSharePlayerLiteService.toItems(lite.getBank());
-		ItemShareItems inventory = ItemSharePlayerLiteService.toItems(lite.getInventory());
-		ItemShareSlots equipment = ItemSharePlayerLiteService.toSlots(lite.getEquipment());
+		Date updatedDate = ItemShareDataService.toDate(lite.getCurrentTimeMs());
+		ItemShareItems bank = ItemShareDataService.toItems(lite.getBank());
+		ItemShareItems inventory = ItemShareDataService.toItems(lite.getInventory());
+		ItemShareSlots equipment = ItemShareDataService.toSlots(lite.getEquipment());
 
 		return ItemSharePlayer.builder()
 			.name(name)
@@ -50,7 +50,7 @@ public class ItemSharePlayerLiteService
 			.currentTimeMs(updateDate == null ? 0 : updateDate.getTime())
 			.bank(toItemsLite(bank))
 			.inventory(toItemsLite(inventory))
-			.equipment(toItemsLite(equipment))
+			.equipment(toSlotsLite(equipment))
 			.build();
 	}
 
@@ -58,31 +58,53 @@ public class ItemSharePlayerLiteService
 	{
 		Date updateDate = items.getUpdatedDate();
 		List<ItemShareItem> itemList = items.getItems();
-		Integer[] raw = itemList.isEmpty() ? new Integer[]{} : toRaw(itemList.stream());
-
-		return ItemShareItemsLite.builder()
-			.currentTimeMs(updateDate == null ? 0 : updateDate.getTime())
-			.items(ArrayUtils.toPrimitive(raw))
-			.build();
+		return toItemsLite(updateDate, itemList);
 	}
 
-	public static ItemShareItemsLite toItemsLite(ItemShareSlots slots)
+	public static ItemShareItemsLite toSlotsLite(ItemShareSlots slots)
 	{
 		Date updateDate = slots.getUpdatedDate();
-		Collection<ItemShareItem> items = slots.getSlots().values();
-		Integer[] raw = items.isEmpty() ? new Integer[]{} : toRaw(items.stream());
-
-		return ItemShareItemsLite.builder()
-			.currentTimeMs(updateDate == null ? 0 : updateDate.getTime())
-			.items(ArrayUtils.toPrimitive(raw))
-			.build();
+		List<ItemShareItem> values = new ArrayList<>(slots.getSlots().values());
+		return toSlotsLite(updateDate, values);
 	}
 
-	private static Integer[] toRaw(Stream<ItemShareItem> stream)
+	private static ItemShareItemsLite toItemsLite(Date updateDate, List<ItemShareItem> itemList)
 	{
-		return stream.filter(Objects::nonNull)
+		int[] raw = itemList.isEmpty() ? new int[]{} : toItemsRaw(itemList.stream());
+		long ms = updateDate == null ? 0 : updateDate.getTime();
+		return ItemShareItemsLite.builder().currentTimeMs(ms).items(raw).build();
+	}
+
+	private static ItemShareItemsLite toSlotsLite(Date updateDate, List<ItemShareItem> itemList)
+	{
+		int[] raw = itemList.isEmpty() ? new int[]{} : toSlotsRaw(itemList.stream());
+		long ms = updateDate == null ? 0 : updateDate.getTime();
+		return ItemShareItemsLite.builder().currentTimeMs(ms).items(raw).build();
+	}
+
+	private static ItemShareItem toSlotItem(List<ItemShareItem> values, int index)
+	{
+		ItemShareItem item = values.get(index);
+		EquipmentInventorySlot slot = SLOTS[index];
+		return item == null ? getEmptyItem(slot) : item;
+	}
+
+	private static int[] toItemsRaw(Stream<ItemShareItem> stream)
+	{
+		Integer[] values = stream.filter(Objects::nonNull)
 			.flatMap(item -> Stream.of(item.getId(), item.getQuantity()))
 			.toArray(Integer[]::new);
+
+		return ArrayUtils.toPrimitive(values);
+	}
+
+	private static int[] toSlotsRaw(Stream<ItemShareItem> stream)
+	{
+		Integer[] values = stream.filter(Objects::nonNull).filter(item -> item.getSlot() != null)
+			.flatMap(item -> Stream.of(item.getId(), item.getQuantity(), item.getSlot().getSlotIdx()))
+			.toArray(Integer[]::new);
+
+		return ArrayUtils.toPrimitive(values);
 	}
 
 	public static ItemShareItems toItems(ItemShareItemsLite lite)
@@ -90,7 +112,7 @@ public class ItemSharePlayerLiteService
 		int[] raw = lite.getItems();
 		ArrayList<ItemShareItem> items = new ArrayList<>();
 
-		for (int i = 0; i < raw.length / 2; i += 2)
+		for (int i = 0; i < raw.length; i += 2)
 		{
 			int id = raw[i];
 			int quantity = raw[i + 1];
@@ -110,13 +132,15 @@ public class ItemSharePlayerLiteService
 		int[] raw = lite.getItems();
 		Map<EquipmentInventorySlot, ItemShareItem> slots = new HashMap<>();
 
-		for (int i = 0; i < raw.length / 2; i += 2)
+		for (int i = 0; i < raw.length; i += 3)
 		{
 			int id = raw[i];
 			int quantity = raw[i + 1];
+			int slotId = raw[i + 2];
 
+			EquipmentInventorySlot slot = Arrays.stream(SLOTS).filter(s -> s.getSlotIdx() == slotId).findFirst().get();
 			ItemShareItem item = ItemShareItemService.getItem(id, quantity);
-			slots.put(SLOTS[i / 2], item);
+			slots.put(slot, item);
 		}
 
 		return ItemShareSlots.builder()
@@ -128,5 +152,10 @@ public class ItemSharePlayerLiteService
 	public static Date toDate(long ms)
 	{
 		return ms == 0 ? null : new Date(ms);
+	}
+
+	private static ItemShareItem getEmptyItem(EquipmentInventorySlot slot)
+	{
+		return ItemShareItem.builder().id(-1).quantity(0).name("").slot(slot).build();
 	}
 }
