@@ -16,21 +16,13 @@ public class ItemShareGroupIdService
 		return !StringUtils.isEmpty(value) && REGEX_VALID_UUID.matcher(value).matches();
 	}
 
-	public static void loadExistingId()
+	public static String getGroupId()
 	{
-		loadSavedId();
+		String id = ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GROUP_ID);
+		String validId = isValidId(id) ? id : getNewId();
+		ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, validId);
 
-		if (!isValidId(ItemShareState.groupId))
-		{
-			loadNewId();
-		}
-	}
-
-	public static void loadNewId()
-	{
-		String uuid = getNewId();
-		ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, uuid);
-		ItemShareState.groupId = uuid;
+		return validId;
 	}
 
 	public static String getNewId()

@@ -15,17 +15,11 @@ public class ItemSharePlayerService
 {
 	private static boolean isLoading = false;
 
-	public static boolean isAvailable()
-	{
-		return ItemShareState.player != null
-			&& !StringUtils.isEmpty(ItemShareState.player.getName());
-	}
-
-	public static void load()
+	public static void loadPlayerData()
 	{
 		if (StringUtils.isEmpty(ItemShareState.playerName))
 		{
-			ItemShareState.playerName = getPlayerName();
+			ItemShareState.playerName = getClientPlayerName();
 		}
 		else if (ItemShareState.player == null && !isLoading)
 		{
@@ -35,10 +29,14 @@ public class ItemSharePlayerService
 			{
 				ItemShareAPIService.getPlayer(ItemShareState.playerName, player -> {
 					ItemShareState.player = player;
-					loadLoggedInPlayerName();
-					ItemShareUIService.update();
+
+					if (!ItemShareState.playerNames.contains(ItemShareState.playerName))
+					{
+						ItemShareState.playerNames.add(ItemShareState.playerName);
+					}
 
 					isLoading = false;
+					ItemShareUIService.update();
 				});
 			}
 			catch (Exception e)
@@ -47,20 +45,6 @@ public class ItemSharePlayerService
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public static void loadLoggedInPlayerName()
-	{
-		if (!ItemShareState.playerNames.contains(ItemShareState.playerName))
-		{
-			ItemShareState.playerNames.add(ItemShareState.playerName);
-		}
-	}
-
-	private static String getPlayerName()
-	{
-		Player player = ItemShareState.client.getLocalPlayer();
-		return player == null ? null : player.getName();
 	}
 
 	public static ItemSharePlayer getUnselectedPlayer()
@@ -83,5 +67,11 @@ public class ItemSharePlayerService
 			.equipment(ItemShareSlots.builder().slots(new HashMap<>()).build())
 			.inventory(ItemShareItems.builder().items(new ArrayList<>()).build())
 			.build();
+	}
+
+	private static String getClientPlayerName()
+	{
+		Player player = ItemShareState.client.getLocalPlayer();
+		return player == null ? null : player.getName();
 	}
 }

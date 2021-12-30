@@ -22,11 +22,11 @@ public class ItemShareDataService
 {
 	private static final EquipmentInventorySlot[] SLOTS = EquipmentInventorySlot.values();
 
-	public static ItemSharePlayer toPlayer(ItemSharePlayerLite lite)
+	public static ItemSharePlayer toPlayer(ItemSharePlayerLite lite, String playerName)
 	{
 		if (lite == null)
 		{
-			return ItemSharePlayerService.getUnselectedPlayer();
+			return ItemSharePlayerService.getEmptyPlayer(playerName);
 		}
 
 		String name = lite.getName();

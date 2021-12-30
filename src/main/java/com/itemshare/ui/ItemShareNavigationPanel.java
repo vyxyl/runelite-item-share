@@ -6,7 +6,6 @@ import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.service.ItemSharePlayerService;
-import com.itemshare.state.ItemShareState;
 import java.awt.event.ItemEvent;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -47,7 +46,7 @@ public class ItemShareNavigationPanel extends JPanel
 
 	public void update()
 	{
-		updatePlayerData();
+		renderPlayerData();
 
 		playerDropdown.update();
 		playerDropdown.setItemListener(this::onPlayerSelected);
@@ -57,17 +56,17 @@ public class ItemShareNavigationPanel extends JPanel
 	{
 		if (event.getStateChange() == ItemEvent.SELECTED)
 		{
-			updatePlayerData();
+			renderPlayerData();
 		}
 	}
 
-	private void updatePlayerData()
+	private void renderPlayerData()
 	{
 		String playerName = playerDropdown.getSelectedPlayerName();
 
 		if (StringUtils.equals(playerName, OPTION_NO_PLAYER))
 		{
-			loadEmptyPlayer();
+			loadEmptyPlayer(playerName);
 		}
 		else
 		{
@@ -81,11 +80,9 @@ public class ItemShareNavigationPanel extends JPanel
 		playerPanel.update(player);
 	}
 
-	private void loadEmptyPlayer()
+	private void loadEmptyPlayer(String playerName)
 	{
-		emptyPlayer.setName(ItemShareState.playerName);
-
 		updateMessagePanel.updatePanel(null);
-		playerPanel.update(emptyPlayer);
+		playerPanel.update(ItemSharePlayerService.getEmptyPlayer(playerName));
 	}
 }

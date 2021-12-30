@@ -8,10 +8,8 @@ import static com.itemshare.constant.ItemShareConstants.AWS_X_API_KEY;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemSharePlayerLite;
 import com.itemshare.service.ItemShareDataService;
-import com.itemshare.service.ItemSharePlayerService;
 import com.itemshare.service.ItemShareRestService;
 import com.itemshare.state.ItemShareState;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -32,7 +30,7 @@ public class ItemShareAPI
 	@Inject
 	private ItemShareRestService httpService;
 
-	public void savePlayer(String groupId, ItemSharePlayer player, Runnable result)
+	public void savePlayer(String groupId, ItemSharePlayer player, Runnable result, Runnable onFailure)
 	{
 		try
 		{
@@ -44,17 +42,20 @@ public class ItemShareAPI
 					json -> result.run(),
 					error -> {
 						logger.error("Failed to save player: " + error);
+						onFailure.run();
 					});
 			}
 			else
 			{
 				logger.error("Failed to save player: invalid request");
+				onFailure.run();
 			}
 		}
 		catch (Exception e)
 		{
 			logger.error("Failed to save player: " + e.getMessage());
 			e.printStackTrace();
+			onFailure.run();
 		}
 	}
 
@@ -67,7 +68,7 @@ public class ItemShareAPI
 				Request request = buildGetPlayerRequest(groupId, playerName);
 
 				httpService.call(request,
-					json -> toGetPlayerResponse(json, result),
+					json -> toGetPlayerResponse(json, playerName, result),
 					error -> {
 						logger.error("Failed to get player: " + error);
 					});
@@ -84,7 +85,7 @@ public class ItemShareAPI
 		}
 	}
 
-	public void getPlayerNames(String groupId, Consumer<List<String>> result)
+	public void getPlayerNames(String groupId, Consumer<List<String>> result, Runnable onFailure)
 	{
 		try
 		{
@@ -96,20 +97,20 @@ public class ItemShareAPI
 					json -> result.accept(toGetPlayerNamesResponse(json)),
 					error -> {
 						logger.error("Failed to get player names: " + error);
-						result.accept(new ArrayList<>());
+						onFailure.run();
 					});
 			}
 			else
 			{
 				logger.error("Failed to get player names: invalid request");
-				result.accept(new ArrayList<>());
+				onFailure.run();
 			}
 		}
 		catch (Exception e)
 		{
 			logger.error("Failed to get player names: " + e.getMessage());
 			e.printStackTrace();
-			result.accept(new ArrayList<>());
+			onFailure.run();
 		}
 	}
 
@@ -149,12 +150,12 @@ public class ItemShareAPI
 			gson.toJson(lite));
 	}
 
-	private void toGetPlayerResponse(String json, Consumer<ItemSharePlayer> result)
+	private void toGetPlayerResponse(String json, String playerName, Consumer<ItemSharePlayer> result)
 	{
 		ItemSharePlayerLite lite = gson.fromJson(json, ItemSharePlayerLite.class);
 
 		ItemShareState.clientThread.invokeLater(() -> {
-			ItemSharePlayer player = ItemShareDataService.toPlayer(lite);
+			ItemSharePlayer player = ItemShareDataService.toPlayer(lite, playerName);
 			result.accept(player);
 		});
 	}

@@ -7,9 +7,12 @@ import net.runelite.api.events.ItemContainerChanged;
 
 public class ItemShareContainerService
 {
-	public static void load(ItemContainerChanged event)
+	public static void loadContainer(ItemContainerChanged event)
 	{
-		if (ItemShareSupportedService.isSupported())
+		boolean isPlayerAvailable = ItemShareState.player != null;
+		boolean isSupportedWorld = ItemShareSupportedService.isSupportedWorld();
+
+		if (isPlayerAvailable && isSupportedWorld)
 		{
 			ItemContainer container = event.getItemContainer();
 

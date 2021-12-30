@@ -7,21 +7,18 @@ import java.util.function.Consumer;
 
 public class ItemShareAPIService
 {
-	public static void load()
+	public static void savePlayer(Runnable onSuccess)
 	{
-		loadPlayerNames(names -> ItemShareUIService.update());
+		savePlayer(onSuccess, () -> {});
 	}
 
-	public static void sync()
+	public static void savePlayer(Runnable onSuccess, Runnable onFailure)
 	{
-		loadPlayerNames(names -> save());
-	}
+		boolean isSupportedWorld = ItemShareSupportedService.isSupportedWorld();
 
-	public static void save()
-	{
-		if (ItemShareSupportedService.isSupported())
+		if (isSupportedWorld)
 		{
-			ItemShareState.api.savePlayer(ItemShareState.groupId, ItemShareState.player, ItemShareUIService::update);
+			ItemShareState.api.savePlayer(ItemShareState.groupId, ItemShareState.player, onSuccess, onFailure);
 		}
 	}
 
@@ -30,13 +27,13 @@ public class ItemShareAPIService
 		ItemShareState.api.getPlayer(ItemShareState.groupId, playerName, onSuccess);
 	}
 
-	private static void loadPlayerNames(Consumer<List<String>> onSuccess)
+	public static void getPlayerNames(Consumer<List<String>> onSuccess)
 	{
-		ItemShareState.api.getPlayerNames(ItemShareState.groupId, names -> {
-			ItemShareState.playerNames = names;
-			ItemSharePlayerService.loadLoggedInPlayerName();
+		getPlayerNames(onSuccess, () -> {});
+	}
 
-			onSuccess.accept(names);
-		});
+	public static void getPlayerNames(Consumer<List<String>> onSuccess, Runnable onFailure)
+	{
+		ItemShareState.api.getPlayerNames(ItemShareState.groupId, onSuccess, onFailure);
 	}
 }

@@ -36,8 +36,14 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		button = ItemSharePanelService.getButton(icon, null, () -> {
 			if (button.isEnabled())
 			{
-				ItemShareAPIService.sync()
-;				temporarilyDisableButton();
+				ItemShareAPIService.savePlayer(() -> {;
+					ItemShareAPIService.getPlayerNames(names -> {
+						ItemShareState.playerNames = names;
+						reselectPLayer();
+					});
+				});
+
+				temporarilyDisableButton();
 			}
 		});
 
@@ -61,13 +67,11 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		String selectedName = (String) dropdown.getSelectedItem();
 		model.setNames(ItemShareState.playerNames);
 
+		dropdown.setSelectedItem(OPTION_NO_PLAYER);
+
 		if (ItemShareState.playerNames.contains(selectedName))
 		{
 			dropdown.setSelectedItem(selectedName);
-		}
-		else
-		{
-			dropdown.setSelectedItem(OPTION_NO_PLAYER);
 		}
 	}
 

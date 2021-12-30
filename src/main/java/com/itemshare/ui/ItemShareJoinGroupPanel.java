@@ -8,6 +8,7 @@ import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
 import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.service.ItemSharePanelService;
+import com.itemshare.service.ItemShareUIService;
 import com.itemshare.state.ItemShareState;
 import java.awt.Component;
 import javax.swing.BoxLayout;
@@ -118,7 +119,7 @@ public class ItemShareJoinGroupPanel extends JPanel
 		{
 			ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, trimmedValue);
 			ItemShareState.groupId = trimmedValue;
-			ItemShareAPIService.load();
+			ItemShareAPIService.getPlayerNames(names -> ItemShareUIService.update());
 
 			statusTextPane.setText("Successfully Joined the Group!");
 		}

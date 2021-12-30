@@ -2,10 +2,10 @@ package com.itemshare;
 
 import com.google.inject.Provides;
 import com.itemshare.db.ItemShareAPI;
+import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemShareContainerService;
 import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.service.ItemSharePlayerService;
-import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemShareUIService;
 import com.itemshare.state.ItemShareState;
 import javax.inject.Inject;
@@ -48,10 +48,10 @@ public class ItemSharePlugin extends Plugin
 	private ConfigManager configManager;
 
 	@Inject
-	private ItemShareAPI dedicatedDB;
+	private ClientThread clientThread;
 
 	@Inject
-	private ClientThread clientThread;
+	private ItemShareAPI api;
 
 	@Provides
 	ItemShareConfig provideConfig(ConfigManager configManager)
@@ -63,47 +63,55 @@ public class ItemSharePlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		ItemShareState.client = client;
-		ItemShareState.toolbar = toolbar;
+		ItemShareState.clientThread = clientThread;
 		ItemShareState.itemManager = itemManager;
 		ItemShareState.configManager = configManager;
-		ItemShareState.api = dedicatedDB;
-		ItemShareState.clientThread = clientThread;
+		ItemShareState.api = api;
 
-		ItemShareUIService.load();
-		ItemShareGroupIdService.loadExistingId();
-		ItemShareAPIService.load();
-		ItemShareUIService.update();
+		toolbar.addNavigation(ItemShareUIService.getNavButton());
+
+		ItemShareState.groupId = ItemShareGroupIdService.getGroupId();
+
+		ItemShareAPIService.getPlayerNames(names -> {
+			ItemShareState.playerNames = names;
+			ItemShareUIService.update();
+		}, ItemShareUIService::update);
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-		ItemShareAPIService.save();
+		ItemShareAPIService.savePlayer(this::clearPlayer, this::clearPlayer);
 	}
 
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
-		ItemSharePlayerService.load();
+		ItemSharePlayerService.loadPlayerData();
 	}
 
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event)
 	{
-		ItemSharePlayerService.load();
+		ItemSharePlayerService.loadPlayerData();
 
 		boolean isLoggedIn = event.getGameState().equals(GameState.LOGGED_IN);
 
-		if (!isLoggedIn)
+		if (!isLoggedIn && ItemShareState.player != null)
 		{
-			ItemShareAPIService.save();
-			ItemShareState.player = null;
+			ItemShareAPIService.savePlayer(this::clearPlayer, this::clearPlayer);
 		}
+	}
+
+	private void clearPlayer()
+	{
+		ItemShareState.player = null;
+		ItemShareState.playerName = null;
 	}
 
 	@Subscribe
 	public void onItemContainerChanged(ItemContainerChanged event)
 	{
-		ItemShareContainerService.load(event);
+		ItemShareContainerService.loadContainer(event);
 	}
 }
