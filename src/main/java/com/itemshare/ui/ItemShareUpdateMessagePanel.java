@@ -31,6 +31,11 @@ public class ItemShareUpdateMessagePanel extends JPanel
 		updateMessage();
 	}
 
+	public void clearMessage()
+	{
+		message.setText("");
+	}
+
 	private void updateMessage()
 	{
 		message.setText(getMessageText());
@@ -45,7 +50,6 @@ public class ItemShareUpdateMessagePanel extends JPanel
 		else
 		{
 			long ms = Math.abs(new Date().getTime() - updatedDate.getTime());
-			long seconds = TimeUnit.SECONDS.convert(ms, TimeUnit.MILLISECONDS);
 			long minutes = TimeUnit.MINUTES.convert(ms, TimeUnit.MILLISECONDS);
 			long hours = TimeUnit.HOURS.convert(ms, TimeUnit.MILLISECONDS);
 			long days = TimeUnit.DAYS.convert(ms, TimeUnit.MILLISECONDS);
@@ -64,14 +68,7 @@ public class ItemShareUpdateMessagePanel extends JPanel
 			}
 			else
 			{
-				if (seconds > 0)
-				{
-					return getSavedMessage(seconds, "second");
-				}
-				else
-				{
-					return "Last Saved: just now";
-				}
+				return "Last Saved: moments ago";
 			}
 		}
 	}

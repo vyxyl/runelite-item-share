@@ -15,6 +15,7 @@ public class ItemShareConstants
 	public static final String ICON_RELOAD = "/reload.png";
 	public static final String ICON_SHARE = "/share.png";
 	public static final String ICON_BANK = "/bank.png";
+	public static final String ICON_PLUS = "/plus.png";
 	public static final String ICON_EQUIPMENT = "/equipment.png";
 	public static final String ICON_INVENTORY = "/inventory.png";
 

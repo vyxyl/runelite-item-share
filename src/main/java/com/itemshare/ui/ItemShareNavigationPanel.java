@@ -6,6 +6,7 @@ import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.service.ItemSharePlayerService;
+import com.itemshare.state.ItemShareState;
 import java.awt.event.ItemEvent;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -76,7 +77,15 @@ public class ItemShareNavigationPanel extends JPanel
 
 	private void loadPlayer(ItemSharePlayer player)
 	{
-		updateMessagePanel.updatePanel(player.getUpdatedDate());
+		if (player.getName().equals(ItemShareState.playerName))
+		{
+			updateMessagePanel.clearMessage();
+		}
+		else
+		{
+			updateMessagePanel.updatePanel(player.getUpdatedDate());
+		}
+
 		playerPanel.update(player);
 	}
 
