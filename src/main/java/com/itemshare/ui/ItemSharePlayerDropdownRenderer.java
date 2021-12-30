@@ -1,6 +1,5 @@
 package com.itemshare.ui;
 
-import com.itemshare.model.ItemSharePlayer;
 import java.awt.Color;
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;

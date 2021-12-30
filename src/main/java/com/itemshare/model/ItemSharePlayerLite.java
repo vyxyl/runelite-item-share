@@ -1,5 +1,6 @@
 package com.itemshare.model;
 
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import lombok.Setter;
 public class ItemSharePlayerLite
 {
 	private String name;
-	private long currentTimeMs;
+	private Date updatedDate;
 	private ItemShareItemsLite bank;
 	private ItemShareItemsLite inventory;
 	private ItemShareItemsLite equipment;

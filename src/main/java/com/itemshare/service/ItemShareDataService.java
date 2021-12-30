@@ -24,8 +24,13 @@ public class ItemShareDataService
 
 	public static ItemSharePlayer toPlayer(ItemSharePlayerLite lite)
 	{
+		if (lite == null)
+		{
+			return ItemSharePlayerService.getUnselectedPlayer();
+		}
+
 		String name = lite.getName();
-		Date updatedDate = ItemShareDataService.toDate(lite.getCurrentTimeMs());
+		Date updatedDate = lite.getUpdatedDate();
 		ItemShareItems bank = ItemShareDataService.toItems(lite.getBank());
 		ItemShareItems inventory = ItemShareDataService.toItems(lite.getInventory());
 		ItemShareSlots equipment = ItemShareDataService.toSlots(lite.getEquipment());
@@ -44,43 +49,27 @@ public class ItemShareDataService
 		ItemShareItems bank = player.getBank();
 		ItemShareItems inventory = player.getInventory();
 		ItemShareSlots equipment = player.getEquipment();
-		Date updateDate = player.getUpdatedDate();
 
 		return ItemSharePlayerLite.builder()
 			.name(player.getName())
-			.currentTimeMs(updateDate == null ? 0 : updateDate.getTime())
 			.bank(toItemsLite(bank))
 			.inventory(toItemsLite(inventory))
 			.equipment(toSlotsLite(equipment))
 			.build();
 	}
 
-	public static ItemShareItemsLite toItemsLite(ItemShareItems items)
+	private static ItemShareItemsLite toItemsLite(ItemShareItems container)
 	{
-		Date updateDate = items.getUpdatedDate();
-		List<ItemShareItem> itemList = items.getItems();
-		return toItemsLite(updateDate, itemList);
+		List<ItemShareItem> items = container.getItems();
+		int[] raw = items.isEmpty() ? new int[]{} : toItemsRaw(items.stream());
+		return ItemShareItemsLite.builder().items(raw).build();
 	}
 
-	public static ItemShareItemsLite toSlotsLite(ItemShareSlots slots)
+	private static ItemShareItemsLite toSlotsLite(ItemShareSlots slots)
 	{
-		Date updateDate = slots.getUpdatedDate();
-		List<ItemShareItem> values = new ArrayList<>(slots.getSlots().values());
-		return toSlotsLite(updateDate, values);
-	}
-
-	private static ItemShareItemsLite toItemsLite(Date updateDate, List<ItemShareItem> itemList)
-	{
-		int[] raw = itemList.isEmpty() ? new int[]{} : toItemsRaw(itemList.stream());
-		long ms = updateDate == null ? 0 : updateDate.getTime();
-		return ItemShareItemsLite.builder().currentTimeMs(ms).items(raw).build();
-	}
-
-	private static ItemShareItemsLite toSlotsLite(Date updateDate, List<ItemShareItem> itemList)
-	{
-		int[] raw = itemList.isEmpty() ? new int[]{} : toSlotsRaw(itemList.stream());
-		long ms = updateDate == null ? 0 : updateDate.getTime();
-		return ItemShareItemsLite.builder().currentTimeMs(ms).items(raw).build();
+		List<ItemShareItem> items = new ArrayList<>(slots.getSlots().values());
+		int[] raw = items.isEmpty() ? new int[]{} : toSlotsRaw(items.stream());
+		return ItemShareItemsLite.builder().items(raw).build();
 	}
 
 	private static int[] toItemsRaw(Stream<ItemShareItem> stream)
@@ -101,7 +90,7 @@ public class ItemShareDataService
 		return ArrayUtils.toPrimitive(values);
 	}
 
-	public static ItemShareItems toItems(ItemShareItemsLite lite)
+	private static ItemShareItems toItems(ItemShareItemsLite lite)
 	{
 		if (lite == null || lite.getItems().length % 2 != 0)
 		{
@@ -123,11 +112,11 @@ public class ItemShareDataService
 
 		return ItemShareItems.builder()
 			.items(items)
-			.updatedDate(toDate(lite.getCurrentTimeMs()))
+			.updatedDate(lite.getUpdatedDate())
 			.build();
 	}
 
-	public static ItemShareSlots toSlots(ItemShareItemsLite lite)
+	private static ItemShareSlots toSlots(ItemShareItemsLite lite)
 	{
 		if (lite == null || lite.getItems().length % 3 != 0)
 		{
@@ -160,12 +149,7 @@ public class ItemShareDataService
 
 		return ItemShareSlots.builder()
 			.slots(slots)
-			.updatedDate(toDate(lite.getCurrentTimeMs()))
+			.updatedDate(lite.getUpdatedDate())
 			.build();
-	}
-
-	public static Date toDate(long ms)
-	{
-		return ms == 0 ? null : new Date(ms);
 	}
 }

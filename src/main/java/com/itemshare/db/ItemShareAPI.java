@@ -8,7 +8,10 @@ import static com.itemshare.constant.ItemShareConstants.AWS_X_API_KEY;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemSharePlayerLite;
 import com.itemshare.service.ItemShareDataService;
+import com.itemshare.service.ItemSharePlayerService;
 import com.itemshare.service.ItemShareRestService;
+import com.itemshare.state.ItemShareState;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -29,60 +32,84 @@ public class ItemShareAPI
 	@Inject
 	private ItemShareRestService httpService;
 
-	public void savePlayer(String groupId, ItemSharePlayer player, Runnable onSuccess, Runnable onFailure)
+	public void savePlayer(String groupId, ItemSharePlayer player, Runnable result)
 	{
-		if (!StringUtils.isEmpty(groupId))
+		try
 		{
-			Request request = buildSavePlayerRequest(groupId, player);
+			if (!StringUtils.isEmpty(groupId) && player != null && !StringUtils.isEmpty(player.getName()))
+			{
+				Request request = buildSavePlayerRequest(groupId, player);
 
-			httpService.call(request,
-				json -> onSuccess.run(),
-				error -> {
-					logger.error("Failed to save player: " + error);
-					onFailure.run();
-				});
+				httpService.call(request,
+					json -> result.run(),
+					error -> {
+						logger.error("Failed to save player: " + error);
+					});
+			}
+			else
+			{
+				logger.error("Failed to save player: invalid request");
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			onFailure.run();
+			logger.error("Failed to save player: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
-	public void getPlayer(String groupId, String playerName, Consumer<ItemSharePlayerLite> onSuccess, Runnable onFailure)
+	public void getPlayer(String groupId, String playerName, Consumer<ItemSharePlayer> result)
 	{
-		if (!StringUtils.isEmpty(groupId))
+		try
 		{
-			Request request = buildGetPlayerRequest(groupId, playerName);
+			if (!StringUtils.isEmpty(groupId) && !StringUtils.isEmpty(playerName))
+			{
+				Request request = buildGetPlayerRequest(groupId, playerName);
 
-			httpService.call(request,
-				json -> onSuccess.accept(toGetPlayerResponse(json)),
-				error -> {
-					logger.error("Failed to get player: " + error);
-					onFailure.run();
-				});
+				httpService.call(request,
+					json -> toGetPlayerResponse(json, result),
+					error -> {
+						logger.error("Failed to get player: " + error);
+					});
+			}
+			else
+			{
+				logger.error("Failed to get player: invalid request");
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			onFailure.run();
+			logger.error("Failed to get player: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
-	public void getPlayerNames(String groupId, Consumer<List<String>> onSuccess, Runnable onFailure)
+	public void getPlayerNames(String groupId, Consumer<List<String>> result)
 	{
-		if (!StringUtils.isEmpty(groupId))
+		try
 		{
-			Request request = buildGetPlayerNamesRequest(groupId);
+			if (!StringUtils.isEmpty(groupId))
+			{
+				Request request = buildGetPlayerNamesRequest(groupId);
 
-			httpService.call(request,
-				json -> onSuccess.accept(toGetPlayerNamesResponse(json)),
-				error -> {
-					logger.error("Failed to get player names: " + error);
-					onFailure.run();
-				});
+				httpService.call(request,
+					json -> result.accept(toGetPlayerNamesResponse(json)),
+					error -> {
+						logger.error("Failed to get player names: " + error);
+						result.accept(new ArrayList<>());
+					});
+			}
+			else
+			{
+				logger.error("Failed to get player names: invalid request");
+				result.accept(new ArrayList<>());
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			onFailure.run();
+			logger.error("Failed to get player names: " + e.getMessage());
+			e.printStackTrace();
+			result.accept(new ArrayList<>());
 		}
 	}
 
@@ -122,11 +149,14 @@ public class ItemShareAPI
 			gson.toJson(lite));
 	}
 
-	private ItemSharePlayerLite toGetPlayerResponse(String json)
+	private void toGetPlayerResponse(String json, Consumer<ItemSharePlayer> result)
 	{
-		return gson.fromJson(json, ItemSharePlayerLite.class);
+		ItemSharePlayerLite lite = gson.fromJson(json, ItemSharePlayerLite.class);
 
-
+		ItemShareState.clientThread.invokeLater(() -> {
+			ItemSharePlayer player = ItemShareDataService.toPlayer(lite);
+			result.accept(player);
+		});
 	}
 
 	private List<String> toGetPlayerNamesResponse(String json)

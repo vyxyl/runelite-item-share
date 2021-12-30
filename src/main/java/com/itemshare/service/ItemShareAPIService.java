@@ -1,8 +1,7 @@
 package com.itemshare.service;
 
-import com.itemshare.model.ItemSharePlayerLite;
+import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.state.ItemShareState;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -10,43 +9,34 @@ public class ItemShareAPIService
 {
 	public static void load()
 	{
-		loadPlayerNames(() -> {
-		});
+		loadPlayerNames(names -> ItemShareUIService.update());
 	}
 
-	public static void getPlayer(String playerName, Consumer<ItemSharePlayerLite> onSuccess, Runnable onFailure)
+	public static void sync()
 	{
-		ItemShareState.api.getPlayer(
-			ItemShareState.groupId,
-			playerName,
-			onSuccess,
-			onFailure);
-	}
-
-	public static void loadPlayerNames(Runnable runnable)
-	{
-		Consumer<List<String>> loadNames = names -> {
-			ItemShareState.playerNames = names;
-			ItemShareUIService.update();
-			runnable.run();
-		};
-
-		ItemShareState.api.getPlayerNames(
-			ItemShareState.groupId,
-			loadNames,
-			() -> ItemShareState.playerNames = new ArrayList<>());
+		loadPlayerNames(names -> save());
 	}
 
 	public static void save()
 	{
 		if (ItemShareSupportedService.isSupported())
 		{
-			ItemShareState.api.savePlayer(
-				ItemShareState.groupId,
-				ItemShareState.player,
-				ItemShareUIService::update,
-				() -> {
-				});
+			ItemShareState.api.savePlayer(ItemShareState.groupId, ItemShareState.player, ItemShareUIService::update);
 		}
+	}
+
+	public static void getPlayer(String playerName, Consumer<ItemSharePlayer> onSuccess)
+	{
+		ItemShareState.api.getPlayer(ItemShareState.groupId, playerName, onSuccess);
+	}
+
+	private static void loadPlayerNames(Consumer<List<String>> onSuccess)
+	{
+		ItemShareState.api.getPlayerNames(ItemShareState.groupId, names -> {
+			ItemShareState.playerNames = names;
+			ItemSharePlayerService.loadLoggedInPlayerName();
+
+			onSuccess.accept(names);
+		});
 	}
 }

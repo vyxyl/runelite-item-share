@@ -25,7 +25,7 @@ public class ItemShareUpdateMessagePanel extends JPanel
 		add(message);
 	}
 
-	public void update(Date updatedDate)
+	public void updatePanel(Date updatedDate)
 	{
 		this.updatedDate = updatedDate;
 		updateMessage();

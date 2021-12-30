@@ -69,9 +69,9 @@ public class ItemSharePlugin extends Plugin
 		ItemShareState.api = dedicatedDB;
 		ItemShareState.clientThread = clientThread;
 
+		ItemShareUIService.load();
 		ItemShareGroupIdService.loadExistingId();
 		ItemShareAPIService.load();
-		ItemShareUIService.load();
 		ItemShareUIService.update();
 	}
 
@@ -97,6 +97,7 @@ public class ItemSharePlugin extends Plugin
 		if (!isLoggedIn)
 		{
 			ItemShareAPIService.save();
+			ItemShareState.player = null;
 		}
 	}
 

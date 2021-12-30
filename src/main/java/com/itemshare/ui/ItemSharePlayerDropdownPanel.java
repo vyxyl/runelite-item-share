@@ -36,8 +36,8 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		button = ItemSharePanelService.getButton(icon, null, () -> {
 			if (button.isEnabled())
 			{
-				ItemShareAPIService.loadPlayerNames(ItemShareAPIService::save);
-				temporarilyDisableButton();
+				ItemShareAPIService.sync()
+;				temporarilyDisableButton();
 			}
 		});
 

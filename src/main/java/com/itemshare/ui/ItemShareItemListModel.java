@@ -76,13 +76,27 @@ public class ItemShareItemListModel implements ListModel<ItemShareRenderItem>
 	@Override
 	public int getSize()
 	{
-		return filteredItems.size();
+		try
+		{
+			return filteredItems.size();
+		}
+		catch (Exception e)
+		{
+			return 0;
+		}
 	}
 
 	@Override
 	public ItemShareRenderItem getElementAt(int index)
 	{
-		return filteredItems.get(index);
+		try
+		{
+			return filteredItems.get(index);
+		}
+		catch (Exception e)
+		{
+			return null;
+		}
 	}
 
 	@Override

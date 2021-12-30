@@ -3,7 +3,6 @@ package com.itemshare.service;
 import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
-import com.itemshare.model.ItemSharePlayerLite;
 import com.itemshare.model.ItemShareSlots;
 import com.itemshare.state.ItemShareState;
 import java.util.ArrayList;
@@ -26,53 +25,45 @@ public class ItemSharePlayerService
 	{
 		if (StringUtils.isEmpty(ItemShareState.playerName))
 		{
-			ItemShareState.playerName = getName();
+			ItemShareState.playerName = getPlayerName();
 		}
 		else if (ItemShareState.player == null && !isLoading)
 		{
 			isLoading = true;
 
-			ItemShareAPIService.getPlayer(ItemShareState.playerName,
-				ItemSharePlayerService::loadExistingPlayer,
-				ItemSharePlayerService::loadNewPlayer);
-		}
-	}
+			try
+			{
+				ItemShareAPIService.getPlayer(ItemShareState.playerName, player -> {
+					ItemShareState.player = player;
+					loadLoggedInPlayerName();
+					ItemShareUIService.update();
 
-	private static void loadExistingPlayer(ItemSharePlayerLite lite)
-	{
-		if (lite == null)
-		{
-			loadNewPlayer();
-		}
-		else
-		{
-			ItemShareState.clientThread.invokeLater(() -> {
-				ItemShareState.player = ItemShareDataService.toPlayer(lite);
+					isLoading = false;
+				});
+			}
+			catch (Exception e)
+			{
 				isLoading = false;
-			});
+				e.printStackTrace();
+			}
 		}
 	}
 
-	private static void loadNewPlayer()
+	public static void loadLoggedInPlayerName()
 	{
-		ItemShareState.player = getNewPlayer();
-
 		if (!ItemShareState.playerNames.contains(ItemShareState.playerName))
 		{
 			ItemShareState.playerNames.add(ItemShareState.playerName);
 		}
-
-		ItemShareUIService.update();
-		isLoading = false;
 	}
 
-	private static String getName()
+	private static String getPlayerName()
 	{
 		Player player = ItemShareState.client.getLocalPlayer();
 		return player == null ? null : player.getName();
 	}
 
-	public static ItemSharePlayer getEmptyPlayer()
+	public static ItemSharePlayer getUnselectedPlayer()
 	{
 		return ItemSharePlayer.builder()
 			.name(OPTION_NO_PLAYER)
@@ -83,10 +74,10 @@ public class ItemSharePlayerService
 			.build();
 	}
 
-	private static ItemSharePlayer getNewPlayer()
+	public static ItemSharePlayer getEmptyPlayer(String name)
 	{
 		return ItemSharePlayer.builder()
-			.name(ItemShareState.playerName)
+			.name(name)
 			.updatedDate(new Date())
 			.bank(ItemShareItems.builder().items(new ArrayList<>()).build())
 			.equipment(ItemShareSlots.builder().slots(new HashMap<>()).build())

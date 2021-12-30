@@ -3,10 +3,8 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS_BUTTON;
 import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
 import com.itemshare.model.ItemSharePlayer;
-import com.itemshare.model.ItemSharePlayerLite;
 import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemSharePanelService;
-import com.itemshare.service.ItemShareDataService;
 import com.itemshare.service.ItemSharePlayerService;
 import com.itemshare.state.ItemShareState;
 import java.awt.event.ItemEvent;
@@ -20,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareNavigationPanel extends JPanel
 {
-	private final ItemSharePlayer emptyPlayer = ItemSharePlayerService.getEmptyPlayer();
+	private final ItemSharePlayer emptyPlayer = ItemSharePlayerService.getUnselectedPlayer();
 	private final ItemSharePlayerDropdownPanel playerDropdown = new ItemSharePlayerDropdownPanel();
 	private final ItemSharePlayerPanel playerPanel = new ItemSharePlayerPanel();
 	private final ItemShareUpdateMessagePanel updateMessagePanel = new ItemShareUpdateMessagePanel();
@@ -49,7 +47,7 @@ public class ItemShareNavigationPanel extends JPanel
 
 	public void update()
 	{
-		updateData();
+		updatePlayerData();
 
 		playerDropdown.update();
 		playerDropdown.setItemListener(this::onPlayerSelected);
@@ -59,11 +57,11 @@ public class ItemShareNavigationPanel extends JPanel
 	{
 		if (event.getStateChange() == ItemEvent.SELECTED)
 		{
-			updateData();
+			updatePlayerData();
 		}
 	}
 
-	private void updateData()
+	private void updatePlayerData()
 	{
 		String playerName = playerDropdown.getSelectedPlayerName();
 
@@ -73,30 +71,21 @@ public class ItemShareNavigationPanel extends JPanel
 		}
 		else
 		{
-			ItemShareAPIService.getPlayer(playerName, this::loadPlayer, this::loadEmptyPlayer);
+			ItemShareAPIService.getPlayer(playerName, this::loadPlayer);
 		}
+	}
+
+	private void loadPlayer(ItemSharePlayer player)
+	{
+		updateMessagePanel.updatePanel(player.getUpdatedDate());
+		playerPanel.update(player);
 	}
 
 	private void loadEmptyPlayer()
 	{
-		updateMessagePanel.update(emptyPlayer.getUpdatedDate());
 		emptyPlayer.setName(ItemShareState.playerName);
-		playerPanel.update(emptyPlayer);
-	}
 
-	private void loadPlayer(ItemSharePlayerLite lite)
-	{
-		if (lite == null)
-		{
-			loadEmptyPlayer();
-		}
-		else
-		{
-			ItemShareState.clientThread.invokeLater(() -> {
-				ItemSharePlayer player = ItemShareDataService.toPlayer(lite);
-				updateMessagePanel.update(player.getUpdatedDate());
-				playerPanel.update(player);
-			});
-		}
+		updateMessagePanel.updatePanel(null);
+		playerPanel.update(emptyPlayer);
 	}
 }
