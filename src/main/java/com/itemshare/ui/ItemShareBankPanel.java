@@ -1,6 +1,5 @@
 package com.itemshare.ui;
 
-import static com.itemshare.constant.ItemShareConstants.SELECT_A_PLAYER;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;

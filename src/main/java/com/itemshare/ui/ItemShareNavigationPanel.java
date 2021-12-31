@@ -6,7 +6,6 @@ import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.service.ItemSharePlayerService;
-import com.itemshare.state.ItemShareState;
 import java.awt.event.ItemEvent;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -18,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareNavigationPanel extends JPanel
 {
-	private final ItemSharePlayer emptyPlayer = ItemSharePlayerService.getUnselectedPlayer();
 	private final ItemSharePlayerDropdownPanel playerDropdown = new ItemSharePlayerDropdownPanel();
 	private final ItemSharePlayerPanel playerPanel = new ItemSharePlayerPanel();
 	private final ItemShareUpdateMessagePanel updateMessagePanel = new ItemShareUpdateMessagePanel();
@@ -77,15 +75,7 @@ public class ItemShareNavigationPanel extends JPanel
 
 	private void loadPlayer(ItemSharePlayer player)
 	{
-		if (player.getName().equals(ItemShareState.playerName))
-		{
-			updateMessagePanel.clearMessage();
-		}
-		else
-		{
-			updateMessagePanel.updatePanel(player.getUpdatedDate());
-		}
-
+		updateMessagePanel.updatePanel(player);
 		playerPanel.update(player);
 	}
 
