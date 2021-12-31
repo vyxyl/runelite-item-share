@@ -4,7 +4,7 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_BACK;
 import static com.itemshare.constant.ItemShareConstants.ICON_RELOAD;
-import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.ICON_SAVE;
 import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.service.ItemSharePanelService;
@@ -79,7 +79,7 @@ public class ItemShareNewGroupPanel extends JPanel
 			textField.setText(ItemShareGroupIdService.getNewId());
 		});
 
-		ImageIcon saveIcon = ItemSharePanelService.loadIcon(ICON_SAVE_BUTTON);
+		ImageIcon saveIcon = ItemSharePanelService.loadIcon(ICON_SAVE);
 		JButton saveButton = ItemSharePanelService.getButton(saveIcon, "Join", () -> updateGroupId(textField.getText()));
 
 		ItemSharePanelService.setSize(newIdButton, 30, 30);

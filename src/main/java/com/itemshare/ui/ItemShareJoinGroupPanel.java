@@ -3,7 +3,7 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_BACK;
-import static com.itemshare.constant.ItemShareConstants.ICON_SAVE_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.ICON_SAVE;
 import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.service.ItemSharePanelService;
@@ -34,7 +34,7 @@ public class ItemShareJoinGroupPanel extends JPanel
 		ImageIcon backIcon = ItemSharePanelService.loadIcon(ICON_BACK);
 		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel("Item Share / Settings / Join", backIcon, onBack);
 
-		ImageIcon saveIcon = ItemSharePanelService.loadIcon(ICON_SAVE_BUTTON);
+		ImageIcon saveIcon = ItemSharePanelService.loadIcon(ICON_SAVE);
 		JButton saveButton = ItemSharePanelService.getButton(saveIcon, "Join", () -> updateGroupId(textField.getText()));
 		ItemSharePanelService.setSize(saveButton, 185, 30);
 

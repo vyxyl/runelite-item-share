@@ -1,6 +1,6 @@
 package com.itemshare.ui;
 
-import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS;
 import static com.itemshare.constant.ItemShareConstants.SELECT_A_PLAYER;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemShareAPIService;
@@ -28,7 +28,7 @@ public class ItemShareNavigationPanel extends JPanel
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-		ImageIcon settingsIcon = ItemSharePanelService.loadIcon(ICON_SETTINGS_BUTTON);
+		ImageIcon settingsIcon = ItemSharePanelService.loadIcon(ICON_SETTINGS);
 		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel("Item Share", settingsIcon, runnable);
 
 		Border border = BorderFactory.createEmptyBorder(0, 0, 10, 0);

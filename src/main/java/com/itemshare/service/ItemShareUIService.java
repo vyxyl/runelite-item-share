@@ -1,6 +1,6 @@
 package com.itemshare.service;
 
-import static com.itemshare.constant.ItemShareConstants.ICON_NAV_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.ICON_PLUGIN;
 import com.itemshare.ui.ItemSharePanel;
 import java.awt.image.BufferedImage;
 import javax.swing.SwingUtilities;
@@ -23,7 +23,7 @@ public class ItemShareUIService
 		assert SwingUtilities.isEventDispatchThread();
 		panel = new ItemSharePanel();
 
-		BufferedImage image = ItemSharePanelService.loadImage(ICON_NAV_BUTTON);
+		BufferedImage image = ItemSharePanelService.loadImage(ICON_PLUGIN);
 
 		return getNavigationButton(image);
 	}

@@ -2,7 +2,7 @@ package com.itemshare.ui;
 
 import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
-import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE;
 import static com.itemshare.constant.ItemShareConstants.ICON_JOIN;
 import static com.itemshare.constant.ItemShareConstants.ICON_PLUS;
 import static com.itemshare.constant.ItemShareConstants.ICON_SHARE;
@@ -48,7 +48,7 @@ public class ItemShareSettingsPanel extends JPanel
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 		setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
 
-		ImageIcon closeIcon = ItemSharePanelService.loadIcon(ICON_CLOSE_BUTTON);
+		ImageIcon closeIcon = ItemSharePanelService.loadIcon(ICON_CLOSE);
 		titlePanel = new ItemShareTitlePanel("Item Share / Settings", closeIcon, onClose);
 
 		shareGroupPanel = new ItemShareCopyGroupPanel(() -> onSettingClick(ItemShareSetting.MAIN));

@@ -3,7 +3,7 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_BACK;
-import static com.itemshare.constant.ItemShareConstants.ICON_COPY_BUTTON;
+import static com.itemshare.constant.ItemShareConstants.ICON_COPY;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
 import java.awt.Component;
@@ -37,7 +37,7 @@ public class ItemShareCopyGroupPanel extends JPanel
 		textField = getGroupIdTextField();
 		JPanel scrollableTextField = ItemSharePanelService.getScrollableTextField(textField);
 
-		ImageIcon copyIcon = ItemSharePanelService.loadIcon(ICON_COPY_BUTTON);
+		ImageIcon copyIcon = ItemSharePanelService.loadIcon(ICON_COPY);
 		JButton copyButton = ItemSharePanelService.getButton(copyIcon, "Copy to Clipboard", () -> copyId(textField));
 		JTextPane textPane = ItemSharePanelService.getCenteredTextPane("Share your Group ID with other players\n\nPlayers with the same Group ID \nwill be able to see each other's items");
 
