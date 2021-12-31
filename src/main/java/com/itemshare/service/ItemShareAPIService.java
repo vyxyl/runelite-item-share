@@ -7,6 +7,11 @@ import java.util.function.Consumer;
 
 public class ItemShareAPIService
 {
+	public static void savePlayer()
+	{
+		savePlayer(() -> {});
+	}
+
 	public static void savePlayer(Runnable onSuccess)
 	{
 		savePlayer(onSuccess, () -> {});
@@ -14,9 +19,10 @@ public class ItemShareAPIService
 
 	public static void savePlayer(Runnable onSuccess, Runnable onFailure)
 	{
+		boolean isPlayerAvailable = ItemShareState.player != null;
 		boolean isSupportedWorld = ItemShareSupportedService.isSupportedWorld();
 
-		if (isSupportedWorld)
+		if (isSupportedWorld && isPlayerAvailable)
 		{
 			ItemShareState.api.savePlayer(ItemShareState.groupId, ItemShareState.player, onSuccess, onFailure);
 		}

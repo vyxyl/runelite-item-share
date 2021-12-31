@@ -15,7 +15,6 @@ public class ItemShareUpdateMessagePanel extends JPanel
 {
 	private final JLabel message = new JLabel();
 	private ItemSharePlayer player;
-	private Timer timer;
 
 	protected ItemShareUpdateMessagePanel()
 	{
@@ -27,7 +26,7 @@ public class ItemShareUpdateMessagePanel extends JPanel
 		ItemSharePanelService.setHeight(message, 20);
 		add(message);
 
-		timer = new Timer((int) TimeUnit.SECONDS.toMillis(6), event -> updateMessage());
+		Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(11), event -> updateMessage());
 		timer.start();
 	}
 
@@ -68,9 +67,9 @@ public class ItemShareUpdateMessagePanel extends JPanel
 			{
 				return getSavedMessage(minutes, "minute");
 			}
-			else if (seconds >= 5)
+			else if (seconds >= 10)
 			{
-				int rounded = getRoundedIncrement(seconds, 5);
+				int rounded = getRoundedIncrement(seconds, 10);
 				return getSavedMessage(rounded, "second");
 			}
 			else

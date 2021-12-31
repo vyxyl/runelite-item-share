@@ -8,7 +8,9 @@ import com.itemshare.service.ItemShareGroupIdService;
 import com.itemshare.service.ItemSharePlayerService;
 import com.itemshare.service.ItemShareUIService;
 import com.itemshare.state.ItemShareState;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
+import javax.swing.Timer;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -59,6 +61,8 @@ public class ItemSharePlugin extends Plugin
 		return configManager.getConfig(ItemShareConfig.class);
 	}
 
+	private Timer saveTimer;
+
 	@Override
 	protected void startUp() throws Exception
 	{
@@ -76,6 +80,8 @@ public class ItemSharePlugin extends Plugin
 			ItemShareState.playerNames = names;
 			ItemShareUIService.update();
 		}, ItemShareUIService::update);
+
+		saveTimer = getSaveTimer();
 	}
 
 	@Override
@@ -93,14 +99,23 @@ public class ItemSharePlugin extends Plugin
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event)
 	{
-		ItemSharePlayerService.loadPlayerData();
-
 		boolean isLoggedIn = event.getGameState().equals(GameState.LOGGED_IN);
 
-		if (!isLoggedIn && ItemShareState.player != null)
+		if (isLoggedIn)
 		{
+			saveTimer.start();
+		}
+		else
+		{
+			saveTimer.stop();
 			ItemShareAPIService.savePlayer(this::clearPlayer, this::clearPlayer);
 		}
+	}
+
+	@Subscribe
+	public void onItemContainerChanged(ItemContainerChanged event)
+	{
+		ItemShareContainerService.loadContainer(event);
 	}
 
 	private void clearPlayer()
@@ -109,9 +124,9 @@ public class ItemSharePlugin extends Plugin
 		ItemShareState.playerName = null;
 	}
 
-	@Subscribe
-	public void onItemContainerChanged(ItemContainerChanged event)
+	private Timer getSaveTimer()
 	{
-		ItemShareContainerService.loadContainer(event);
+		int repeatMs = (int) TimeUnit.MINUTES.toMillis(10);
+		return new Timer(repeatMs, event -> ItemShareAPIService.savePlayer());
 	}
 }

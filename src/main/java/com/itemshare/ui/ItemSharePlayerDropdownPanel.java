@@ -7,6 +7,7 @@ import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
 import java.awt.Component;
 import java.awt.event.ItemListener;
+import java.util.concurrent.TimeUnit;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -37,14 +38,13 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 			if (button.isEnabled())
 			{
 				ItemShareAPIService.savePlayer(() -> {
-					;
 					ItemShareAPIService.getPlayerNames(names -> {
 						ItemShareState.playerNames = names;
 						reselectPLayer();
 					});
 				});
 
-				temporarilyDisableButton();
+				disableButtonTemporarily();
 			}
 		});
 
@@ -76,14 +76,15 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		}
 	}
 
-	private void temporarilyDisableButton()
+	private void disableButtonTemporarily()
 	{
-		int delayMs = 5 * 1000;
 		button.setEnabled(false);
-		timer = new Timer(delayMs, event -> {
+
+		timer = new Timer((int) TimeUnit.SECONDS.toMillis(5), event -> {
 			button.setEnabled(true);
 			timer.stop();
 		});
+
 		timer.start();
 	}
 

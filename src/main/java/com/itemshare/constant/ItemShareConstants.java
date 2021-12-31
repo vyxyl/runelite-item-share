@@ -7,7 +7,7 @@ public class ItemShareConstants
 	public static final String CONFIG_BASE = "itemshare";
 	public static final String CONFIG_GROUP_ID = "groupId";
 
-	public static final String ICON_PLUGIN = "/wiki-icons/icon.png";
+	public static final String ICON_PLUGIN = "/wiki-icons/plugin.png";
 	public static final String ICON_BANK = "/wiki-icons/bank.png";
 	public static final String ICON_EQUIPMENT = "/wiki-icons/equipment.png";
 	public static final String ICON_INVENTORY = "/wiki-icons/inventory.png";
