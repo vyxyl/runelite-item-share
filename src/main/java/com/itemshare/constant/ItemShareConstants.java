@@ -19,7 +19,7 @@ public class ItemShareConstants
 	public static final String ICON_EQUIPMENT = "/equipment.png";
 	public static final String ICON_INVENTORY = "/inventory.png";
 
-	public static final String OPTION_NO_PLAYER = "Select a player";
+	public static final String SELECT_A_PLAYER = "Select a player";
 
 	public static final String AWS_X_API_KEY = "IlJzFmPQQA8XBaihKSucd2bXsXgnot4l2NiWCkQP";
 	public static final String AWS_BASE_URL = "https://f0r2noiv31.execute-api.us-east-1.amazonaws.com/dev";

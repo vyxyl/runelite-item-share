@@ -1,6 +1,6 @@
 package com.itemshare.service;
 
-import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
+import static com.itemshare.constant.ItemShareConstants.SELECT_A_PLAYER;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemShareSlots;
@@ -8,12 +8,14 @@ import com.itemshare.state.ItemShareState;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import net.runelite.api.InventoryID;
 import net.runelite.api.Player;
 import org.apache.commons.lang3.StringUtils;
 
 public class ItemSharePlayerService
 {
-	private static boolean isLoading = false;
+	private static boolean isLoadingPlayer = false;
+	private static boolean hasLoadedItems = false;
 
 	public static void loadPlayerData()
 	{
@@ -21,40 +23,57 @@ public class ItemSharePlayerService
 		{
 			ItemShareState.playerName = getClientPlayerName();
 		}
-		else if (ItemShareState.player == null && !isLoading)
+		else if (ItemShareState.player == null && !isLoadingPlayer)
 		{
-			isLoading = true;
-
+			isLoadingPlayer = true;
 			try
 			{
 				ItemShareAPIService.getPlayer(ItemShareState.playerName, player -> {
 					ItemShareState.player = player;
+					addToPlayerNames(ItemShareState.playerName);
 
-					if (!ItemShareState.playerNames.contains(ItemShareState.playerName))
-					{
-						ItemShareState.playerNames.add(ItemShareState.playerName);
-					}
-
-					isLoading = false;
+					isLoadingPlayer = false;
 					ItemShareUIService.update();
 				});
 			}
 			catch (Exception e)
 			{
-				isLoading = false;
+				isLoadingPlayer = false;
 				e.printStackTrace();
 			}
+		}
+		else if (ItemShareState.player != null && !hasLoadedItems)
+		{
+			try
+			{
+				hasLoadedItems = true;
+				ItemShareContainerService.loadContainer(InventoryID.INVENTORY);
+				ItemShareContainerService.loadContainer(InventoryID.EQUIPMENT);
+			}
+			catch (Exception e)
+			{
+				hasLoadedItems = false;
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private static void addToPlayerNames(String name)
+	{
+		if (!ItemShareState.playerNames.contains(name))
+		{
+			ItemShareState.playerNames.add(name);
 		}
 	}
 
 	public static ItemSharePlayer getUnselectedPlayer()
 	{
 		return ItemSharePlayer.builder()
-			.name(OPTION_NO_PLAYER)
+			.name(SELECT_A_PLAYER)
 			.updatedDate(null)
-			.bank(ItemShareItems.builder().items(new ArrayList<>()).build())
-			.equipment(ItemShareSlots.builder().slots(new HashMap<>()).build())
-			.inventory(ItemShareItems.builder().items(new ArrayList<>()).build())
+			.bank(getEmptyItems())
+			.inventory(getEmptyItems())
+			.equipment(getEmptySlots())
 			.build();
 	}
 
@@ -63,10 +82,20 @@ public class ItemSharePlayerService
 		return ItemSharePlayer.builder()
 			.name(name)
 			.updatedDate(new Date())
-			.bank(ItemShareItems.builder().items(new ArrayList<>()).build())
-			.equipment(ItemShareSlots.builder().slots(new HashMap<>()).build())
-			.inventory(ItemShareItems.builder().items(new ArrayList<>()).build())
+			.bank(getEmptyItems())
+			.inventory(getEmptyItems())
+			.equipment(getEmptySlots())
 			.build();
+	}
+
+	private static ItemShareSlots getEmptySlots()
+	{
+		return ItemShareSlots.builder().slots(new HashMap<>()).build();
+	}
+
+	private static ItemShareItems getEmptyItems()
+	{
+		return ItemShareItems.builder().items(new ArrayList<>()).build();
 	}
 
 	private static String getClientPlayerName()

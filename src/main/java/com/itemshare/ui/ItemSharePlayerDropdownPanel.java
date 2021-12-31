@@ -1,7 +1,7 @@
 package com.itemshare.ui;
 
 import static com.itemshare.constant.ItemShareConstants.ICON_RELOAD;
-import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
+import static com.itemshare.constant.ItemShareConstants.SELECT_A_PLAYER;
 import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
@@ -36,7 +36,8 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		button = ItemSharePanelService.getButton(icon, null, () -> {
 			if (button.isEnabled())
 			{
-				ItemShareAPIService.savePlayer(() -> {;
+				ItemShareAPIService.savePlayer(() -> {
+					;
 					ItemShareAPIService.getPlayerNames(names -> {
 						ItemShareState.playerNames = names;
 						reselectPLayer();
@@ -67,7 +68,7 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		String selectedName = (String) dropdown.getSelectedItem();
 		model.setNames(ItemShareState.playerNames);
 
-		dropdown.setSelectedItem(OPTION_NO_PLAYER);
+		dropdown.setSelectedItem(SELECT_A_PLAYER);
 
 		if (ItemShareState.playerNames.contains(selectedName))
 		{

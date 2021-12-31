@@ -1,5 +1,6 @@
 package com.itemshare.ui;
 
+import static com.itemshare.constant.ItemShareConstants.SELECT_A_PLAYER;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
@@ -12,13 +13,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.AsyncBufferedImage;
 
-public class ItemShareItemListPanel extends JPanel
+public class ItemShareBankPanel extends JPanel
 {
 	private final ItemShareItemListRenderer renderer = new ItemShareItemListRenderer();
 	private final ItemShareItemSearchBoxPanel searchBox = new ItemShareItemSearchBoxPanel();
@@ -26,8 +28,9 @@ public class ItemShareItemListPanel extends JPanel
 
 	private final JScrollPane scrollPane;
 	private final JList<ItemShareRenderItem> list;
+	private final JLabel message = new JLabel();
 
-	protected ItemShareItemListPanel()
+	protected ItemShareBankPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -41,15 +44,13 @@ public class ItemShareItemListPanel extends JPanel
 		scrollPane = new JScrollPane(list);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-		add(searchBox);
-		add(scrollPane);
-
 		searchBox.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.addListener(this::repaintAll);
 
-		repaintAll();
+		add(searchBox);
+		add(scrollPane);
 	}
 
 	public void update(ItemSharePlayer player)

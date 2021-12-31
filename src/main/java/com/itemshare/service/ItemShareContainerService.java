@@ -9,26 +9,41 @@ public class ItemShareContainerService
 {
 	public static void loadContainer(ItemContainerChanged event)
 	{
-		boolean isPlayerAvailable = ItemShareState.player != null;
-		boolean isSupportedWorld = ItemShareSupportedService.isSupportedWorld();
+		ItemContainer container = event.getItemContainer();
+		loadContainer(container);
+	}
 
-		if (isPlayerAvailable && isSupportedWorld)
+	public static void loadContainer(InventoryID inventoryId)
+	{
+		ItemContainer container = ItemShareState.client.getItemContainer(inventoryId);
+		loadContainer(container);
+	}
+
+	private static void loadContainer(ItemContainer container)
+	{
+		if (isLoadingAllowed())
 		{
-			ItemContainer container = event.getItemContainer();
-
-			if (container == ItemShareState.client.getItemContainer(InventoryID.BANK))
+			if (container.getId() == InventoryID.BANK.getId())
 			{
 				loadBank(container);
 			}
-			else if (container == ItemShareState.client.getItemContainer(InventoryID.INVENTORY))
+			else if (container.getId() == InventoryID.INVENTORY.getId())
 			{
 				loadInventory(container);
 			}
-			else if (container == ItemShareState.client.getItemContainer(InventoryID.EQUIPMENT))
+			else if (container.getId() == InventoryID.EQUIPMENT.getId())
 			{
 				loadEquipment(container);
 			}
 		}
+	}
+
+	private static boolean isLoadingAllowed()
+	{
+		boolean isPlayerAvailable = ItemShareState.player != null;
+		boolean isSupportedWorld = ItemShareSupportedService.isSupportedWorld();
+
+		return isPlayerAvailable && isSupportedWorld;
 	}
 
 	private static void loadBank(ItemContainer container)

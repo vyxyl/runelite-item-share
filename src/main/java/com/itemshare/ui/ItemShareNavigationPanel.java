@@ -1,7 +1,7 @@
 package com.itemshare.ui;
 
 import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS_BUTTON;
-import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
+import static com.itemshare.constant.ItemShareConstants.SELECT_A_PLAYER;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemSharePanelService;
@@ -65,7 +65,7 @@ public class ItemShareNavigationPanel extends JPanel
 	{
 		String playerName = playerDropdown.getSelectedPlayerName();
 
-		if (StringUtils.equals(playerName, OPTION_NO_PLAYER))
+		if (StringUtils.equals(playerName, SELECT_A_PLAYER))
 		{
 			loadEmptyPlayer(playerName);
 		}

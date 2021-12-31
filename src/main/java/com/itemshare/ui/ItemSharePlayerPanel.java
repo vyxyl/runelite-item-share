@@ -20,7 +20,7 @@ public class ItemSharePlayerPanel extends JPanel
 
 	ItemShareEquipmentPanel equipment;
 	ItemShareInventoryPanel inventory;
-	ItemShareItemListPanel bank;
+	ItemShareBankPanel bank;
 
 	protected ItemSharePlayerPanel()
 	{
@@ -29,7 +29,7 @@ public class ItemSharePlayerPanel extends JPanel
 
 		equipment = new ItemShareEquipmentPanel();
 		inventory = new ItemShareInventoryPanel();
-		bank = new ItemShareItemListPanel();
+		bank = new ItemShareBankPanel();
 
 		tabs.addTab("Gear", getIcon(ICON_EQUIPMENT), equipment, "Equipment");
 		tabs.addTab("Inventory", getIcon(ICON_INVENTORY), inventory, "Inventory");

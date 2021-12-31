@@ -76,7 +76,7 @@ public class ItemShareSettingsPanel extends JPanel
 
 	private void showCreateGroupPopup(Runnable onClose)
 	{
-		JLabel line1 = new JLabel("This will create and assign you to a new group");
+		JLabel line1 = new JLabel("This will assign you to a new group");
 		JLabel line2 = new JLabel("Are you sure?");
 
 		line1.setAlignmentX(Component.CENTER_ALIGNMENT);

@@ -1,6 +1,6 @@
 package com.itemshare.ui;
 
-import static com.itemshare.constant.ItemShareConstants.OPTION_NO_PLAYER;
+import static com.itemshare.constant.ItemShareConstants.SELECT_A_PLAYER;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,16 +16,16 @@ public class ItemSharePlayerDropdownModel implements ComboBoxModel<String>
 
 	ItemSharePlayerDropdownModel()
 	{
-		selected = OPTION_NO_PLAYER;
+		selected = SELECT_A_PLAYER;
 
 		names = new ArrayList<>();
-		names.add(OPTION_NO_PLAYER);
+		names.add(SELECT_A_PLAYER);
 	}
 
 	public void setNames(List<String> names)
 	{
 		this.names.clear();
-		this.names.add(OPTION_NO_PLAYER);
+		this.names.add(SELECT_A_PLAYER);
 		this.names.addAll(names);
 	}
 
@@ -62,23 +62,23 @@ public class ItemSharePlayerDropdownModel implements ComboBoxModel<String>
 		}
 		else
 		{
-			this.selected = OPTION_NO_PLAYER;
+			this.selected = SELECT_A_PLAYER;
 		}
 	}
 
 	@Override
 	public String getSelectedItem()
 	{
-		if (Objects.equals(selected, OPTION_NO_PLAYER))
+		if (Objects.equals(selected, SELECT_A_PLAYER))
 		{
-			return OPTION_NO_PLAYER;
+			return SELECT_A_PLAYER;
 		}
 		else
 		{
 			return names.stream()
 				.filter(option -> StringUtils.equals(option, selected))
 				.findFirst()
-				.orElse(OPTION_NO_PLAYER);
+				.orElse(SELECT_A_PLAYER);
 		}
 	}
 }
