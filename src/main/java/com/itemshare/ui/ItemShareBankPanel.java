@@ -45,6 +45,8 @@ public class ItemShareBankPanel extends JPanel
 		searchBox.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.addListener(this::repaintItems);
+
+		add(searchBox);
 	}
 
 	public void update(ItemSharePlayer player)
@@ -115,7 +117,9 @@ public class ItemShareBankPanel extends JPanel
 			model.getFilteredItems().forEach(this::repaintItem);
 
 			remove(scrollPane);
-			add(searchBox);
+			add(scrollPane);
+
+			repaint();
 		}
 		catch (Exception e)
 		{
