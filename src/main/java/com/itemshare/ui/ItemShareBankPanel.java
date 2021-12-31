@@ -28,7 +28,6 @@ public class ItemShareBankPanel extends JPanel
 
 	private final JScrollPane scrollPane;
 	private final JList<ItemShareRenderItem> list;
-	private final JLabel message = new JLabel();
 
 	protected ItemShareBankPanel()
 	{
