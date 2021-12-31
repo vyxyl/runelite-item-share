@@ -44,10 +44,7 @@ public class ItemShareBankPanel extends JPanel
 		searchBox.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
-		searchBox.addListener(this::repaintAll);
-
-		add(searchBox);
-		add(scrollPane);
+		searchBox.addListener(this::repaintItems);
 	}
 
 	public void update(ItemSharePlayer player)
@@ -55,7 +52,6 @@ public class ItemShareBankPanel extends JPanel
 		ItemShareItems bank = player.getBank();
 		List<ItemShareItem> items = bank == null ? new ArrayList<>() : bank.getItems();
 		updateItems(items);
-		repaintAll();
 	}
 
 	private void updateItems(List<ItemShareItem> items)
@@ -68,6 +64,8 @@ public class ItemShareBankPanel extends JPanel
 		{
 			setAllItems(items);
 		}
+
+		repaintItems();
 	}
 
 	private void removeAllItems()
@@ -75,10 +73,11 @@ public class ItemShareBankPanel extends JPanel
 		model.removeAllItems();
 	}
 
-	private void setAllItems(List<ItemShareItem> baseItems)
+	private void setAllItems(List<ItemShareItem> items)
 	{
-		List<ItemShareRenderItem> allItems = getRenderItems(baseItems);
+		List<ItemShareRenderItem> allItems = getRenderItems(items);
 		List<ItemShareRenderItem> unfilteredItems = model.getUnfilteredItems();
+
 		List<ItemShareRenderItem> existingItems = unfilteredItems.stream().filter(allItems::contains).collect(Collectors.toList());
 		List<ItemShareRenderItem> newItems = allItems.stream().filter(item -> !unfilteredItems.contains(item)).collect(Collectors.toList());
 
@@ -86,33 +85,20 @@ public class ItemShareBankPanel extends JPanel
 		existingItems.sort(Comparator.comparing(item -> item.getItem().getName()));
 
 		model.setItems(existingItems);
+
 		newItems.forEach(this::addIcon);
-	}
-
-	private void repaintAll()
-	{
-		String searchText = searchBox.getText();
-		model.filterItems(searchText);
-		list.setModel(model);
-
-		repaintItems(model.getFilteredItems());
-
-		renderer.repaint();
-		list.repaint();
-
-		remove(scrollPane);
-		add(scrollPane);
-		scrollPane.repaint();
-
-		revalidate();
-		repaint();
+		newItems.forEach(this::loadIcon);
 	}
 
 	private void addIcon(ItemShareRenderItem item)
 	{
 		AsyncBufferedImage icon = getIcon(item);
 		item.setIcon(icon);
-		icon.onLoaded(() -> repaintItem(item));
+	}
+
+	private void loadIcon(ItemShareRenderItem item)
+	{
+		item.getIcon().onLoaded(() -> repaintItem(item));
 	}
 
 	private AsyncBufferedImage getIcon(ItemShareRenderItem renderItem)
@@ -121,25 +107,36 @@ public class ItemShareBankPanel extends JPanel
 		return ItemSharePanelService.getIcon(item);
 	}
 
-	private void repaintItems(List<ItemShareRenderItem> items)
+	private void repaintItems()
 	{
-		items.forEach(this::repaintItem);
+		try
+		{
+			model.filterItems(searchBox.getText());
+			model.getFilteredItems().forEach(this::repaintItem);
+
+			remove(scrollPane);
+			add(searchBox);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	private void repaintItem(ItemShareRenderItem item)
 	{
-		int index = model.getIndex(item);
-
-		if (index >= 0)
+		try
 		{
-			try
+			int index = model.getIndex(item);
+
+			if (index >= 0)
 			{
 				list.repaint(list.getCellBounds(index, index));
 			}
-			catch (Exception e)
-			{
-				//
-			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 
