@@ -37,7 +37,7 @@ public class ItemShareRestService
 					}
 					else
 					{
-						onFailure.accept("Response body: " + body);
+						onFailure.accept("Response was unsuccessful");
 					}
 				}
 				catch (Exception e)
