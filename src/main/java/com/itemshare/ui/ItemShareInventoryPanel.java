@@ -4,6 +4,7 @@ import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemSharePanelService;
+import com.itemshare.service.ItemShareWikiService;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -100,8 +101,10 @@ public class ItemShareInventoryPanel extends JPanel
 	private void addIcon(JPanel itemPanel, ItemShareItem item)
 	{
 		JLabel label = (JLabel) itemPanel.getComponent(0);
-		AsyncBufferedImage icon = ItemSharePanelService.getIcon(item);
 		label.setToolTipText(item.getName());
+		label.addMouseListener(ItemShareWikiService.getWikiMouseListener(item));
+
+		AsyncBufferedImage icon = ItemSharePanelService.getIcon(item);
 		icon.addTo(label);
 	}
 

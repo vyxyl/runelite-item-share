@@ -5,7 +5,10 @@ import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemShareRenderItem;
 import com.itemshare.service.ItemSharePanelService;
+import com.itemshare.service.ItemShareWikiService;
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -37,6 +40,7 @@ public class ItemShareBankPanel extends JPanel
 		list.setModel(model);
 		list.setCellRenderer(renderer);
 		list.setFixedCellWidth(PluginPanel.PANEL_WIDTH);
+		list.addMouseListener(getListMouseListener());
 
 		scrollPane = new JScrollPane(list);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -155,5 +159,28 @@ public class ItemShareBankPanel extends JPanel
 	private boolean isNullItem(ItemShareItem item)
 	{
 		return item == null || item.getName().equals("null") || item.getId() == -1;
+	}
+
+	private MouseAdapter getListMouseListener()
+	{
+		return new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent event)
+			{
+				try
+				{
+					if (event.getClickCount() == 1)
+					{
+						int index = list.locationToIndex(event.getPoint());
+						ItemShareRenderItem item = model.getElementAt(index);
+						ItemShareWikiService.goToWiki(item.getItem());
+					}
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		};
 	}
 }
