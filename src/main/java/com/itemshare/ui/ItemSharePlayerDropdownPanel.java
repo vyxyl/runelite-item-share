@@ -19,7 +19,7 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 {
 	private final ItemSharePlayerDropdownModel model;
 	private final JComboBox<String> dropdown;
-	private JButton button = new JButton();
+	private JButton syncButton = new JButton();
 	private Timer timer;
 
 	protected ItemSharePlayerDropdownPanel()
@@ -33,16 +33,18 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 		dropdown.setRenderer(new ItemSharePlayerDropdownRenderer());
 		dropdown.setFocusable(false);
 
-		ImageIcon icon = ItemSharePanelService.loadIcon(ICON_RELOAD);
-		button = ItemSharePanelService.getButton(icon, null, () -> {
-			if (button.isEnabled())
+		ImageIcon syncIcon = ItemSharePanelService.loadIcon(ICON_RELOAD);
+		syncButton = ItemSharePanelService.getButton(syncIcon, null, () -> {
+			if (syncButton.isEnabled())
 			{
-				ItemShareAPIService.savePlayer(() -> {
-					ItemShareAPIService.getPlayerNames(names -> {
-						ItemShareState.playerNames = names;
-						reselectPLayer();
-					});
-				});
+				if (ItemShareState.player == null)
+				{
+					retrievePlayers();
+				}
+				else
+				{
+					ItemShareAPIService.savePlayer(this::retrievePlayers);
+				}
 
 				disableButtonTemporarily();
 			}
@@ -50,17 +52,25 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 
 		JPanel padding = new JPanel();
 
-		button.setAlignmentX(Component.LEFT_ALIGNMENT);
+		syncButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		padding.setAlignmentX(Component.LEFT_ALIGNMENT);
 		dropdown.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-		ItemSharePanelService.setSize(button, 30, 30);
+		ItemSharePanelService.setSize(syncButton, 30, 30);
 		ItemSharePanelService.setSize(padding, 10, 30);
 		ItemSharePanelService.setSize(dropdown, 185, 30);
 
-		add(button);
+		add(syncButton);
 		add(padding);
 		add(dropdown);
+	}
+
+	private void retrievePlayers()
+	{
+		ItemShareAPIService.getPlayerNames(names -> {
+			ItemShareState.playerNames = names;
+			reselectPLayer();
+		});
 	}
 
 	private void reselectPLayer()
@@ -78,10 +88,10 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 
 	private void disableButtonTemporarily()
 	{
-		button.setEnabled(false);
+		syncButton.setEnabled(false);
 
 		timer = new Timer((int) TimeUnit.SECONDS.toMillis(5), event -> {
-			button.setEnabled(true);
+			syncButton.setEnabled(true);
 			timer.stop();
 		});
 
