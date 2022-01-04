@@ -1,6 +1,8 @@
 package com.itemshare.ui;
 
 import com.itemshare.ItemSharePlugin;
+import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
+import static com.itemshare.constant.ItemShareConstants.CONFIG_GIM_ENABLED;
 import static com.itemshare.constant.ItemShareConstants.ICON_BANK;
 import static com.itemshare.constant.ItemShareConstants.ICON_EQUIPMENT;
 import static com.itemshare.constant.ItemShareConstants.ICON_GIM;
@@ -16,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import net.runelite.client.util.ImageUtil;
 
-public class ItemSharePlayerPanel extends JPanel
+public class ItemSharePlayerItemsPanel extends JPanel
 {
 	JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 
@@ -25,7 +27,7 @@ public class ItemSharePlayerPanel extends JPanel
 	ItemShareBankPanel bank;
 	ItemShareBankPanel gimStorage;
 
-	protected ItemSharePlayerPanel()
+	protected ItemSharePlayerItemsPanel()
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -36,9 +38,10 @@ public class ItemSharePlayerPanel extends JPanel
 		gimStorage = new ItemShareBankPanel();
 
 		tabs.addTab("Gear", getIcon(ICON_EQUIPMENT), equipment, "Equipment");
-		tabs.addTab("Inv", getIcon(ICON_INVENTORY), inventory, "Inventory");
+		tabs.addTab("Inventory", getIcon(ICON_INVENTORY), inventory, "Inventory");
 		tabs.addTab("Bank", getIcon(ICON_BANK), bank, "Bank");
-		tabs.addTab("GIM", getIcon(ICON_GIM), gimStorage, "Group Ironman");
+		updateGIM();
+
 		tabs.setAlignmentX(CENTER_ALIGNMENT);
 
 		add(tabs, BorderLayout.NORTH);
@@ -55,9 +58,46 @@ public class ItemSharePlayerPanel extends JPanel
 		equipment.update(player);
 		inventory.update(player);
 		bank.update(player);
-		gimStorage.update(ItemShareState.gimStorage);
+		updateGIM();
 
 		revalidate();
 		repaint();
+	}
+
+	private void updateGIM()
+	{
+		boolean isGIMEnabled = isGIMEnabled();
+		boolean hasGIMTab = tabs.indexOfComponent(gimStorage) > -1;
+
+		if (isGIMEnabled)
+		{
+			gimStorage.update(ItemShareState.gimStorage);
+
+			if (!hasGIMTab)
+			{
+				addGIMTab();
+				tabs.setTitleAt(tabs.indexOfComponent(inventory), "Inv");
+			}
+		}
+		else if (hasGIMTab)
+		{
+			removeGIMTab();
+			tabs.setTitleAt(tabs.indexOfComponent(inventory), "Inventory");
+		}
+	}
+
+	private boolean isGIMEnabled()
+	{
+		return Boolean.parseBoolean(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GIM_ENABLED));
+	}
+
+	private void addGIMTab()
+	{
+		tabs.addTab("GIM", getIcon(ICON_GIM), gimStorage, "Group Ironman");
+	}
+
+	private void removeGIMTab()
+	{
+		tabs.remove(gimStorage);
 	}
 }

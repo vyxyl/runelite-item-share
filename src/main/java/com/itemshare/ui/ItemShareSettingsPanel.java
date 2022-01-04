@@ -1,6 +1,7 @@
 package com.itemshare.ui;
 
 import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
+import static com.itemshare.constant.ItemShareConstants.CONFIG_GIM_ENABLED;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE;
 import static com.itemshare.constant.ItemShareConstants.ICON_JOIN;
@@ -16,9 +17,11 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 import net.runelite.client.ui.ColorScheme;
 
 public class ItemShareSettingsPanel extends JPanel
@@ -37,6 +40,9 @@ public class ItemShareSettingsPanel extends JPanel
 	private final JButton shareGroupButton;
 	private final JButton joinGroupButton;
 	private final JButton createGroupButton;
+
+	private final JCheckBox gimCheckbox;
+	private final JTextPane gimNote;
 
 	private ItemShareSetting currentSetting = ItemShareSetting.MAIN;
 
@@ -61,17 +67,38 @@ public class ItemShareSettingsPanel extends JPanel
 		joinGroupButton = ItemSharePanelService.getButton(joinIcon, "Join Group", () -> onSettingClick(ItemShareSetting.JOIN_GROUP));
 		shareGroupButton = ItemSharePanelService.getButton(shareIcon, "Share Group", () -> onSettingClick(ItemShareSetting.SHARE_GROUP));
 		createGroupButton = ItemSharePanelService.getButton(newIcon, "Create Group", () -> showCreateGroupPopup(onClose));
+		gimCheckbox = getGIMStorageCheckbox();
+		gimNote = ItemSharePanelService.getCenteredTextPane("\nYou can share items with anyone\n\nHowever, only one GIM storage is saved per group");
 
 		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		joinGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		shareGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		createGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+		gimCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
+		gimNote.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		ItemSharePanelService.setHeight(joinGroupButton, 30);
 		ItemSharePanelService.setHeight(shareGroupButton, 30);
 		ItemSharePanelService.setHeight(createGroupButton, 30);
+		ItemSharePanelService.setHeight(gimCheckbox, 30);
+		ItemSharePanelService.setHeight(gimNote, 100);
 
 		rebuild();
+	}
+
+	private JCheckBox getGIMStorageCheckbox()
+	{
+		boolean isGIMEnabled = Boolean.parseBoolean(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GIM_ENABLED));
+
+		JCheckBox checkbox = new JCheckBox("GIM Storage", isGIMEnabled);
+		checkbox.setSelected(isGIMEnabled);
+		checkbox.addItemListener(event -> {
+			ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GIM_ENABLED, checkbox.isSelected());
+			rebuild();
+			ItemShareUIService.update();
+		});
+
+		return checkbox;
 	}
 
 	private void showCreateGroupPopup(Runnable onClose)
@@ -146,6 +173,8 @@ public class ItemShareSettingsPanel extends JPanel
 
 	private void rebuildMain()
 	{
+		boolean isGIMEnabled = Boolean.parseBoolean(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GIM_ENABLED));
+
 		add(titlePanel);
 		add(ItemSharePanelService.getPadding(10));
 		add(shareGroupButton);
@@ -153,5 +182,13 @@ public class ItemShareSettingsPanel extends JPanel
 		add(joinGroupButton);
 		add(ItemSharePanelService.getPadding(10));
 		add(createGroupButton);
+		add(ItemSharePanelService.getPadding(20));
+		add(gimCheckbox);
+		add(ItemSharePanelService.getPadding(10));
+
+		if (isGIMEnabled)
+		{
+			add(gimNote);
+		}
 	}
 }

@@ -15,13 +15,13 @@ import javax.swing.border.Border;
 import net.runelite.client.ui.ColorScheme;
 import org.apache.commons.lang3.StringUtils;
 
-public class ItemShareNavigationPanel extends JPanel
+public class ItemShareContentPanel extends JPanel
 {
 	private final ItemSharePlayerDropdownPanel playerDropdown = new ItemSharePlayerDropdownPanel();
-	private final ItemSharePlayerPanel playerPanel = new ItemSharePlayerPanel();
+	private final ItemSharePlayerItemsPanel playerItemsPanel = new ItemSharePlayerItemsPanel();
 	private final ItemShareUpdateMessagePanel updateMessagePanel = new ItemShareUpdateMessagePanel();
 
-	protected ItemShareNavigationPanel(Runnable runnable)
+	protected ItemShareContentPanel(Runnable runnable)
 	{
 		super(false);
 
@@ -35,12 +35,12 @@ public class ItemShareNavigationPanel extends JPanel
 
 		playerDropdown.setBorder(border);
 		updateMessagePanel.setBorder(border);
-		playerPanel.setBorder(border);
+		playerItemsPanel.setBorder(border);
 
 		add(titlePanel);
 		add(playerDropdown);
 		add(updateMessagePanel);
-		add(playerPanel);
+		add(playerItemsPanel);
 	}
 
 	public void update()
@@ -76,12 +76,12 @@ public class ItemShareNavigationPanel extends JPanel
 	private void loadPlayer(ItemSharePlayer player)
 	{
 		updateMessagePanel.updatePanel(player);
-		playerPanel.update(player);
+		playerItemsPanel.update(player);
 	}
 
 	private void loadEmptyPlayer(String playerName)
 	{
 		updateMessagePanel.updatePanel(null);
-		playerPanel.update(ItemShareLoadService.getEmptyPlayer(playerName));
+		playerItemsPanel.update(ItemShareLoadService.getEmptyPlayer(playerName));
 	}
 }

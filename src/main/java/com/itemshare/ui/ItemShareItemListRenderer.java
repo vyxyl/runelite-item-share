@@ -14,13 +14,20 @@ public class ItemShareItemListRenderer extends JLabel implements ListCellRendere
 	@Override
 	public Component getListCellRendererComponent(JList<? extends ItemShareRenderItem> list, ItemShareRenderItem value, int index, boolean isSelected, boolean cellHasFocus)
 	{
-		ItemShareItem item = value.getItem();
-		AsyncBufferedImage image = value.getIcon();
+		if (value != null)
+		{
+			ItemShareItem item = value.getItem();
+			AsyncBufferedImage image = value.getIcon();
 
-		String name = item == null ? "N/A" : item.getName();
+			String name = item == null ? "N/A" : item.getName();
 
-		setText(name);
-		setIcon(new ImageIcon(image));
+			setText(name);
+			setIcon(new ImageIcon(image));
+		}
+		else
+		{
+			setText("N/A");
+		}
 
 		return this;
 	}
