@@ -3,6 +3,7 @@ package com.itemshare.ui;
 import static com.itemshare.constant.ItemShareConstants.ICON_RELOAD;
 import static com.itemshare.constant.ItemShareConstants.SELECT_A_PLAYER;
 import com.itemshare.service.ItemShareAPIService;
+import com.itemshare.service.ItemShareLoadService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.state.ItemShareState;
 import java.awt.Component;
@@ -45,6 +46,8 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 				{
 					ItemShareAPIService.savePlayer(this::retrievePlayers);
 				}
+
+				ItemShareLoadService.loadGIMStorage();
 
 				disableButtonTemporarily();
 			}

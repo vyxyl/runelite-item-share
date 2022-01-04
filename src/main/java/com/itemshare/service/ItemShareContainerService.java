@@ -1,12 +1,17 @@
 package com.itemshare.service;
 
 import com.itemshare.state.ItemShareState;
+import java.util.Date;
+import javax.swing.Timer;
 import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.ItemContainerChanged;
 
 public class ItemShareContainerService
 {
+	private static Timer timer = new Timer(1000, e -> {
+	});
+
 	public static void loadContainer(ItemContainerChanged event)
 	{
 		ItemContainer container = event.getItemContainer();
@@ -35,6 +40,10 @@ public class ItemShareContainerService
 			{
 				loadEquipment(container);
 			}
+			else if (container.getId() == InventoryID.GROUP_STORAGE.getId())
+			{
+				loadGIMStorage(container);
+			}
 		}
 	}
 
@@ -59,5 +68,18 @@ public class ItemShareContainerService
 	private static void loadEquipment(ItemContainer container)
 	{
 		ItemShareState.player.setEquipment(ItemShareItemService.getEquipmentContainer(container));
+	}
+
+	private static void loadGIMStorage(ItemContainer container)
+	{
+		ItemShareState.tempStorage.setItems(ItemShareItemService.getBankItems(container));
+		ItemShareState.tempStorage.setUpdatedDate(new Date());
+
+		timer.stop();
+		timer = new Timer(10000, e -> {
+			timer.stop();
+			ItemShareAPIService.saveGIMStorage();
+		});
+		timer.start();
 	}
 }

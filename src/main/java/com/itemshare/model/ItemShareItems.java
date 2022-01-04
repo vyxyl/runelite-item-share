@@ -1,8 +1,6 @@
 package com.itemshare.model;
 
 import java.util.ArrayList;
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,5 +15,4 @@ import lombok.Setter;
 public class ItemShareItems
 {
 	private ArrayList<ItemShareItem> items;
-	private Date updatedDate;
 }

@@ -1,5 +1,7 @@
 package com.itemshare.service;
 
+import com.itemshare.model.ItemShareGIMStorage;
+import com.itemshare.model.ItemShareGIMStorageLite;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemShareItemsLite;
@@ -26,7 +28,7 @@ public class ItemShareDataService
 	{
 		if (lite == null)
 		{
-			return ItemSharePlayerService.getEmptyPlayer(playerName);
+			return ItemShareLoadService.getEmptyPlayer(playerName);
 		}
 
 		String name = lite.getName();
@@ -58,9 +60,40 @@ public class ItemShareDataService
 			.build();
 	}
 
+	public static ItemShareGIMStorage toGimStorage(ItemShareGIMStorageLite lite)
+	{
+		if (lite == null)
+		{
+			return ItemShareGIMStorage.builder()
+				.items(new ArrayList<>())
+				.updatedDate(new Date())
+				.build();
+		}
+
+		Date updatedDate = lite.getUpdatedDate();
+
+		return ItemShareGIMStorage.builder()
+			.updatedDate(updatedDate)
+			.items(rawToItems(lite.getItems()))
+			.build();
+	}
+
+	public static ItemShareGIMStorageLite toGimStorageLite(ItemShareGIMStorage gimStorage)
+	{
+		return ItemShareGIMStorageLite.builder()
+			.items(toItemsRaw(gimStorage.getItems().stream()))
+			.updatedDate(gimStorage.getUpdatedDate())
+			.build();
+	}
+
 	private static ItemShareItemsLite toItemsLite(ItemShareItems container)
 	{
 		List<ItemShareItem> items = container.getItems();
+		return toItemsLite(items);
+	}
+
+	private static ItemShareItemsLite toItemsLite(List<ItemShareItem> items)
+	{
 		int[] raw = items.isEmpty() ? new int[]{} : toItemsRaw(items.stream());
 		return ItemShareItemsLite.builder().items(raw).build();
 	}
@@ -96,11 +129,19 @@ public class ItemShareDataService
 		{
 			return ItemShareItems.builder()
 				.items(new ArrayList<>())
-				.updatedDate(null)
 				.build();
 		}
 
 		int[] raw = lite.getItems();
+		ArrayList<ItemShareItem> items = rawToItems(raw);
+
+		return ItemShareItems.builder()
+			.items(items)
+			.build();
+	}
+
+	private static ArrayList<ItemShareItem> rawToItems(int[] raw)
+	{
 		ArrayList<ItemShareItem> items = new ArrayList<>();
 
 		for (int i = 0; i < raw.length; i += 2)
@@ -110,10 +151,7 @@ public class ItemShareDataService
 			items.add(ItemShareItemService.getItem(id, quantity));
 		}
 
-		return ItemShareItems.builder()
-			.items(items)
-			.updatedDate(lite.getUpdatedDate())
-			.build();
+		return items;
 	}
 
 	private static ItemShareSlots toSlots(ItemShareItemsLite lite)
@@ -122,7 +160,6 @@ public class ItemShareDataService
 		{
 			return ItemShareSlots.builder()
 				.slots(new HashMap<>())
-				.updatedDate(null)
 				.build();
 		}
 
@@ -149,7 +186,6 @@ public class ItemShareDataService
 
 		return ItemShareSlots.builder()
 			.slots(slots)
-			.updatedDate(lite.getUpdatedDate())
 			.build();
 	}
 }

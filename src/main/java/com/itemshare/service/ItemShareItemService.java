@@ -6,7 +6,6 @@ import com.itemshare.model.ItemShareSlots;
 import com.itemshare.state.ItemShareState;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,7 +20,6 @@ public class ItemShareItemService
 	{
 		return ItemShareItems.builder()
 			.items(getBankItems(container))
-			.updatedDate(new Date())
 			.build();
 	}
 
@@ -29,7 +27,6 @@ public class ItemShareItemService
 	{
 		return ItemShareItems.builder()
 			.items(getInventoryItems(container))
-			.updatedDate(new Date())
 			.build();
 	}
 
@@ -37,7 +34,6 @@ public class ItemShareItemService
 	{
 		return ItemShareSlots.builder()
 			.slots(getEquipmentSlots(container))
-			.updatedDate(new Date())
 			.build();
 	}
 
@@ -50,7 +46,7 @@ public class ItemShareItemService
 			.build();
 	}
 
-	private static ArrayList<ItemShareItem> getBankItems(ItemContainer container)
+	public static ArrayList<ItemShareItem> getBankItems(ItemContainer container)
 	{
 		return (ArrayList<ItemShareItem>) Arrays.stream(container.getItems())
 			.filter(ItemShareItemService::isBankItem)

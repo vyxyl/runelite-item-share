@@ -9,6 +9,7 @@ public class ItemShareConstants
 
 	public static final String ICON_PLUGIN = "/wiki-icons/plugin.png";
 	public static final String ICON_BANK = "/wiki-icons/bank.png";
+	public static final String ICON_GIM = "/wiki-icons/gim.png";
 	public static final String ICON_EQUIPMENT = "/wiki-icons/equipment.png";
 	public static final String ICON_INVENTORY = "/wiki-icons/inventory.png";
 
@@ -26,4 +27,5 @@ public class ItemShareConstants
 	public static final String AWS_BASE_URL = "https://f0r2noiv31.execute-api.us-east-1.amazonaws.com/dev";
 	public static final String AWS_PLAYER_API = AWS_BASE_URL + "/player";
 	public static final String AWS_PLAYER_NAMES_API = AWS_BASE_URL + "/player-names";
+	public static final String AWS_GIM_STORAGE_API = AWS_BASE_URL + "/gim-storage";
 }

@@ -5,7 +5,7 @@ import com.itemshare.db.ItemShareAPI;
 import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemShareContainerService;
 import com.itemshare.service.ItemShareGroupIdService;
-import com.itemshare.service.ItemSharePlayerService;
+import com.itemshare.service.ItemShareLoadService;
 import com.itemshare.service.ItemShareUIService;
 import com.itemshare.state.ItemShareState;
 import java.util.concurrent.TimeUnit;
@@ -78,8 +78,13 @@ public class ItemSharePlugin extends Plugin
 
 		ItemShareAPIService.getPlayerNames(names -> {
 			ItemShareState.playerNames = names;
-			ItemShareUIService.update();
+			ItemShareAPIService.getGIMStorage(gimStorage -> {
+				ItemShareState.gimStorage = gimStorage;
+				ItemShareUIService.update();
+			}, ItemShareUIService::update);
 		}, ItemShareUIService::update);
+
+		ItemShareLoadService.loadGIMStorage();
 
 		saveTimer = getSaveTimer();
 	}
@@ -93,7 +98,7 @@ public class ItemSharePlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
-		ItemSharePlayerService.loadPlayerData();
+		ItemShareLoadService.loadPlayerData();
 	}
 
 	@Subscribe

@@ -1,5 +1,6 @@
 package com.itemshare.ui;
 
+import com.itemshare.model.ItemShareGIMStorage;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
@@ -56,8 +57,21 @@ public class ItemShareBankPanel extends JPanel
 	public void update(ItemSharePlayer player)
 	{
 		ItemShareItems bank = player.getBank();
-		List<ItemShareItem> items = bank == null ? new ArrayList<>() : bank.getItems();
-		updateItems(items);
+		update(bank);
+	}
+
+	public void update(ItemShareGIMStorage storage)
+	{
+		if (storage != null)
+		{
+			updateItems(storage.getItems());
+		}
+	}
+
+	public void update(ItemShareItems items)
+	{
+		List<ItemShareItem> itemList = items == null ? new ArrayList<>() : items.getItems();
+		updateItems(itemList);
 	}
 
 	private void updateItems(List<ItemShareItem> items)

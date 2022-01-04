@@ -1,6 +1,5 @@
 package com.itemshare.service;
 
-import static com.itemshare.constant.ItemShareConstants.SELECT_A_PLAYER;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemShareSlots;
@@ -12,10 +11,10 @@ import net.runelite.api.InventoryID;
 import net.runelite.api.Player;
 import org.apache.commons.lang3.StringUtils;
 
-public class ItemSharePlayerService
+public class ItemShareLoadService
 {
 	private static boolean isLoadingPlayer = false;
-	private static boolean hasLoadedItems = false;
+	private static boolean hasLoadedPlayerItems = false;
 
 	public static void loadPlayerData()
 	{
@@ -42,20 +41,28 @@ public class ItemSharePlayerService
 				e.printStackTrace();
 			}
 		}
-		else if (ItemShareState.player != null && !hasLoadedItems)
+		else if (ItemShareState.player != null && !hasLoadedPlayerItems)
 		{
 			try
 			{
-				hasLoadedItems = true;
+				hasLoadedPlayerItems = true;
 				ItemShareContainerService.loadContainer(InventoryID.INVENTORY);
 				ItemShareContainerService.loadContainer(InventoryID.EQUIPMENT);
 			}
 			catch (Exception e)
 			{
-				hasLoadedItems = false;
+				hasLoadedPlayerItems = false;
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public static void loadGIMStorage()
+	{
+		ItemShareAPIService.getGIMStorage(gimStorage -> {
+			ItemShareState.gimStorage = gimStorage;
+			ItemShareUIService.update();
+		});
 	}
 
 	private static void addToPlayerNames(String name)
@@ -64,17 +71,6 @@ public class ItemSharePlayerService
 		{
 			ItemShareState.playerNames.add(name);
 		}
-	}
-
-	public static ItemSharePlayer getUnselectedPlayer()
-	{
-		return ItemSharePlayer.builder()
-			.name(SELECT_A_PLAYER)
-			.updatedDate(null)
-			.bank(getEmptyItems())
-			.inventory(getEmptyItems())
-			.equipment(getEmptySlots())
-			.build();
 	}
 
 	public static ItemSharePlayer getEmptyPlayer(String name)

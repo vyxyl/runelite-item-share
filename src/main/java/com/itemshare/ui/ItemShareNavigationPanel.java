@@ -4,8 +4,8 @@ import static com.itemshare.constant.ItemShareConstants.ICON_SETTINGS;
 import static com.itemshare.constant.ItemShareConstants.SELECT_A_PLAYER;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.service.ItemShareAPIService;
+import com.itemshare.service.ItemShareLoadService;
 import com.itemshare.service.ItemSharePanelService;
-import com.itemshare.service.ItemSharePlayerService;
 import java.awt.event.ItemEvent;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -82,6 +82,6 @@ public class ItemShareNavigationPanel extends JPanel
 	private void loadEmptyPlayer(String playerName)
 	{
 		updateMessagePanel.updatePanel(null);
-		playerPanel.update(ItemSharePlayerService.getEmptyPlayer(playerName));
+		playerPanel.update(ItemShareLoadService.getEmptyPlayer(playerName));
 	}
 }

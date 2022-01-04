@@ -2,9 +2,12 @@ package com.itemshare.db;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import static com.itemshare.constant.ItemShareConstants.AWS_GIM_STORAGE_API;
 import static com.itemshare.constant.ItemShareConstants.AWS_PLAYER_API;
 import static com.itemshare.constant.ItemShareConstants.AWS_PLAYER_NAMES_API;
 import static com.itemshare.constant.ItemShareConstants.AWS_X_API_KEY;
+import com.itemshare.model.ItemShareGIMStorage;
+import com.itemshare.model.ItemShareGIMStorageLite;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemSharePlayerLite;
 import com.itemshare.service.ItemShareDataService;
@@ -114,6 +117,64 @@ public class ItemShareAPI
 		}
 	}
 
+	public void getGIMStorage(String groupId, Consumer<ItemShareGIMStorage> result, Runnable onFailure)
+	{
+		try
+		{
+			if (!StringUtils.isEmpty(groupId))
+			{
+				Request request = buildGetGIMStorageRequest(groupId);
+
+				httpService.call(request,
+					json -> toGetGIMStorageResponse(json, result),
+					error -> {
+						logger.error("Failed to get GIM storage: " + error);
+						onFailure.run();
+					});
+			}
+			else
+			{
+				logger.error("Failed to get GIM storage: invalid request");
+				onFailure.run();
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to get GIM storage: " + e.getMessage());
+			onFailure.run();
+			e.printStackTrace();
+		}
+	}
+
+	public void saveGIMStorage(String groupId, ItemShareGIMStorage storage, Runnable result, Runnable onFailure)
+	{
+		try
+		{
+			if (!StringUtils.isEmpty(groupId) && storage != null)
+			{
+				Request request = buildSaveGIMStorageRequest(groupId, storage);
+
+				httpService.call(request,
+					json -> result.run(),
+					error -> {
+						logger.error("Failed to save GIM storage: " + error);
+						onFailure.run();
+					});
+			}
+			else
+			{
+				logger.error("Failed to save GIM storage: invalid request");
+				onFailure.run();
+			}
+		}
+		catch (Exception e)
+		{
+			logger.error("Failed to save GIM storage: " + e.getMessage());
+			e.printStackTrace();
+			onFailure.run();
+		}
+	}
+
 	private Request buildSavePlayerRequest(String groupId, ItemSharePlayer player)
 	{
 		return new Request.Builder()
@@ -141,9 +202,36 @@ public class ItemShareAPI
 			.build();
 	}
 
+	private Request buildSaveGIMStorageRequest(String groupId, ItemShareGIMStorage storage)
+	{
+		return new Request.Builder()
+			.url(AWS_GIM_STORAGE_API + "?groupId=" + groupId)
+			.addHeader("x-api-key", AWS_X_API_KEY)
+			.post(toSaveGIMStorageRequest(storage))
+			.build();
+	}
+
+	private Request buildGetGIMStorageRequest(String groupId)
+	{
+		return new Request.Builder()
+			.url(AWS_GIM_STORAGE_API + "?groupId=" + groupId)
+			.addHeader("x-api-key", AWS_X_API_KEY)
+			.get()
+			.build();
+	}
+
 	private RequestBody toSavePlayerRequest(ItemSharePlayer player)
 	{
 		ItemSharePlayerLite lite = ItemShareDataService.toPlayerLite((player));
+
+		return RequestBody.create(
+			MediaType.parse("application/json; charset=utf-8"),
+			gson.toJson(lite));
+	}
+
+	private RequestBody toSaveGIMStorageRequest(ItemShareGIMStorage storage)
+	{
+		ItemShareGIMStorageLite lite = ItemShareDataService.toGimStorageLite((storage));
 
 		return RequestBody.create(
 			MediaType.parse("application/json; charset=utf-8"),
@@ -157,6 +245,16 @@ public class ItemShareAPI
 		ItemShareState.clientThread.invokeLater(() -> {
 			ItemSharePlayer player = ItemShareDataService.toPlayer(lite, playerName);
 			result.accept(player);
+		});
+	}
+
+	private void toGetGIMStorageResponse(String json, Consumer<ItemShareGIMStorage> result)
+	{
+		ItemShareGIMStorageLite lite = gson.fromJson(json, ItemShareGIMStorageLite.class);
+
+		ItemShareState.clientThread.invokeLater(() -> {
+			ItemShareGIMStorage storage = ItemShareDataService.toGimStorage(lite);
+			result.accept(storage);
 		});
 	}
 
