@@ -29,8 +29,8 @@ This plugin gives players the ability to share their Equipment, Inventory, Bank,
 
 ### Sharing your Items
 * The plugin will automatically share your items with players in your group
-* However, it will only share items that the plugin _**has actually viewed**_
-* This applies to your `Inventory`, `Equipment`, `Bank`, and `Group Storage`
+  * However, it will only share items that the plugin _**has actually viewed**_
+  * This applies to your `Inventory`, `Equipment`, `Bank`, and `GIM Storage`
 * On first time installing this plugin, simply open your `Bank` and click the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
 * The `Sync Button` will manually save your items for other players in your group to see
 * Your items will also be automatically saved every 10 minutes
@@ -39,7 +39,7 @@ This plugin gives players the ability to share their Equipment, Inventory, Bank,
 * To view other player items, simply select the player from the dropdown
 
   ![image info](./src/main/resources/screenshots/player-dropdown.png)
-* Click on any of the item tabs
+* And click on any of the item tabs
 
   ![image info](./src/main/resources/screenshots/view-items.png)
 
@@ -48,8 +48,8 @@ This plugin gives players the ability to share their Equipment, Inventory, Bank,
 ### Misc.
 * Clicking any item icon navigate you to the wiki page for that item
 * You can enable the GIM Storage item tab from your settings
-    * Note: only 1 GIM Storage is saved per group
-    * If multiple players belong to different GIM groups, the last saved storage will be visible
+    * Note: only **1** GIM Storage is saved per group
+    * If multiple players belong to different GIM groups, then the last saved storage will be visible
 
 ## Feature requests or Reporting a bug
 
