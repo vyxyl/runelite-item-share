@@ -42,6 +42,8 @@ This plugin gives players the ability to share their Equipment, Inventory, Bank,
 
   ![image info](./src/main/resources/screenshots/view-items.png)
 
+* If their saved items are not showing up you can try hitting the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
+
 ## Feature requests or Reporting a bug
 
 If you have a feature request or have come across a bug, please [create an issue](https://github.com/vyxyl/item-share/issues/new)
