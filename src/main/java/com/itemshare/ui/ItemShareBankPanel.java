@@ -6,7 +6,7 @@ import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemShareRenderItem;
 import com.itemshare.service.ItemSharePanelService;
-import com.itemshare.service.ItemShareWikiService;
+import com.itemshare.service.ItemShareLinkService;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -187,7 +187,7 @@ public class ItemShareBankPanel extends JPanel
 					{
 						int index = list.locationToIndex(event.getPoint());
 						ItemShareRenderItem item = model.getElementAt(index);
-						ItemShareWikiService.goToWiki(item.getItem());
+						ItemShareLinkService.goToWiki(item.getItem());
 					}
 				}
 				catch (Exception e)

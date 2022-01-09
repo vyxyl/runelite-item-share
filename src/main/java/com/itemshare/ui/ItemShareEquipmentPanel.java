@@ -4,7 +4,7 @@ import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemShareSlots;
 import com.itemshare.service.ItemSharePanelService;
-import com.itemshare.service.ItemShareWikiService;
+import com.itemshare.service.ItemShareLinkService;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -139,12 +139,12 @@ public class ItemShareEquipmentPanel extends JPanel
 		label.setToolTipText(item.getName());
 
 		Arrays.stream(label.getMouseListeners()).forEach(label::removeMouseListener);
-		label.addMouseListener(ItemShareWikiService.getWikiMouseListener(item));
+		label.addMouseListener(ItemShareLinkService.getWikiMouseListener(item));
 
 		AsyncBufferedImage icon = ItemSharePanelService.getIcon(item);
 		icon.addTo(label);
 	}
-	
+
 	private void removeIcon(JPanel itemPanel)
 	{
 		JLabel label = (JLabel) itemPanel.getComponent(0);

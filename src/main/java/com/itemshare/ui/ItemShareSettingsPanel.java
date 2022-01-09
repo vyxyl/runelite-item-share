@@ -4,11 +4,12 @@ import static com.itemshare.constant.ItemShareConstants.CONFIG_BASE;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GIM_ENABLED;
 import static com.itemshare.constant.ItemShareConstants.CONFIG_GROUP_ID;
 import static com.itemshare.constant.ItemShareConstants.ICON_CLOSE;
+import static com.itemshare.constant.ItemShareConstants.ICON_EXIT;
+import static com.itemshare.constant.ItemShareConstants.ICON_HELP;
 import static com.itemshare.constant.ItemShareConstants.ICON_JOIN;
-import static com.itemshare.constant.ItemShareConstants.ICON_PLUS;
 import static com.itemshare.constant.ItemShareConstants.ICON_SHARE;
-import com.itemshare.service.ItemShareAPIService;
 import com.itemshare.service.ItemShareGroupIdService;
+import com.itemshare.service.ItemShareLinkService;
 import com.itemshare.service.ItemSharePanelService;
 import com.itemshare.service.ItemShareUIService;
 import com.itemshare.state.ItemShareState;
@@ -39,7 +40,8 @@ public class ItemShareSettingsPanel extends JPanel
 	private final ItemShareTitlePanel titlePanel;
 	private final JButton shareGroupButton;
 	private final JButton joinGroupButton;
-	private final JButton createGroupButton;
+	private final JButton leaveGroupButton;
+	private final JButton helpButton;
 
 	private final JCheckBox gimCheckbox;
 	private final JTextPane gimNote;
@@ -62,24 +64,29 @@ public class ItemShareSettingsPanel extends JPanel
 
 		ImageIcon joinIcon = ItemSharePanelService.loadIcon(ICON_JOIN);
 		ImageIcon shareIcon = ItemSharePanelService.loadIcon(ICON_SHARE);
-		ImageIcon newIcon = ItemSharePanelService.loadIcon(ICON_PLUS);
+		ImageIcon leaveIcon = ItemSharePanelService.loadIcon(ICON_EXIT);
+		ImageIcon helpIcon = ItemSharePanelService.loadIcon(ICON_HELP);
 
 		joinGroupButton = ItemSharePanelService.getButton(joinIcon, "Join Group", () -> onSettingClick(ItemShareSetting.JOIN_GROUP));
 		shareGroupButton = ItemSharePanelService.getButton(shareIcon, "Share Group", () -> onSettingClick(ItemShareSetting.SHARE_GROUP));
-		createGroupButton = ItemSharePanelService.getButton(newIcon, "Create Group", () -> showCreateGroupPopup(onClose));
+		leaveGroupButton = ItemSharePanelService.getButton(leaveIcon, "Leave Group", () -> showLeaveGroupPopup(onClose));
+		helpButton = ItemSharePanelService.getButton(helpIcon, "Help", ItemShareLinkService::goToReadme);
+
 		gimCheckbox = getGIMStorageCheckbox();
-		gimNote = ItemSharePanelService.getCenteredTextPane("\n*** Only one GIM storage is saved per group");
+		gimNote = ItemSharePanelService.getCenteredTextPane("\n*** Only one GIM Storage is saved and viewable at a time");
 
 		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		joinGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		shareGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-		createGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+		leaveGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+		helpButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		gimCheckbox.setAlignmentX(Component.LEFT_ALIGNMENT);
 		gimNote.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		ItemSharePanelService.setHeight(joinGroupButton, 30);
 		ItemSharePanelService.setHeight(shareGroupButton, 30);
-		ItemSharePanelService.setHeight(createGroupButton, 30);
+		ItemSharePanelService.setHeight(leaveGroupButton, 30);
+		ItemSharePanelService.setHeight(helpButton, 30);
 		ItemSharePanelService.setHeight(gimCheckbox, 30);
 		ItemSharePanelService.setHeight(gimNote, 60);
 
@@ -101,7 +108,7 @@ public class ItemShareSettingsPanel extends JPanel
 		return checkbox;
 	}
 
-	private void showCreateGroupPopup(Runnable onClose)
+	private void showLeaveGroupPopup(Runnable onClose)
 	{
 		JLabel line1 = new JLabel("This will assign you to a new group");
 		JLabel line2 = new JLabel("Are you sure?");
@@ -118,7 +125,7 @@ public class ItemShareSettingsPanel extends JPanel
 		message.add(line2);
 
 		int result = JOptionPane.showConfirmDialog(
-			this, message, "Create a New Group",
+			this, message, "Leave my current group",
 			JOptionPane.YES_NO_OPTION,
 			JOptionPane.WARNING_MESSAGE);
 
@@ -178,7 +185,9 @@ public class ItemShareSettingsPanel extends JPanel
 		add(ItemSharePanelService.getPadding(10));
 		add(joinGroupButton);
 		add(ItemSharePanelService.getPadding(10));
-		add(createGroupButton);
+		add(leaveGroupButton);
+		add(ItemSharePanelService.getPadding(10));
+		add(helpButton);
 		add(ItemSharePanelService.getPadding(20));
 		add(gimCheckbox);
 

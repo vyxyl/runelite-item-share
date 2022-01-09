@@ -1,4 +1,4 @@
-# Runelite Item Share plugin
+# Runelite Item Share Plugin
 
 This plugin gives players the ability to share their Equipment, Inventory, Bank, and GIM Storage within their invite-only group of players
 
@@ -28,12 +28,11 @@ This plugin gives players the ability to share their Equipment, Inventory, Bank,
 * You are now both in the same group!
 
 ### Sharing your Items
-* The plugin will automatically share your items with players in your group
+* The plugin will automatically share your items with players in your group every 10 minutes
     * However, it will only share items that the plugin _**has actually viewed**_
     * This applies to your `Inventory`, `Equipment`, `Bank`, and `GIM Storage`
 * On first time installing this plugin, simply open your `Bank` and click the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
 * The `Sync Button` will manually save your items for other players in your group to see
-* Your items will also be automatically saved every 10 minutes
 
 ### Viewing others' Items
 * To view other player items, simply select the player from the dropdown

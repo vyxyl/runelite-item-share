@@ -7,7 +7,7 @@ import net.runelite.client.util.LinkBrowser;
 import okhttp3.HttpUrl;
 import org.apache.commons.lang3.StringUtils;
 
-public class ItemShareWikiService
+public class ItemShareLinkService
 {
 	public static MouseAdapter getWikiMouseListener(ItemShareItem item)
 	{
@@ -30,6 +30,18 @@ public class ItemShareWikiService
 				urlBuilder.addPathSegments("w/Special:Lookup").addQueryParameter("name", item.getName());
 				LinkBrowser.browse(urlBuilder.build().toString());
 			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static void goToReadme()
+	{
+		try
+		{
+			LinkBrowser.browse(HttpUrl.parse("https://github.com/vyxyl/item-share#readme").newBuilder().build().toString());
 		}
 		catch (Exception e)
 		{

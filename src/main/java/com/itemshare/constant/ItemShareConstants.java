@@ -23,6 +23,8 @@ public class ItemShareConstants
 	public static final String ICON_RELOAD = "/custom-icons/reload.png";
 	public static final String ICON_SHARE = "/custom-icons/share.png";
 	public static final String ICON_PLUS = "/custom-icons/plus.png";
+	public static final String ICON_EXIT = "/custom-icons/exit.png";
+	public static final String ICON_HELP = "/custom-icons/help.png";
 
 	public static final String AWS_X_API_KEY = "IlJzFmPQQA8XBaihKSucd2bXsXgnot4l2NiWCkQP";
 	public static final String AWS_BASE_URL = "https://f0r2noiv31.execute-api.us-east-1.amazonaws.com/dev";
