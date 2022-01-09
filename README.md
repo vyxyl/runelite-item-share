@@ -50,6 +50,6 @@ This plugin gives players the ability to share their Equipment, Inventory, Bank,
     * Note: only **1** GIM Storage is saved per group
     * If multiple players belong to different GIM groups, then the last saved storage will be visible
 
-## Feature requests or Reporting a bug
+## Feature Requests or Reporting a bug
 
-If you have a feature request or have come across a bug, please [create an issue](https://github.com/vyxyl/item-share/issues/new)
+If you have a feature request or have experienced any bugs, please [create an issue](https://github.com/vyxyl/item-share/issues/new) and add any necessary details
