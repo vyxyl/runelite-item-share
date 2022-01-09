@@ -6,7 +6,7 @@ This plugin gives players the ability to share their Equipment, Inventory, Bank,
 
 ### Installation
 * Install the Item Share plugin from the Runelite Plugin Hub
-* You should then see the item share icon appear in the Runelite sidebar 
+* You should then see the item share icon appear in the Runelite sidebar
 * At this stage you are currently assigned to an empty group
 
   ![image info](./src/main/resources/screenshots/install.png)
@@ -14,7 +14,7 @@ This plugin gives players the ability to share their Equipment, Inventory, Bank,
 ### Joining a group
 * You can either invite players to your group or join someone else's group
 * In either case, if you click the `Settings Button` ![image info](./src/main/resources/screenshots/settings-icon.png)
-  
+
   ![image info](./src/main/resources/screenshots/settings.png)
 * Click `Share Group`
 
@@ -29,8 +29,8 @@ This plugin gives players the ability to share their Equipment, Inventory, Bank,
 
 ### Sharing your Items
 * The plugin will automatically share your items with players in your group
-  * However, it will only share items that the plugin _**has actually viewed**_
-  * This applies to your `Inventory`, `Equipment`, `Bank`, and `GIM Storage`
+    * However, it will only share items that the plugin _**has actually viewed**_
+    * This applies to your `Inventory`, `Equipment`, `Bank`, and `GIM Storage`
 * On first time installing this plugin, simply open your `Bank` and click the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
 * The `Sync Button` will manually save your items for other players in your group to see
 * Your items will also be automatically saved every 10 minutes
@@ -46,7 +46,7 @@ This plugin gives players the ability to share their Equipment, Inventory, Bank,
 * If their saved items are not showing up you can try hitting the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
 
 ### Misc.
-* Clicking any item icon navigate you to the wiki page for that item
+* Clicking any item icon will navigate you to its wiki page
 * You can enable the GIM Storage item tab from your settings
     * Note: only **1** GIM Storage is saved per group
     * If multiple players belong to different GIM groups, then the last saved storage will be visible
