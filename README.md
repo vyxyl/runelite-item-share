@@ -2,6 +2,9 @@
 
 This plugin gives players the ability to share items in their `Equipment`, `Inventory`, `Bank`, and `GIM Storage` within their invite-only group of players
 
+## Feature Requests or Reporting a bug
+If you have a feature request or have experienced any bugs, please [create an issue](https://github.com/vyxyl/item-share/issues/new) and add all necessary details
+
 ## Using the Plugin
 
 ### Installation
@@ -49,7 +52,3 @@ This plugin gives players the ability to share items in their `Equipment`, `Inve
 * You can enable the GIM Storage item tab from your settings
     * Note: only **1** GIM Storage is saved per group
     * If multiple players belong to different GIM groups, then the last saved storage will be visible
-
-## Feature Requests or Reporting a bug
-
-If you have a feature request or have experienced any bugs, please [create an issue](https://github.com/vyxyl/item-share/issues/new) and add any necessary details
