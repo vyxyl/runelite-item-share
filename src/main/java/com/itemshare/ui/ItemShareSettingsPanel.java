@@ -68,7 +68,7 @@ public class ItemShareSettingsPanel extends JPanel
 		shareGroupButton = ItemSharePanelService.getButton(shareIcon, "Share Group", () -> onSettingClick(ItemShareSetting.SHARE_GROUP));
 		createGroupButton = ItemSharePanelService.getButton(newIcon, "Create Group", () -> showCreateGroupPopup(onClose));
 		gimCheckbox = getGIMStorageCheckbox();
-		gimNote = ItemSharePanelService.getCenteredTextPane("\nYou can share items with anyone\n\nHowever, only one GIM storage is saved per group");
+		gimNote = ItemSharePanelService.getCenteredTextPane("\n*** Only one GIM storage is saved per group");
 
 		titlePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		joinGroupButton.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -81,7 +81,7 @@ public class ItemShareSettingsPanel extends JPanel
 		ItemSharePanelService.setHeight(shareGroupButton, 30);
 		ItemSharePanelService.setHeight(createGroupButton, 30);
 		ItemSharePanelService.setHeight(gimCheckbox, 30);
-		ItemSharePanelService.setHeight(gimNote, 100);
+		ItemSharePanelService.setHeight(gimNote, 60);
 
 		rebuild();
 	}
@@ -90,7 +90,7 @@ public class ItemShareSettingsPanel extends JPanel
 	{
 		boolean isGIMEnabled = Boolean.parseBoolean(ItemShareState.configManager.getConfiguration(CONFIG_BASE, CONFIG_GIM_ENABLED));
 
-		JCheckBox checkbox = new JCheckBox("GIM Storage", isGIMEnabled);
+		JCheckBox checkbox = new JCheckBox("Enable GIM Storage", isGIMEnabled);
 		checkbox.setSelected(isGIMEnabled);
 		checkbox.addItemListener(event -> {
 			ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GIM_ENABLED, checkbox.isSelected());
@@ -125,15 +125,12 @@ public class ItemShareSettingsPanel extends JPanel
 		if (result == JOptionPane.OK_OPTION)
 		{
 			String id = ItemShareGroupIdService.getNewId();
-
 			ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, id);
 			ItemShareState.groupId = id;
 
-			ItemShareAPIService.getPlayerNames(names -> {
-				ItemShareState.playerNames = names;
-				ItemShareUIService.update();
-				onClose.run();
-			});
+			ItemShareState.reset();
+
+			onClose.run();
 		}
 	}
 
@@ -184,7 +181,6 @@ public class ItemShareSettingsPanel extends JPanel
 		add(createGroupButton);
 		add(ItemSharePanelService.getPadding(20));
 		add(gimCheckbox);
-		add(ItemSharePanelService.getPadding(10));
 
 		if (isGIMEnabled)
 		{

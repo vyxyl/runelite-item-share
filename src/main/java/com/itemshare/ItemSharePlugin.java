@@ -132,6 +132,6 @@ public class ItemSharePlugin extends Plugin
 	private Timer getSaveTimer()
 	{
 		int repeatMs = (int) TimeUnit.MINUTES.toMillis(10);
-		return new Timer(repeatMs, event -> ItemShareAPIService.savePlayer());
+		return new Timer(repeatMs, event -> ItemShareAPIService.savePlayer(ItemShareUIService::update));
 	}
 }

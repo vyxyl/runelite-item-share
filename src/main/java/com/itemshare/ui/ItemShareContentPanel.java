@@ -18,10 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 public class ItemShareContentPanel extends JPanel
 {
 	private final ItemSharePlayerDropdownPanel playerDropdown = new ItemSharePlayerDropdownPanel();
-	private final ItemSharePlayerItemsPanel playerItemsPanel = new ItemSharePlayerItemsPanel();
 	private final ItemShareUpdateMessagePanel updateMessagePanel = new ItemShareUpdateMessagePanel();
+	private final ItemSharePlayerItemsPanel playerItemsPanel = new ItemSharePlayerItemsPanel(this::updateGIM);
 
-	protected ItemShareContentPanel(Runnable runnable)
+	protected ItemShareContentPanel(Runnable goToSettings)
 	{
 		super(false);
 
@@ -29,7 +29,7 @@ public class ItemShareContentPanel extends JPanel
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 
 		ImageIcon settingsIcon = ItemSharePanelService.loadIcon(ICON_SETTINGS);
-		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel("Item Share", settingsIcon, runnable);
+		ItemShareTitlePanel titlePanel = new ItemShareTitlePanel("Item Share", settingsIcon, goToSettings);
 
 		Border border = BorderFactory.createEmptyBorder(0, 0, 10, 0);
 
@@ -49,6 +49,11 @@ public class ItemShareContentPanel extends JPanel
 
 		playerDropdown.update();
 		playerDropdown.setItemListener(this::onPlayerSelected);
+	}
+
+	public void updateGIM(Boolean isGIMSelected)
+	{
+		updateMessagePanel.updateGIM(isGIMSelected);
 	}
 
 	private void onPlayerSelected(ItemEvent event)
@@ -75,13 +80,13 @@ public class ItemShareContentPanel extends JPanel
 
 	private void loadPlayer(ItemSharePlayer player)
 	{
-		updateMessagePanel.updatePanel(player);
+		updateMessagePanel.updatePlayer(player);
 		playerItemsPanel.update(player);
 	}
 
 	private void loadEmptyPlayer(String playerName)
 	{
-		updateMessagePanel.updatePanel(null);
+		updateMessagePanel.updatePlayer(null);
 		playerItemsPanel.update(ItemShareLoadService.getEmptyPlayer(playerName));
 	}
 }

@@ -7,7 +7,7 @@ import net.runelite.client.ui.PluginPanel;
 public class ItemSharePanel extends PluginPanel
 {
 	private final ItemShareSettingsPanel settingsPanel;
-	private final ItemShareContentPanel headerPanel;
+	private final ItemShareContentPanel contentPanel;
 
 	public ItemSharePanel()
 	{
@@ -16,24 +16,24 @@ public class ItemSharePanel extends PluginPanel
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-		headerPanel = new ItemShareContentPanel(this::showSettings);
+		contentPanel = new ItemShareContentPanel(this::showSettings);
 		settingsPanel = new ItemShareSettingsPanel(this::showItems);
 
 		add(settingsPanel);
-		add(headerPanel);
+		add(contentPanel);
 
 		showItems();
 	}
 
 	public void update()
 	{
-		headerPanel.update();
+		contentPanel.update();
 	}
 
 	private void showItems()
 	{
 		removeAll();
-		add(headerPanel);
+		add(contentPanel);
 
 		repaint();
 		revalidate();

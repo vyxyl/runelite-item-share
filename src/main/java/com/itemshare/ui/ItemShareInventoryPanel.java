@@ -10,6 +10,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 import javax.swing.JLabel;
@@ -63,6 +64,7 @@ public class ItemShareInventoryPanel extends JPanel
 	{
 		ItemShareItems inventory = player.getInventory();
 		List<ItemShareItem> items = inventory == null ? new ArrayList<>() : inventory.getItems();
+		clearItems();
 		updateItems(items);
 		repaint();
 	}
@@ -71,12 +73,17 @@ public class ItemShareInventoryPanel extends JPanel
 	{
 		if (items == null || items.size() <= 0)
 		{
-			IntStream.range(0, 28).forEach(this::removeIcon);
+			clearItems();
 		}
 		else
 		{
 			IntStream.range(0, items.size()).forEach(index -> updateItem(items, index));
 		}
+	}
+
+	private void clearItems()
+	{
+		IntStream.range(0, 28).forEach(this::removeIcon);
 	}
 
 	private void updateItem(List<ItemShareItem> items, int index)
@@ -102,6 +109,8 @@ public class ItemShareInventoryPanel extends JPanel
 	{
 		JLabel label = (JLabel) itemPanel.getComponent(0);
 		label.setToolTipText(item.getName());
+
+		Arrays.stream(label.getMouseListeners()).forEach(label::removeMouseListener);
 		label.addMouseListener(ItemShareWikiService.getWikiMouseListener(item));
 
 		AsyncBufferedImage icon = ItemSharePanelService.getIcon(item);

@@ -72,20 +72,22 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 	{
 		ItemShareAPIService.getPlayerNames(names -> {
 			ItemShareState.playerNames = names;
-			reselectPLayer();
+			reselectPlayer();
 		});
 	}
 
-	private void reselectPLayer()
+	private void reselectPlayer()
 	{
 		String selectedName = (String) dropdown.getSelectedItem();
 		model.setNames(ItemShareState.playerNames);
 
-		dropdown.setSelectedItem(SELECT_A_PLAYER);
-
 		if (ItemShareState.playerNames.contains(selectedName))
 		{
 			dropdown.setSelectedItem(selectedName);
+		}
+		else
+		{
+			dropdown.setSelectedItem(SELECT_A_PLAYER);
 		}
 	}
 
@@ -113,7 +115,7 @@ public class ItemSharePlayerDropdownPanel extends JPanel
 
 	public void update()
 	{
-		reselectPLayer();
+		reselectPlayer();
 		repaint();
 	}
 }

@@ -94,10 +94,8 @@ public class ItemShareJoinGroupPanel extends JPanel
 		{
 			ItemShareState.configManager.setConfiguration(CONFIG_BASE, CONFIG_GROUP_ID, trimmedValue);
 			ItemShareState.groupId = trimmedValue;
-			ItemShareAPIService.getPlayerNames(names -> {
-				ItemShareState.playerNames = names;
-				ItemShareUIService.update();
-			});
+
+			ItemShareState.reset();
 
 			statusTextPane.setText("Successfully Joined the Group!");
 		}

@@ -66,7 +66,7 @@ public class ItemShareDataService
 		{
 			return ItemShareGIMStorage.builder()
 				.items(new ArrayList<>())
-				.updatedDate(new Date())
+				.updatedDate(null)
 				.build();
 		}
 

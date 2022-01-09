@@ -12,10 +12,14 @@ import com.itemshare.state.ItemShareState;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import static java.awt.Image.SCALE_SMOOTH;
+import java.util.Objects;
+import java.util.function.Consumer;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import net.runelite.client.util.ImageUtil;
 
 public class ItemSharePlayerItemsPanel extends JPanel
@@ -27,7 +31,7 @@ public class ItemSharePlayerItemsPanel extends JPanel
 	ItemShareBankPanel bank;
 	ItemShareBankPanel gimStorage;
 
-	protected ItemSharePlayerItemsPanel()
+	protected ItemSharePlayerItemsPanel(Consumer<Boolean> isGIMSelected)
 	{
 		super(false);
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
@@ -44,13 +48,15 @@ public class ItemSharePlayerItemsPanel extends JPanel
 
 		tabs.setAlignmentX(CENTER_ALIGNMENT);
 
-		add(tabs, BorderLayout.NORTH);
-	}
+		tabs.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				isGIMSelected.accept(Objects.equals(gimStorage, tabs.getSelectedComponent()));
+			}
+		});
 
-	private ImageIcon getIcon(String path)
-	{
-		Image image = ImageUtil.loadImageResource(ItemSharePlugin.class, path);
-		return new ImageIcon(image.getScaledInstance(16, 16, SCALE_SMOOTH));
+		add(tabs, BorderLayout.NORTH);
 	}
 
 	public void update(ItemSharePlayer player)
@@ -99,5 +105,11 @@ public class ItemSharePlayerItemsPanel extends JPanel
 	private void removeGIMTab()
 	{
 		tabs.remove(gimStorage);
+	}
+
+	private ImageIcon getIcon(String path)
+	{
+		Image image = ImageUtil.loadImageResource(ItemSharePlugin.class, path);
+		return new ImageIcon(image.getScaledInstance(16, 16, SCALE_SMOOTH));
 	}
 }

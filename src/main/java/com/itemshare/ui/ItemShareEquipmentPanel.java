@@ -137,6 +137,8 @@ public class ItemShareEquipmentPanel extends JPanel
 	{
 		JLabel label = (JLabel) panel.getComponent(0);
 		label.setToolTipText(item.getName());
+
+		Arrays.stream(label.getMouseListeners()).forEach(label::removeMouseListener);
 		label.addMouseListener(ItemShareWikiService.getWikiMouseListener(item));
 
 		AsyncBufferedImage icon = ItemSharePanelService.getIcon(item);
