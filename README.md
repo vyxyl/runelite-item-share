@@ -10,7 +10,7 @@ If you have a feature request or have experienced any bugs, please [create an is
 ### Installation
 * Install the Item Share plugin from the Runelite Plugin Hub
 * You should then see the item share icon appear in the Runelite sidebar
-* At this stage you are currently assigned to an empty group
+* At this stage you are automatically assigned to a group with only yourself as a member
 
   ![image info](./src/main/resources/screenshots/install.png)
 
@@ -34,7 +34,7 @@ If you have a feature request or have experienced any bugs, please [create an is
 * The plugin will automatically share your items with players in your group every 10 minutes
     * However, it will only share items that the plugin _**has actually viewed**_
     * This applies to your `Inventory`, `Equipment`, `Bank`, and `GIM Storage`
-* On first time installing this plugin, simply open your `Bank` and click the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
+* On the first time installing this plugin, simply open your `Bank` and click the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
 * The `Sync Button` will manually save your items for other players in your group to see
 
 ### Viewing others' Items
@@ -47,8 +47,13 @@ If you have a feature request or have experienced any bugs, please [create an is
 
 * If their saved items are not showing up you can try hitting the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
 
+### GIM Storage
+* You can enable the GIM Storage item tab from your settings, by checking `Enable GIM Storage`
+
+  ![image info](./src/main/resources/screenshots/enable-gim.png)
+
+* Note: only **one** GIM Storage is saved per group
+* If multiple players belong to different GIM groups, then the last saved storage will be visible
+
 ### Misc.
 * Clicking any item icon will navigate you to its wiki page
-* You can enable the GIM Storage item tab from your settings
-    * Note: only **1** GIM Storage is saved per group
-    * If multiple players belong to different GIM groups, then the last saved storage will be visible
