@@ -56,4 +56,4 @@ If you have a feature request or have experienced any bugs, please [create an is
 * If multiple players belong to different GIM groups, then the last saved storage will be visible
 
 ### Misc.
-* Clicking any item icon will navigate you to its wiki page
+* Clicking any item icon will open its wiki page in your browser
