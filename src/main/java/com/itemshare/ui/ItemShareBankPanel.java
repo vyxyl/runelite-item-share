@@ -19,6 +19,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.AsyncBufferedImage;
 
@@ -49,7 +50,7 @@ public class ItemShareBankPanel extends JPanel
 		searchBox.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
 		searchBox.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 30));
-		searchBox.addListener(this::repaintItems);
+		searchBox.addListener(this::repaintSearchItems);
 
 		add(searchBox);
 	}
@@ -85,7 +86,7 @@ public class ItemShareBankPanel extends JPanel
 			setAllItems(items);
 		}
 
-		repaintItems();
+		repaintSearchItems();
 	}
 
 	private void removeAllItems()
@@ -127,7 +128,7 @@ public class ItemShareBankPanel extends JPanel
 		return ItemSharePanelService.getIcon(item);
 	}
 
-	private void repaintItems()
+	private void repaintSearchItems()
 	{
 		try
 		{
@@ -136,6 +137,11 @@ public class ItemShareBankPanel extends JPanel
 
 			remove(scrollPane);
 			add(scrollPane);
+
+			SwingUtilities.invokeLater(() -> {
+				scrollPane.getVerticalScrollBar().setValue(0);
+				scrollPane.getVerticalScrollBar().updateUI();
+			});
 
 			repaint();
 		}

@@ -47,6 +47,12 @@ If you have a feature request or have experienced any bugs, please [create an is
 
 * If their saved items are not showing up you can try hitting the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
 
+### Sync Button
+* The `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png) is pretty multipurpose
+  * Saves your items for other players to see
+  * Updates the dropdown with any new players that have joined your group
+  * Reloads the items for the currently selected player
+
 ### GIM Storage
 * You can enable the GIM Storage item tab from your settings, by checking `Enable GIM Storage`
 
