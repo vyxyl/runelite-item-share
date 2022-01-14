@@ -34,7 +34,9 @@ If you have a feature request or have experienced any bugs, please [create an is
 * The plugin will automatically share your items with players in your group every 10 minutes
     * However, it will only share items that the plugin _**has actually viewed**_
     * This applies to your `Inventory`, `Equipment`, `Bank`, and `GIM Storage`
+
 * On the first time installing this plugin, simply open your `Bank` and click the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
+
 * The `Sync Button` will manually save your items for other players in your group to see
 
 ### Viewing others' Items
@@ -48,6 +50,7 @@ If you have a feature request or have experienced any bugs, please [create an is
 * If their saved items are not showing up you can try hitting the `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png)
 
 ### Sync Button
+
 * The `Sync Button` ![image info](./src/main/resources/screenshots/sync-icon.png) is pretty multipurpose
   * Saves your items for other players to see
   * Updates the dropdown with any new players that have joined your group
@@ -63,3 +66,5 @@ If you have a feature request or have experienced any bugs, please [create an is
 
 ### Misc.
 * Clicking any item icon will open its wiki page in your browser
+
+* The server code is open source is available here: https://github.com/vyxyl/runelite-item-share-aws
