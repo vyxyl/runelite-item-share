@@ -1,6 +1,5 @@
 # Runelite Item Share Plugin
-
-This plugin gives players the ability to share items in their `Equipment`, `Inventory`, `Bank`, and `GIM Storage` within their invite-only group of players
+This plugin gives players the ability to share items from their `Equipment`, `Inventory`, `Bank`, and `GIM Storage` to other players within their invite-only group
 
 ## Feature Requests or Reporting a bug
 If you have a feature request or have experienced any bugs, please [create an issue](https://github.com/vyxyl/item-share/issues/new) and add all necessary details
