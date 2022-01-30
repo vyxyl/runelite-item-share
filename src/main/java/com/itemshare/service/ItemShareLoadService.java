@@ -20,7 +20,10 @@ public class ItemShareLoadService
 	{
 		if (StringUtils.isEmpty(ItemShareState.playerName))
 		{
-			ItemShareState.playerName = getClientPlayerName();
+			ItemShareState.clientThread.invokeLater(() -> {
+				Player player = ItemShareState.client.getLocalPlayer();
+				ItemShareState.playerName = player == null ? null : player.getName();
+			});
 		}
 		else if (ItemShareState.player == null && !isLoadingPlayer)
 		{
@@ -92,11 +95,5 @@ public class ItemShareLoadService
 	private static ItemShareItems getEmptyItems()
 	{
 		return ItemShareItems.builder().items(new ArrayList<>()).build();
-	}
-
-	private static String getClientPlayerName()
-	{
-		Player player = ItemShareState.client.getLocalPlayer();
-		return player == null ? null : player.getName();
 	}
 }

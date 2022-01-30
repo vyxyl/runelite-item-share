@@ -20,13 +20,15 @@ public class ItemShareContainerService
 
 	public static void loadContainer(InventoryID inventoryId)
 	{
-		ItemContainer container = ItemShareState.client.getItemContainer(inventoryId);
-		loadContainer(container);
+		ItemShareState.clientThread.invokeLater(() -> {
+			ItemContainer container = ItemShareState.client.getItemContainer(inventoryId);
+			loadContainer(container);
+		});
 	}
 
 	private static void loadContainer(ItemContainer container)
 	{
-		if (isLoadingAllowed())
+		if (isLoadingAllowed() && container != null)
 		{
 			if (container.getId() == InventoryID.BANK.getId())
 			{

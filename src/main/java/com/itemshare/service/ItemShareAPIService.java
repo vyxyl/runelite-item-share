@@ -22,13 +22,15 @@ public class ItemShareAPIService
 
 	public static void savePlayer(Runnable onSuccess, Runnable onFailure)
 	{
-		boolean isPlayerAvailable = ItemShareState.player != null;
-		boolean isSupportedWorld = ItemShareSupportedService.isSupportedWorld();
+		ItemShareState.clientThread.invokeLater(() -> {
+			boolean isPlayerAvailable = ItemShareState.player != null;
+			boolean isSupportedWorld = ItemShareSupportedService.isSupportedWorld();
 
-		if (isSupportedWorld && isPlayerAvailable)
-		{
-			ItemShareState.api.savePlayer(ItemShareState.groupId, ItemShareState.player, onSuccess, onFailure);
-		}
+			if (isSupportedWorld && isPlayerAvailable)
+			{
+				ItemShareState.api.savePlayer(ItemShareState.groupId, ItemShareState.player, onSuccess, onFailure);
+			}
+		});
 	}
 
 	public static void getPlayer(String playerName, Consumer<ItemSharePlayer> onSuccess)
