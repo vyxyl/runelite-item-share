@@ -22,7 +22,6 @@ public class ItemShareConstants
 	public static final String ICON_JOIN = "/custom-icons/join.png";
 	public static final String ICON_RELOAD = "/custom-icons/reload.png";
 	public static final String ICON_SHARE = "/custom-icons/share.png";
-	public static final String ICON_PLUS = "/custom-icons/plus.png";
 	public static final String ICON_EXIT = "/custom-icons/exit.png";
 	public static final String ICON_HELP = "/custom-icons/help.png";
 
