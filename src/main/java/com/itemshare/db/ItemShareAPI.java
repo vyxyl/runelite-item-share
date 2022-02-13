@@ -44,19 +44,19 @@ public class ItemShareAPI
 				httpService.call(request,
 					json -> result.run(),
 					error -> {
-						logger.error("Failed to save player: " + error);
+						logger.warn("Failed to save player: " + error);
 						onFailure.run();
 					});
 			}
 			else
 			{
-				logger.error("Failed to save player: invalid request");
+				logger.warn("Failed to save player: invalid request");
 				onFailure.run();
 			}
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to save player: " + e.getMessage());
+			logger.warn("Failed to save player: ", e);
 			e.printStackTrace();
 			onFailure.run();
 		}
@@ -73,17 +73,17 @@ public class ItemShareAPI
 				httpService.call(request,
 					json -> toGetPlayerResponse(json, playerName, result),
 					error -> {
-						logger.error("Failed to get player: " + error);
+						logger.warn("Failed to get player: " + error);
 					});
 			}
 			else
 			{
-				logger.error("Failed to get player: invalid request");
+				logger.warn("Failed to get player: invalid request");
 			}
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to get player: " + e.getMessage());
+			logger.warn("Failed to get player: ", e);
 			e.printStackTrace();
 		}
 	}
@@ -99,19 +99,19 @@ public class ItemShareAPI
 				httpService.call(request,
 					json -> result.accept(toGetPlayerNamesResponse(json)),
 					error -> {
-						logger.error("Failed to get player names: " + error);
+						logger.warn("Failed to get player names: " + error);
 						onFailure.run();
 					});
 			}
 			else
 			{
-				logger.error("Failed to get player names: invalid request");
+				logger.warn("Failed to get player names: invalid request");
 				onFailure.run();
 			}
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to get player names: " + e.getMessage());
+			logger.warn("Failed to get player names: ", e);
 			e.printStackTrace();
 			onFailure.run();
 		}
@@ -128,19 +128,19 @@ public class ItemShareAPI
 				httpService.call(request,
 					json -> toGetGIMStorageResponse(json, result),
 					error -> {
-						logger.error("Failed to get GIM storage: " + error);
+						logger.warn("Failed to get GIM storage: " + error);
 						onFailure.run();
 					});
 			}
 			else
 			{
-				logger.error("Failed to get GIM storage: invalid request");
+				logger.warn("Failed to get GIM storage: invalid request");
 				onFailure.run();
 			}
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to get GIM storage: " + e.getMessage());
+			logger.warn("Failed to get GIM storage: ", e);
 			onFailure.run();
 			e.printStackTrace();
 		}
@@ -157,19 +157,19 @@ public class ItemShareAPI
 				httpService.call(request,
 					json -> result.run(),
 					error -> {
-						logger.error("Failed to save GIM storage: " + error);
+						logger.warn("Failed to save GIM storage: " + error);
 						onFailure.run();
 					});
 			}
 			else
 			{
-				logger.error("Failed to save GIM storage: invalid request");
+				logger.warn("Failed to save GIM storage: invalid request");
 				onFailure.run();
 			}
 		}
 		catch (Exception e)
 		{
-			logger.error("Failed to save GIM storage: " + e.getMessage());
+			logger.warn("Failed to save GIM storage: ", e);
 			e.printStackTrace();
 			onFailure.run();
 		}

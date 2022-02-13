@@ -71,8 +71,9 @@ public class ItemSharePlugin extends Plugin
 		ItemShareState.itemManager = itemManager;
 		ItemShareState.configManager = configManager;
 		ItemShareState.api = api;
+		ItemShareState.navButton = ItemShareUIService.getNavButton();
 
-		toolbar.addNavigation(ItemShareUIService.getNavButton());
+		toolbar.addNavigation(ItemShareState.navButton);
 
 		ItemShareState.groupId = ItemShareGroupIdService.getGroupId();
 
@@ -92,6 +93,7 @@ public class ItemSharePlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
+		toolbar.removeNavigation(ItemShareState.navButton);
 		ItemShareAPIService.savePlayer(this::clearPlayer, this::clearPlayer);
 	}
 

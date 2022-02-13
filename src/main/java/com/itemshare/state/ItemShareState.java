@@ -11,6 +11,7 @@ import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.ui.NavigationButton;
 import org.apache.commons.lang3.StringUtils;
 
 public class ItemShareState
@@ -19,6 +20,7 @@ public class ItemShareState
 	public static ClientThread clientThread;
 	public static ItemManager itemManager;
 	public static ConfigManager configManager;
+	public static NavigationButton navButton;
 
 	public static ItemShareAPI api;
 
