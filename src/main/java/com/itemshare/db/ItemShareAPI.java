@@ -57,7 +57,6 @@ public class ItemShareAPI
 		catch (Exception e)
 		{
 			logger.warn("Failed to save player: ", e);
-			e.printStackTrace();
 			onFailure.run();
 		}
 	}
@@ -84,7 +83,6 @@ public class ItemShareAPI
 		catch (Exception e)
 		{
 			logger.warn("Failed to get player: ", e);
-			e.printStackTrace();
 		}
 	}
 
@@ -112,7 +110,6 @@ public class ItemShareAPI
 		catch (Exception e)
 		{
 			logger.warn("Failed to get player names: ", e);
-			e.printStackTrace();
 			onFailure.run();
 		}
 	}
@@ -142,7 +139,6 @@ public class ItemShareAPI
 		{
 			logger.warn("Failed to get GIM storage: ", e);
 			onFailure.run();
-			e.printStackTrace();
 		}
 	}
 
@@ -170,7 +166,6 @@ public class ItemShareAPI
 		catch (Exception e)
 		{
 			logger.warn("Failed to save GIM storage: ", e);
-			e.printStackTrace();
 			onFailure.run();
 		}
 	}

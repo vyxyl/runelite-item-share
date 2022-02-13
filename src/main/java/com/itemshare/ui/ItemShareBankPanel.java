@@ -1,5 +1,6 @@
 package com.itemshare.ui;
 
+import com.itemshare.db.ItemShareAPI;
 import com.itemshare.model.ItemShareGIMStorage;
 import com.itemshare.model.ItemShareItem;
 import com.itemshare.model.ItemShareItems;
@@ -22,6 +23,8 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.AsyncBufferedImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ItemShareBankPanel extends JPanel
 {
@@ -31,6 +34,8 @@ public class ItemShareBankPanel extends JPanel
 
 	private final JScrollPane scrollPane;
 	private final JList<ItemShareRenderItem> list;
+
+	private final Logger logger = LoggerFactory.getLogger(ItemShareAPI.class);
 
 	protected ItemShareBankPanel()
 	{
@@ -147,7 +152,7 @@ public class ItemShareBankPanel extends JPanel
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.warn("Failed to repaint bank items: ", e);
 		}
 	}
 
@@ -164,7 +169,7 @@ public class ItemShareBankPanel extends JPanel
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.warn("Failed to repaint bank item: ", e);
 		}
 	}
 
@@ -198,7 +203,7 @@ public class ItemShareBankPanel extends JPanel
 				}
 				catch (Exception e)
 				{
-					e.printStackTrace();
+					logger.warn("Failed to go to wiki on item click: ", e);
 				}
 			}
 		};

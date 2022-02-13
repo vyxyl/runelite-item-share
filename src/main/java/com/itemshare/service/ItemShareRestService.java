@@ -3,7 +3,6 @@ package com.itemshare.service;
 import java.io.IOException;
 import java.util.function.Consumer;
 import javax.inject.Inject;
-import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -50,7 +49,6 @@ public class ItemShareRestService
 					else
 					{
 						onFailure.accept(e.getMessage());
-						e.printStackTrace();
 					}
 				}
 				finally

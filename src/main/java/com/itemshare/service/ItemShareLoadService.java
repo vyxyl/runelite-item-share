@@ -1,5 +1,6 @@
 package com.itemshare.service;
 
+import com.itemshare.db.ItemShareAPI;
 import com.itemshare.model.ItemShareItems;
 import com.itemshare.model.ItemSharePlayer;
 import com.itemshare.model.ItemShareSlots;
@@ -10,11 +11,14 @@ import java.util.HashMap;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Player;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ItemShareLoadService
 {
 	private static boolean isLoadingPlayer = false;
 	private static boolean hasLoadedPlayerItems = false;
+	private static final Logger logger = LoggerFactory.getLogger(ItemShareAPI.class);
 
 	public static void loadPlayerData()
 	{
@@ -41,7 +45,7 @@ public class ItemShareLoadService
 			catch (Exception e)
 			{
 				isLoadingPlayer = false;
-				e.printStackTrace();
+				logger.warn("Failed to retrieve player: ", e);
 			}
 		}
 		else if (ItemShareState.player != null && !hasLoadedPlayerItems)
@@ -55,7 +59,7 @@ public class ItemShareLoadService
 			catch (Exception e)
 			{
 				hasLoadedPlayerItems = false;
-				e.printStackTrace();
+				logger.warn("Failed to retrieve player items: ", e);
 			}
 		}
 	}

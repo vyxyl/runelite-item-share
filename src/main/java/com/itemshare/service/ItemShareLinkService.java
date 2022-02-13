@@ -1,14 +1,19 @@
 package com.itemshare.service;
 
+import com.itemshare.db.ItemShareAPI;
 import com.itemshare.model.ItemShareItem;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import net.runelite.client.util.LinkBrowser;
 import okhttp3.HttpUrl;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ItemShareLinkService
 {
+	private static final Logger logger = LoggerFactory.getLogger(ItemShareAPI.class);
+
 	public static MouseAdapter getWikiMouseListener(ItemShareItem item)
 	{
 		return new MouseAdapter()
@@ -33,7 +38,7 @@ public class ItemShareLinkService
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.warn("Failed to navigate to oldschool runescape wiki: ", e);
 		}
 	}
 
@@ -45,7 +50,7 @@ public class ItemShareLinkService
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			logger.warn("Failed to navigate to readme: ", e);
 		}
 	}
 }
